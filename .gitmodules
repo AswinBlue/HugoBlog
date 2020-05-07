@@ -1,0 +1,11 @@
+[submodule "AswinBlue.github.io"]
+	path = AswinBlue.github.io
+	url = https://github.com/AswinBlue/AswinBlue.github.io
+	branch = master
+[submodule "public"]
+	path = public
+	url = https://github.com/AswinBlue/AswinBlue.github.io
+	branch = master
+[submodule "themes/hugo-notepadium"]
+	path = themes/hugo-notepadium
+	url = https://github.com/cntrump/hugo-notepadium.git
