@@ -6,7 +6,7 @@ tags = [
     "html",
     "webServer",
 ]
-categories = []
+categories = ["dev",]
 imgs = []
 cover = ""  # image show on top
 readingTime = true  # show reading time after article date

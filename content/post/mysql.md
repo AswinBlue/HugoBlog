@@ -6,7 +6,7 @@ tags = [
 "DB",
 "mysql",
 ]
-categories = []
+categories = ["dev",]
 imgs = []
 cover = ""  # image show on top
 readingTime = true  # show reading time after article date
@@ -40,7 +40,7 @@ USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으�
 - TABLE_NAME 테이블의 스키마 확인
 ``desc TABLE_NAME``
 - CSV파일 DB에 적용
-``LOAD DATA FROM LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
+``LOAD DATA LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
   - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다. 
 필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다. 
 
@@ -144,17 +144,29 @@ LONGBLOB(n) | 이진 데이터 타입 (최대 4294967295byte)
 
 ## 참조
 [데이터베이스 정규화 1NF, 2NF, 3NF, BCNF :: Deep Play](https://3months.tistory.com/193)
+
 [[MySQL] csv 파일을 직접 MySQL 테이블로 Import 하는 방법 (대용량 파일 import 팁) 주경야근](https://moonlighting.tistory.com/140)
+
 [Import CSV File Into MySQL Table](https://www.mysqltutorial.org/import-csv-file-mysql-table/)
+
 [DB - 데이터 타입/MYSQL](http://www.incodom.kr/DB_-_%EB%8D%B0%EC%9D%B4%ED%84%B0_%ED%83%80%EC%9E%85/MYSQL)
+
 [[MySQL] Warnings 발생 했을 때 경고 내용 보기 - Blog Goooood.net](http://blog.devez.net/277)
+
 [How to import CSV into mysql if values contains comma - Stack Overflow](https://stackoverflow.com/questions/31599622/how-to-import-csv-into-mysql-if-values-contains-comma)
+
 [[SQL] 테이블 합치기 (JOIN / UNION) : 네이버 블로그](https://blog.naver.com/PostView.nhn?blogId=horajjan&logNo=220465143567&parentCategoryNo=&categoryNo=10&viewDate=&isShowPopularPosts=true&from=search)
+
 [MySQL 계정 생성 관리 및 권한설정 :: 비실이의 개발공간](https://2dubbing.tistory.com/13)
+
 [[MySQL] ERROR 1044 (42000.. : 네이버블로그](https://blog.naver.com/maestrois/220486269515)
+
 [php - How can I make a key pair primary? - Stack Overflow](https://stackoverflow.com/questions/8376420/how-can-i-make-a-key-pair-primary)
+
 [MySQL 계정 변경 및 간단한 사용법 : 네이버 블로그](https://m.blog.naver.com/PostView.nhn?blogId=athena1028&logNo=20060725715&proxyReferer=https:%2F%2Fwww.google.com%2F)
+
 [MySQL 소개 및 기본 사용법 - 생활코딩](https://opentutorials.org/course/2136/12020)
+
 [MySQL ALTER TABLE 테이블 변경하기](https://nexthops.tistory.com/2)
 
 
