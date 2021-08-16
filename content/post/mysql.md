@@ -1,7 +1,7 @@
 +++
 title = "Mysql"
 date = 2020-07-02T20:29:29+09:00
-lastmod = 2020-07-02T20:29:29+09:00
+lastmod = 2021-08-16T14:15:00+09:00
 tags = [
 "DB",
 "mysql",
@@ -15,16 +15,18 @@ comments = false
 justify = false  # text-align: justify;
 single = false  # display as a single page, hide navigation on bottom, like as about page.
 license = ""  # CC License
-draft = false 
+draft = false
 +++
 
 # mysql
 
-## 명령어 
+## 명령어
 - ``$ mysql -p DB_NAME -u USER_NAME``
 사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행
 USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인 시도
 -u DB_NAME 옵션은 로그인 후 ``$use DB_NAME`` 과 같은 효과
+- 종료
+ ``EXIT``
 
 - DB 목록확인
  ``show databases``
@@ -41,42 +43,48 @@ USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으�
 ``desc TABLE_NAME``
 - CSV파일 DB에 적용
 ``LOAD DATA LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
-  - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다. 
-필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다. 
+  - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다.
+필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다.
 
-- 경고문 확인 
+- 경고문 확인
 `` SHOW WARNINGS\G ``
-  
-- 테이블 생성 명령 
+
+- 테이블 생성 명령
 ```
-  CREATE  TABLE 테이블이름 ( 
-    id  INT  NOT  NULL AUTO_INCREMENT, 
-    항목1 VARCHAR(255) NOT  NULL, 
-    항목2 DATE  NOT  NULL, 
-    항목3 DECIMAL(10 , 2 ) NULL, 
-    PRIMARY KEY (id) 
+  CREATE  TABLE 테이블이름 (
+    id  INT  NOT  NULL AUTO_INCREMENT,
+    항목1 VARCHAR(255) NOT  NULL,
+    항목2 DATE  NOT  NULL,
+    항목3 DECIMAL(10 , 2 ) NULL,
+    PRIMARY KEY (id)
   );
   ```
 
 ---
 문법 참조 : [http://tcpschool.com/mysql/mysql_basic_syntax](http://tcpschool.com/mysql/mysql_basic_syntax)
 
-- SELECT
-``SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건]``
+- SELECT : 테이블 검색
+``SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]``
   - 필드를 ','로 다중 선택
-  - 
+  - WHERE 문으로 특정 조건에 해당하는 레코드만 추출
+    - LIKE : 뒤에 와일드 카드 사용
+    - _ : 와일드카드로, '한 자리의 어떤 문자'를 의미한다.
+    - % : 와일드카드로, 정규식의 *과 같은 의미이다.
+    - NOT : 부정의 의미, !과 동일
+    - <> : !=와 같은 의미
+  - ORDER BY 문으로 검색 결과를 필드에 맞게 정렬
 - DELETE
 ``DELETE FROM 테이블 [WHERE 조건]``
   - 조건을 생략하면 테이블의 모든 데이터 삭제
 
-- DROP 
+- DROP : 테이블 삭제
 `` DROP DATABASE 데이터베이스``
 `` DROP TABLE 테이블``
 - INSERT
 `` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )``
 `` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )``
 
-- JOIN
+- JOIN : 테이블 융합
   1. 내부Join
      - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건``
      - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건``
@@ -84,10 +92,22 @@ USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으�
   2. 외부Join
       - LEFT Join
          - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
-         - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다. 
+         - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
       - RIGHT Join
          - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
-         - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다. 
+         - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
+
+ - GRANT : 권한 부여
+   - `` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; ``
+
+     - `ALL PRIVILEGES` : 모든 권한
+     - `my_db.*` : my_db의 모든 테이블
+     - `new_user` : 사용권한을 받을 유저(없을시 자동생성),
+     - `@localhost` : 로컬환경에서만 접속 가능
+     - `IDENTIFIED BY 'pswd'` : 비밀번호 pswd
+
+
+-----
 
 ## 데이터 타입
 
@@ -102,8 +122,8 @@ TEXT(n) | 문자열 데이터 타입(최대 65535byte)
 MEDIUMTEXT(n) | 문자열 데이터 타입(최대 16777215byte)
 LONGTEXT(n) | 문자열 데이터 타입(최대 4294967295byte)
  ---
- 
-   2. 숫자형 데이터 타입
+
+2. 숫자형 데이터 타입
 
 
 데이터 타입 | 설명
@@ -141,6 +161,15 @@ MEDIUMBLOB(n) | 이진 데이터 타입 (최대 16777215byte)
 LONGBLOB(n) | 이진 데이터 타입 (최대 4294967295byte)
 ---
 
+## C++연동 SDK
+- mysql cpp connector 라 불리는, C++ 코드로 mysql을 사용할 수 있는 SDK가 제공된다.
+- mysql과 mysqlx가 있는데, 전자는 RDB, 후자는 NoSQL이다.
+- 표준 docmument
+https://dev.mysql.com/doc/connector-cpp/8.0/en/connector-cpp-installation-source-distribution.html
+- guthub
+https://github.com/mysql/mysql-connector-cpp
+
+
 
 ## 참조
 [데이터베이스 정규화 1NF, 2NF, 3NF, BCNF :: Deep Play](https://3months.tistory.com/193)
@@ -168,5 +197,3 @@ LONGBLOB(n) | 이진 데이터 타입 (최대 4294967295byte)
 [MySQL 소개 및 기본 사용법 - 생활코딩](https://opentutorials.org/course/2136/12020)
 
 [MySQL ALTER TABLE 테이블 변경하기](https://nexthops.tistory.com/2)
-
-
