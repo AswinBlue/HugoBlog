@@ -1,35 +1,32 @@
-+++ 
++++
 title = "Nodejs"
 date = 2020-07-20T20:40:05+09:00
 lastmod = 2020-07-20T20:40:05+09:00
-tags = [ "nodejs", "webServer", ] 
-categories = ["dev",] 
+tags = [ "nodejs", "webServer", ]
+categories = ["dev",]
 imgs = []
 cover = "" # image show on top
-readingTime = true # show reading time after article date 
-toc = true 
-comments = false 
-justify = false # text-align: justify; 
-single = false # display as a single page, hide navigation on bottom, like as about page. 
-license = "" # CC License 
-draft = false 
+readingTime = true # show reading time after article date
+toc = true
+comments = false
+justify = false # text-align: justify;
+single = false # display as a single page, hide navigation on bottom, like as about page.
+license = "" # CC License
+draft = false
 +++
 
-# Nodejs
-- 패키지 생성
+# Node.js
 
-``npm init`` 
+## 기본 명령
+- `npm init` : 패키지 생성
+- `npm install` : 라이브러리 설치
+- `node main.js` : 실행(main.js)
+- `npx <package_name>` : 설치하지 않고 일회만 실행
+- `node main.js` : 패키지 실행 (main.js파일)
 
-- 라이브러리 설치
+## 구조
+- `main.js` : nodejs 실행시 실행할 메인 파일
 
-``npm install``
-
-- 실행(main.js)
-
-``node main.js``
-
-## main.js
-- nodejs 실행시 실행할 메인 파일
 ### 모듈 사용
 
 ``var express = require('express');``
@@ -51,7 +48,7 @@ draft = false
 
 ``    secret:"SECRET_CODE",`` -> 세션을 암호화 할 시드 설정
 
-``    resave:false,`` 
+``    resave:false,``
 
 ``    saveUninitialized:true``
 
@@ -100,7 +97,7 @@ draft = false
 
 
 ## edit.js
-- main 파일에서 라우팅을 위해 r_edit 변수에 연결시켜 사용하는 파일, ./route 폴더에 정리되어 있다. 
+- main 파일에서 라우팅을 위해 r_edit 변수에 연결시켜 사용하는 파일, ./route 폴더에 정리되어 있다.
 
 ``var express = require('express');`` -> express 모듈 사용
 
@@ -121,10 +118,10 @@ draft = false
 
 ### routing 설정
 
-``router.post('/:category/:product', function(req, res, next) {`` 
-- post 명령으로 / ... / ... 주소로 명령이 내려올 경우 function을 수행한다. 
-- main.js에서 r_edit을 'SERVER_ADDRESS/edit' 주소로 왔을 때 실행하도록 매핑해 놓았으므로, 'SERVER_ADDRESS/edit/AAA/BBB' 주소로 명령이 내려오면 해당 함수가 동작한다. 
-- AAA 자리에 들어가는 값은 req.params.category 로 참조 가능하며, BBB는 req.params.product로 참조 가능하다. 
+``router.post('/:category/:product', function(req, res, next) {``
+- post 명령으로 / ... / ... 주소로 명령이 내려올 경우 function을 수행한다.
+- main.js에서 r_edit을 'SERVER_ADDRESS/edit' 주소로 왔을 때 실행하도록 매핑해 놓았으므로, 'SERVER_ADDRESS/edit/AAA/BBB' 주소로 명령이 내려오면 해당 함수가 동작한다.
+- AAA 자리에 들어가는 값은 req.params.category 로 참조 가능하며, BBB는 req.params.product로 참조 가능하다.
 
 
 ``router.get('/:TLV', function(req, res, next) {`` -> get 명령은 router.get으로 설정 가능하다.
@@ -134,21 +131,21 @@ draft = false
 
 
 ### session 설정
-``    if (req.session.user) {`` 
+``    if (req.session.user) {``
 
-- main.js에서 session을 사용하였으므로 req.session으로 session에 담긴 변수들을 참조 가능하다. 
-- req.session.user 값이 있으면 아래 내용을 수행한다는 코드이다. 
-- 값을 집어넣을 때에도 ``req.session.val = 1`` 과 같이 사용 가능하다. 
+- main.js에서 session을 사용하였으므로 req.session으로 session에 담긴 변수들을 참조 가능하다.
+- req.session.user 값이 있으면 아래 내용을 수행한다는 코드이다.
+- 값을 집어넣을 때에도 ``req.session.val = 1`` 과 같이 사용 가능하다.
 
 ### DB 사용
 
-``       var mysql = require('mysql');`` -> mysql 모듈을 사용한다. 
+``       var mysql = require('mysql');`` -> mysql 모듈을 사용한다.
 
-``        var db_config = require('../config/db_config.json');`` -> config 폴더 안에 db 접속에 필요한 내용을 저장해 놓았다. js 파일과 해당 내용을 분리하여 보안을 강화시킬 수 있다. db_config.json파일은 json 데이터를 담고 있다. 
+``        var db_config = require('../config/db_config.json');`` -> config 폴더 안에 db 접속에 필요한 내용을 저장해 놓았다. js 파일과 해당 내용을 분리하여 보안을 강화시킬 수 있다. db_config.json파일은 json 데이터를 담고 있다.
 
 ``        var connection = mysql.createConnection({`` -> mysql 연결 설정
 
-``            host : db_config.host,`` -> db_config_json 파일의 key를 참조하여 value를 대입한다. 
+``            host : db_config.host,`` -> db_config_json 파일의 key를 참조하여 value를 대입한다.
 
 ``            user : db_config.user,``
 
@@ -156,14 +153,14 @@ draft = false
 
 ``            database : db_config.database`` -> 사용할 DB 이름
 
-``        connection.connect();`` -> 연결을 수행한다. 
+``        connection.connect();`` -> 연결을 수행한다.
 
 ``        });``
 
-``            connection.query('UPDATE mytable SET name = ?, description = ?, price = ? where number = ?',[inputs.name, inputs.description, inputs.price, req.params.category], function (error, results, fields) {`` -> 연결된 DB에 query를 날린다.  error는 오류정보, results는 DB 결과(row)를 array형태로 반환한다. 
+``            connection.query('UPDATE mytable SET name = ?, description = ?, price = ? where number = ?',[inputs.name, inputs.description, inputs.price, req.params.category], function (error, results, fields) {`` -> 연결된 DB에 query를 날린다.  error는 오류정보, results는 DB 결과(row)를 array형태로 반환한다.
 - query 안에 query를 넣으면 오류가 난다. 완료 후 다음 query를 진행하도록 하자.
 
-``                console.log(this.sql);`` -> 함수 안에서 this.sql을 호출하면 query 내용을 참조할 수 있다. 
+``                console.log(this.sql);`` -> 함수 안에서 this.sql을 호출하면 query 내용을 참조할 수 있다.
 
 ``                if (error) {`` -> 에러가 발생한 경우
 
@@ -179,37 +176,37 @@ draft = false
 
 
 ``    connection.query("SELECT * FROM user WHERE User=? AND authentication_string=PASSWORD(?)", [id, pswd], function (error, results, fields) {``
-- PASSWORD() 함수는 mysql의 user DB에서 사용자의 비밀번호를 인코딩하여 authentication_string 컬럼에 해당하는 값으로 만드는 함수이다. 비밀번호를 넣으면 authentication_string값을 반환한다. 
+- PASSWORD() 함수는 mysql의 user DB에서 사용자의 비밀번호를 인코딩하여 authentication_string 컬럼에 해당하는 값으로 만드는 함수이다. 비밀번호를 넣으면 authentication_string값을 반환한다.
 
 
 ### html 페이지 연결
-- routing 함수에서 받은 요청에 대해 redirect를 할 수도 있고, render로 파일을 열 수도 있다. 
+- routing 함수에서 받은 요청에 대해 redirect를 할 수도 있고, render로 파일을 열 수도 있다.
 
-``res.redirect('/edit/' + req.params.TLV);`` -> 설정한 주소로 페이지를 리다이렉트 한다. 
+``res.redirect('/edit/' + req.params.TLV);`` -> 설정한 주소로 페이지를 리다이렉트 한다.
 
-``res.render('login.html', {url: target});`` -> url이란 키로 target 이라는 변수에 담긴 data를 login.html에 전달한다. html 파일에서는 url 이란 변수로 target값을 사용 가능하다. 
+``res.render('login.html', {url: target});`` -> url이란 키로 target 이라는 변수에 담긴 data를 login.html에 전달한다. html 파일에서는 url 이란 변수로 target값을 사용 가능하다.
 
 ### html 페이지 연동
-- html 페이지에서 form에 넣어서 보낸 내용은 bodyParser 모듈로 파싱하면 'req.body.변수이름' 으로 참조 가능하다. 
+- html 페이지에서 form에 넣어서 보낸 내용은 bodyParser 모듈로 파싱하면 'req.body.변수이름' 으로 참조 가능하다.
 
 ``           var inputs = {`` -> 내용을 받아 json 형태로 저장
 
-``                "relation": req.body.relation,`` -> html파일의 form 태그의 input 태그중 name="relation"인 태그의 value 값을 참조 
+``                "relation": req.body.relation,`` -> html파일의 form 태그의 input 태그중 name="relation"인 태그의 value 값을 참조
 
 ``                "number": req.body.name}``
 
 
 ## index.html
-- ejs모듈을 사용하여 설정한 대로 view 폴더 내에 생성한다. 
-- static 설정을 마쳤기 때문에 js 파일이나 css 파일들은 미리 설정해둔 '/static' 폴더 내에서 참조 가능하다. 
+- ejs모듈을 사용하여 설정한 대로 view 폴더 내에 생성한다.
+- static 설정을 마쳤기 때문에 js 파일이나 css 파일들은 미리 설정해둔 '/static' 폴더 내에서 참조 가능하다.
 
 ``       <script type="text/javascript" src="/static/edit_func.js"></script>`` -> static 파일 호출 방법
 
-- html 안에서 nodejs 문법을 사용하려면 <% %> 안에서 사용하면 된다. 변수 값을 바로 반환하려면 <%= %> 를 사용한다. 
+- html 안에서 nodejs 문법을 사용하려면 <% %> 안에서 사용하면 된다. 변수 값을 바로 반환하려면 <%= %> 를 사용한다.
 
 ``            <% var ptr = 10 %>``  -> 변수 ptr 선언
 
-``            <% dataList.forEach(function(item, index) { %>``-> dataList의 항목들에 대해 수행, dataList는 routing function(route/index.js 안의 routing 함수)에서 ``res.render('index.html', {dataList: data});`` 로 전해준 데이터이다. 
+``            <% dataList.forEach(function(item, index) { %>``-> dataList의 항목들에 대해 수행, dataList는 routing function(route/index.js 안의 routing 함수)에서 ``res.render('index.html', {dataList: data});`` 로 전해준 데이터이다.
 
 ``                <% if (dataList[ptr].number != item.number) { %>`` -> if 함수 사용 가능, if문이 false라면 아래 내용은 출력되지 않음
 
@@ -239,7 +236,7 @@ draft = false
 
 ``                <% } %>``
 
-``                    <td><%= item.relation %></td>`` -> item.relation의 값을 반환, 즉 해당 값의 내용이 <td></td> 안에 출력된다. 
+``                    <td><%= item.relation %></td>`` -> item.relation의 값을 반환, 즉 해당 값의 내용이 <td></td> 안에 출력된다.
 
 ``                    <td><%= item.etc %></td>``
 
@@ -256,6 +253,3 @@ draft = false
 ``                </tr>``
 
 ``            <% }); %>``
-
-
-

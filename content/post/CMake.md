@@ -16,7 +16,8 @@ draft = false
 +++
 
 # CMake
-- C,C++ 언어 컴파일시 make 툴을 이용할 때, 규모가 큰 프로젝트에서 컴파일 의존성 관리를 쉽게 하기 위한 도구
+Cmake란 : C,C++ 언어 컴파일시 make 툴을 이용할 때, 규모가 큰 프로젝트에서 컴파일 의존성 관리를 쉽게 하기 위한 도구
+
 ## 명령어
 - `cmake CMakeList.txt` : CMakeList.txt파일 안의 내용을 수행한다.
 - `cmake .` : 파일 경로를 입력하면 해당 경로에서 CMakeList.txt파일을 찾아서 수행.
@@ -30,11 +31,20 @@ draft = false
   4. cmake ..
   5. make
   ```
--
+  - CmakeLists.txt 작성은 쉘 프로그래밍과 유사하다. cmake 문법을 사용하여 작성해 주면 된다. 미리 지정된 변수들도 있는데, 해당 변수들에 주의하며 작성한다.
 
 ## 문법
-- `ADD_EXECUTABLE(main.exe main.cpp function.cpp)` : 실행파일 생성
--
+- `ADD_EXECUTABLE` : 실행파일 생성
+ex) ``ADD_EXECUTABLE(main.exe main.cpp function.cpp)`` : main.cpp와 function.cpp를 사용해 main.exe를 생성한다. 헤더 파일은 자동으로 적용된다.
+
+- `TARGET` : 목표 생성물, 생성할 실행 파일을 의미한다. `add_executable()`, `add_library()`, `add_custom_target()` 등의 함수로 수정 가능하다.
+
+- `add_subdirectory` : 하위 디렉터리를 빌드 환경에 추가한다.
+ - `add_subdirectory`를 사용한 경우 find_package를 사용하지 않는다.
+
+- `add_dependencies` : subdirectory 이름을 사용하지 않고, add_library 혹은 add_executable로 생성한 이름을 첫번째 인자로 사용해야 한다.   
+ex) ``add_dependencies(<생성한 객체이름> <모듈1> <모듈2> ...)``   
+
 
 ## 참조
 https://nowonbun.tistory.com/712

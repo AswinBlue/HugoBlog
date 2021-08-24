@@ -1,5 +1,5 @@
 +++
-title = "Json in C++"
+title = "Linux commands"
 date = 2021-08-12T10:41:00+09:00
 lastmod = 2021-08-12T10:41:00+09:00
 tags = [ "linux", "sed",]

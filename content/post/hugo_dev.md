@@ -19,6 +19,8 @@ single = false  # display as a single page, hide navigation on bottom, like as a
 license = ""  # CC License
 +++
 
+# Hugo를 이용해 블로그 만들기
+
 Git과 markdown을 이용하여 git을 블로그처럼 이용하는 사람들이 있다는 것을 알았다.
 
 게다가 UI를 보기 좋게 꾸며줄 수 있는 툴들도 찾았는데, 그 중 Hugo를 사용해 보았다.
@@ -42,7 +44,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 
 -----
 
-# 링크
+## 링크
 
 1. hugo 환경설정 및 사용방법 가이드
 
@@ -71,8 +73,25 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 	https://gohugo.io/getting-started/installing/
 
 -----
+## 환경 세팅 (window)
+리눅스 환경세팅은 apt, yum을 이용하면 간단하게 수행 가능하여 생략한다.
+1. Go 언어를 설치한다.
+ - 설치파일로 받아서 설치하면 간단하다.
+ - 리눅스에 설치할 경우, apt를 사용하면 낮은 버전이 설치될 수 있으니 코드를 받아 설치하는걸 추천한다.
+2. Hugo를 설치한다.
+ - 압축파일 형태로 제공되며, 압축을 푼 후 path 설정만 해주면 된다.
+ - 리눅스의 경우 코드를 이용해 설치할 수 있다.
+3. git 레퍼지토리를 2개 생성한다.
+ - 한개는 글 작성용, 한개는 publish용이다.
+ - 작성용은 소스코드에 해당하며 publish용은 컴파일된 바이너리에 해당한다고 보면 된다.
+4. 프로젝트를 생성한다.
+ - `hugo new site <SITE>` 명령으로 새로운 hugo 프로젝트를 생성한다.
+5. 생성한 프로젝트를 git과 연동시킨다.
+ - 프로젝트 root디렉터리에 (3)에서 만든 소스용 git을 연동시킨다.
+ - /public 디렉터리에 (3)에서 만든 publish용 git을 연동시킨다.
+    - git 폴더 안에 git을 연동하려면 `git submodule add <URL>`명령어를 이용한다.
 
-# 기본 동작
+## 기본 동작
 
 새로운 Hugo 사이트를 생성하는 명령어, <NAME> 폴더 안에 Hugo 구조에 맞게 폴더 및 파일이 자동 생성된다.
 ```
@@ -95,5 +114,7 @@ public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
 ```
 hugo server [--theme <THEME_PATH>]
 ```
+
+내용이 마음에 든다면 git push를 하면
 
 Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.

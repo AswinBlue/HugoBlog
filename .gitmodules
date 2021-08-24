@@ -12,3 +12,6 @@
 [submodule "hugo-notepadium"]
 	path = hugo-notepadium
 	url = https://github.com/cntrump/hugo-notepadium.git
+[submodule "public/AswinBlue.github.io"]
+	path = public/AswinBlue.github.io
+	url = https://github.com/AswinBlue/AswinBlue.github.io
