@@ -82,7 +82,8 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
  - 압축파일 형태로 제공되며, 압축을 푼 후 path 설정만 해주면 된다.
  - 리눅스의 경우 코드를 이용해 설치할 수 있다.
 3. git 레퍼지토리를 2개 생성한다.
- - 한개는 글 작성용, 한개는 publish용이다.
+ - 한개는 글 작성용, 한개는 publish용이다. (이 경우, `<GITHUB_ID>.github.io` 이름으로 repository를 생성한다. 그렇지 않으면 정상동작하지 않는다.)   
+ `ex) github.com/AswinBlue/AswinBlue.github.io`
  - 작성용은 소스코드에 해당하며 publish용은 컴파일된 바이너리에 해당한다고 보면 된다.
 4. 프로젝트를 생성한다.
  - `hugo new site <SITE>` 명령으로 새로운 hugo 프로젝트를 생성한다.
@@ -115,6 +116,6 @@ public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
 hugo server [--theme <THEME_PATH>]
 ```
 
-내용이 마음에 든다면 git push를 하면
+내용이 완벽하다면 public 폴더 안의 git을 push 하면 `<GIT_ID>.github.io` 주소에서 방금 본 내용을 볼 수 있다. `ex : aswinblue.github.io`
 
 Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.

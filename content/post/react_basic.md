@@ -63,36 +63,9 @@ ReactDOM.render(
 1. 함수형, 클래스형
  - react는 함수형 방식과 클래스형 방식으로 작성할 수 있다. 최근에는 함수형 방식을 선호하는 추세이다.
 2. 다른 파일 참조
- - react에서 다른 파일을 참조할 때에는 'import'를 사용하며, 확장자가 없으면 '.js'가 생략된 것으로 본다.
+ - react에서 다른 파일을 참조할 때에는 'import'를 사용하며, 확장자가 없으면 '.js'가 생략된 것으로 본다.   
+ `import React, { Component } from "react"`는 기본으로 필요하다.
 3. html에서 예약어로 사용하는 태그들은 'synamtic tag'라 한다.
  - 'h1', 'header', 'nav', 'article' 등이 있다.
-
-[React advance]
-1. js파일에서 컴포넌트를 생성하여 html에 적용
- - 'Subject'라는 이름의 component를 생성해 본다.
- 1) class형태로 만들기
-```
-class Subject extends Component {
-    render() {
-	    return (
-			<header>
-				<h1>Hello</h1>
-			</header>
-        );
-    }
-}
-```
- 2) 함수 형태로 만들기
-```
-function Subject() {
-    return (
-	    <div>
-		    <h1>Hello</h1>
-		</div>
-	);
-}
-```
- - 'App.js'에서 `<Subject></Subject>` 와 같이 태그를 생성한다. (다른 파일에 선언했다면 해당 파일을 `App.js`에서 참조 필요)
- ※ 'App.js' 파일은 확장자가 js이지만 코드 문법은 javascript가 아니다.
-
-2. component를
+4. `export` : 특정 객체를 다른 파일에서 import할 수 있도록 한다.   
+ex) `export App`
