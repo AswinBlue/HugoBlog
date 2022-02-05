@@ -21,92 +21,145 @@ draft = false
 # mysql
 
 ## 명령어
-- ``$ mysql -p DB_NAME -u USER_NAME``
-사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행
-USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인 시도
--u DB_NAME 옵션은 로그인 후 ``$use DB_NAME`` 과 같은 효과
-- 종료
- ``EXIT``
+문법 참조 : [http://tcpschool.com/mysql/mysql_basic_syntax](http://tcpschool.com/mysql/mysql_basic_syntax)
 
-- DB 목록확인
- ``show databases``
+- 명령어에서 대소문자는 상관없다.
+- mysql에서 주석은 '#'을 사용한다.
 
-- DB 선택
- ``use DB_NAME``
+### 실행 및 로그인
+1. ``mysql``
+  - mysql 실행, 기본으로 설정된 user로 로그인됨
+2. ``mysql -u 아이디 -p``
+  - `-u`: 특정 아이디로 로그인
+  - `-p`: 로그인시 비밀번호 입력하도록
 
-- 현재 사용자 정보 확인
- ``select user()``
+### 데이터베이스 관리
+1. DB 생성
+   - UTF8 로 문자열 저장하기
+   ``CREATE DATABASE 데이터베이스_이름 default CHARACTER SET UTF8``
+1. DB 목록확인
+  ``show databases``
+1. DB 선택
+  ``use DB_NAME``  
+1. 종료
+  ``EXIT``
+1. 로그인 & 데이터베이스 선택
+ ``$ mysql -p DB_NAME -u USER_NAME``
+    - 사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행
+    - USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인 시도
+    - -u DB_NAME 옵션은 로그인 후 ``$use DB_NAME`` 과 같은 효과
 
-- 현재 DB 정보 확인
-``select databases()``
-- TABLE_NAME 테이블의 스키마 확인
+
+### 테이블 생성 및 관리
+1. TABLE_NAME 테이블의 스키마 확인
 ``desc TABLE_NAME``
-- CSV파일 DB에 적용
-``LOAD DATA LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
-  - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다.
-필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다.
 
-- 경고문 확인
-`` SHOW WARNINGS\G ``
-
-- 테이블 생성 명령
+1. CREATE : 테이블 생성
 ```
   CREATE  TABLE 테이블이름 (
     id  INT  NOT  NULL AUTO_INCREMENT,
-    항목1 VARCHAR(255) NOT  NULL,
+    항목1 VARCHAR(255) NOT  NULL DEFAULT 'FOO',
     항목2 DATE  NOT  NULL,
     항목3 DECIMAL(10 , 2 ) NULL,
     PRIMARY KEY (id)
-  );
-  ```
+  ) ENGINE-;
+```
+  - `NOT NULL`: 필수항목
+  - `AUTO_INCREMENT`: 수동으로 설정 가능하지만, 따로 설정하지 않으면 테이블 내 해당 컬럼에서 가장 큰 값에 1을 증가하여 자동으로 설정됨.
+  - `VARCHAR(#)`: 캐릭터형 #bit
+  - `DEFAULT` : 기본값, 따로 설정안할시 기본값은 NULL이 됨.
+  - `ENGINE`: 데이터 저장 구조
+    - MyISAM
+      - row level locking이 아닌 table level locking을 사용하기에, 한 테이블에 많은 접근이 이루어지면 속도가 느려짐
+      - select count(*) from TABLE 속도가 빠름
+    - InnoDB
+      - 풀 텍스트 인덱스를 지원하지 않고 속도가 약간 느림
+      - 트랜잭션을 지원함
+    [참조](https://chiccoder.tistory.com/24)
 
----
-문법 참조 : [http://tcpschool.com/mysql/mysql_basic_syntax](http://tcpschool.com/mysql/mysql_basic_syntax)
+1. DESC: 테이블 구조 확인
+``DESC 테이블``
+``DESCRIBE 테이블``
 
-- SELECT : 테이블 검색
+1. SELECT : 테이블 검색
 ``SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]``
-  - 필드를 ','로 다중 선택
-  - WHERE 문으로 특정 조건에 해당하는 레코드만 추출
-    - LIKE : 뒤에 와일드 카드 사용
-    - _ : 와일드카드로, '한 자리의 어떤 문자'를 의미한다.
-    - % : 와일드카드로, 정규식의 *과 같은 의미이다.
-    - NOT : 부정의 의미, !과 동일
-    - <> : !=와 같은 의미
-  - ORDER BY 문으로 검색 결과를 필드에 맞게 정렬
-- DELETE
+    - 필드를 ','로 다중 선택
+    - `WHERE` 문으로 특정 조건에 해당하는 레코드만 추출
+      - `LIKE` : 뒤에 와일드 카드 사용
+      - `_` : 와일드카드로, '한 자리의 어떤 문자'를 의미한다.
+      - `%` : 와일드카드로, 정규식의 *과 같은 의미이다.
+      - `NOT` : 부정의 의미, !과 동일
+      - `<>` : !=와 같은 의미
+    - `ORDER BY` 문으로 검색 결과를 필드에 맞게 정렬
+
+1. DELETE : 데이터 삭제
 ``DELETE FROM 테이블 [WHERE 조건]``
   - 조건을 생략하면 테이블의 모든 데이터 삭제
 
-- DROP : 테이블 삭제
+1. ALTER: 테이블 변경
+[참조](https://nexthops.tistory.com/2)
+- 컬럼 추가
+`` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형``
+- 컬럼 타입 변경
+`` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형``
+- 컬럼 이름 변경
+`` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형``
+- 컬럼 삭제
+`` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름``
+- Primary Key 설정
+`` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)``
+- Primary key 삭제
+`` ALTER TABLE 테이블이름 DROP PRIMARY KEY``
+- 테이블명 변경
+`` ALTER TABLE 테이블이름 RENAME 새테이블이름``
+- DB구조 변경
+`` ALTER TABLE 테이블 engine=InnoDB;``
+
+1. DROP : 테이블 삭제
 `` DROP DATABASE 데이터베이스``
 `` DROP TABLE 테이블``
-- INSERT
+
+1. INSERT : 행 추가
+- 원하는 필드만 설정, 설정 안한부분은 default값이 들어감
 `` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )``
+- 모든 필드를 설정할땐 컬럼 이름을 생략 가능
 `` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )``
 
-- JOIN : 테이블 융합
-  1. 내부Join
-     - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건``
-     - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건``
+1. JOIN : 테이블 융합
+    - 내부Join
+       - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건``
+       - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건``
 
-  2. 외부Join
-      - LEFT Join
-         - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
-         - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
-      - RIGHT Join
-         - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
-         - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
+    - 외부Join
+        - LEFT Join
+           - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
+           - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
+        - RIGHT Join
+           - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
+           - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
 
- - GRANT : 권한 부여
-   - `` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; ``
+### 유저 관리
+ 1. GRANT : 데이터베이스에 권한 부여
+    - `` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; ``
+       - `ALL PRIVILEGES` : 모든 권한
+       - `my_db.*` : my_db의 모든 테이블
+       - `new_user` : 사용권한을 받을 유저(없을시 자동생성),
+       - `@localhost` : 로컬환경에서만 접속 가능
+       - `IDENTIFIED BY 'pswd'` : new_user의 비밀번호를 pswd로 설정
+    - `flush privileges` 권한 즉시 적용
 
-     - `ALL PRIVILEGES` : 모든 권한
-     - `my_db.*` : my_db의 모든 테이블
-     - `new_user` : 사용권한을 받을 유저(없을시 자동생성),
-     - `@localhost` : 로컬환경에서만 접속 가능
-     - `IDENTIFIED BY 'pswd'` : 비밀번호 pswd
+### 기타 명령어
+   1. 현재 사용자 정보 확인
+   ``select user()``
+   1. 현재 DB 정보 확인
+   ``select databases()``
+   1. CSV파일 DB에 적용
+   ``LOAD DATA LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
+     - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다.
+   필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다.
 
- - `flush privileges` 권한 즉시 적용 
+   1. 경고문 확인
+   `` SHOW WARNINGS\G ``
 
 -----
 
@@ -160,6 +213,7 @@ TINYBLOB(n) | 이진 데이터 타입 (최대 255byte)
 BLOB(n) | 이진 데이터 타입 (최대 65535byte)
 MEDIUMBLOB(n) | 이진 데이터 타입 (최대 16777215byte)
 LONGBLOB(n) | 이진 데이터 타입 (최대 4294967295byte)
+
 ---
 
 ## C++연동 SDK
@@ -171,6 +225,7 @@ https://dev.mysql.com/doc/connector-cpp/8.0/en/connector-cpp-installation-source
 https://github.com/mysql/mysql-connector-cpp
 
 
+---
 
 ## 참조
 [데이터베이스 정규화 1NF, 2NF, 3NF, BCNF :: Deep Play](https://3months.tistory.com/193)
@@ -197,4 +252,4 @@ https://github.com/mysql/mysql-connector-cpp
 
 [MySQL 소개 및 기본 사용법 - 생활코딩](https://opentutorials.org/course/2136/12020)
 
-[MySQL ALTER TABLE 테이블 변경하기](https://nexthops.tistory.com/2)
+[(MySQL) 1장 시작하기. (DB 생성, 테이블 생성, SELECT) - 미래학자](https://futurists.tistory.com/11)
