@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>©2020 Notepadium.</copyright>
-    <lastBuildDate>Fri, 14 Jan 2022 21:52:14 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 02 Feb 2022 13:22:27 +0900</lastBuildDate>
     
         <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Cryptocurrency</title>
+      <link>/post/cryptocurrency/</link>
+      <pubDate>Wed, 02 Feb 2022 13:22:27 +0900</pubDate>
+      
+      <guid>/post/cryptocurrency/</guid>
+      <description>Cryptocurrency Cryptographic Hash function hash function은 아래와 같은 속성을 갖는다. 모든 크기의 String을 input 으로 받는다. 정해진 크기의 output을 생성한다. (bitcoi</description>
+      
+    </item>
     
     <item>
       <title>Golang</title>
@@ -178,7 +188,7 @@
       <pubDate>Thu, 02 Jul 2020 20:29:29 +0900</pubDate>
       
       <guid>/post/mysql/</guid>
-      <description>mysql 명령어 $ mysql -p DB_NAME -u USER_NAME 사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행 USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인</description>
+      <description>mysql 명령어 문법 참조 : http://tcpschool.com/mysql/mysql_basic_syntax 명령어에서 대소문자는 상관없다. mysql에서 주석은 &amp;lsquo;#&amp;lsquo;을 사용한다. 실행 및 로그인 mysql mysql 실행, 기본으</description>
       
     </item>
     
