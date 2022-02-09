@@ -115,7 +115,14 @@ public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
 ```
 hugo server [--theme <THEME_PATH>]
 ```
+서버 실행 후 http://localhost:1313 경로에서 웹 브라우저로 내용을 확인할 수 있다.
 
 내용이 완벽하다면 public 폴더 안의 git을 push 하면 `<GIT_ID>.github.io` 주소에서 방금 본 내용을 볼 수 있다. `ex : aswinblue.github.io`
 
 Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.
+
+## Adsense 추가
+구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
+1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `adsense.html` 파일을 만들고, 애드센스에 필요한 script를 붙여넣은 후 저장한다.
+1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
+1. `hugo -t 원하는_테마` 명령으로 다시 빌드하고, 서버에 push한다.
