@@ -88,7 +88,9 @@ draft = true
  - componentDidMount, componentWillUnmount 혹은 componentDidUpdate 와 유사한 효과를 발생시키며, 한 함수에서 여러번 선언 가능하다.
  - useEffect의 첫번째 인자로 함수가 들어가는데, 이 함수는 componentDidMount와 같은 시점에 동작된다.
  - useEffect의 첫번째 인자로 들어간 함수는 return값으로 함수를 반환하는데, 이 반환된 함수는 componentWillUnmount와 같은 시점에 동작된다.
- - useEffect의 두번째 인자로는 배열이 들어가는데, 이 배열 요소의 값이 바뀔경우 useEffect의 첫번째 인자로 들어간 함수를 실행시킨다. componentDidUpdate와 유사하게 특정 변수가 변할때 rerendering을 할 수 있다.
+ - useEffect의 두번째 인자로는 배열이 들어가고, 빈 배열을 넣을수도 있고, 값을 넣을수도 있다.
+   - 이 배열 요소의 값이 바뀔경우 useEffect의 첫번째 인자로 들어간 함수를 실행시킨다. (componentDidUpdate와 유사하게 특정 변수가 변할때 rerendering을 할 수 있다.)
+   - 또한, 이 배열 요소의 값이 바뀌기 직전, 첫번째 인자로 들어간 함수의 return 값이 실행된다.
  ```
      // return 없는 함수만 오는 경우
      useEffect( () => {
@@ -103,8 +105,12 @@ draft = true
      })
      // 두번쨰 인자가 들어간 경우
      useEffect( () => {
-       console.log("componentDidUpdate only when 'value' changes");
+       console.log("'value' changed");
+       return (
+         () => { console.log("value will be change")}
+       )
      }, [value])
+
  ```
  - class 의 componentdidMount와 같은 함수에 비해 간단하고 직관적으로 사용할 수 있다.
 
@@ -115,7 +121,7 @@ draft = true
 5. Custom Hooks
  - hook을 담고 있는 사용자 정의 함수를 custom hook이라 칭한다. 반복되는 hook 호출 + 일련의 처리 과정을 하나의 함수로 묶어서 사용할 수 있다.
  - 통념적으로 'use'로 시작하는 이름을 붙여준다.
- - 호출된 custom hook도 일반 hook과 마찬가지로 중복해서 사용이 가능하며 각 hook들 끼리는 독립적이다. 
+ - 호출된 custom hook도 일반 hook과 마찬가지로 중복해서 사용이 가능하며 각 hook들 끼리는 독립적이다.
 
 ## 기타
 - `debugger`라는 예약어는, chrome에서 실행할 때 break point역할을 한다. 개발시 코드로 break point를 설정할 수 있다.

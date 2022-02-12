@@ -243,6 +243,11 @@ var B = {...A} // 깊은복사 : one==1, two==2, three==3
 var C = {...A, three:30} // 깊은복사+값 할당 : one==1, two==2, three==30
 ```
 
+### promise
+- 비동기 처리시 사용하는 객체
+- promise 객체는 async와 wait를 이용한다.
+  - `async function f1() {}` : async 함수 선언, f1 함수는 비동기로 동작하고, 내부에 await 구문을 사용할 수 있다. 
+  - `const var = await f1()` : async 함수가 완료될 때 까지 대기하도록 await로 명시
 
 ## Component
 1. js파일에서 컴포넌트를 생성하여 html에 적용
