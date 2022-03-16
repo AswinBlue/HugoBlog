@@ -45,6 +45,8 @@ draft = true
 - 언마운트 단계의 메서드로는 다음이 존재한다.
   - `componentWillUnmount` : 컴퍼넌트가 브라우저상에서 사라지기 직전 호출되는 메서드
 
+---
+
 ## this
  - javascript 문법의 this와 동일하게 동작한다.
  - class 안에서는 this를 호출하면 class(컴퍼넌트)에 소속된 요소들에 접근할 수 있다.
@@ -64,6 +66,8 @@ draft = true
      }
    }
  ```
+
+---
 
 ## hook
 - class component에는 this.state가 있지만 function component 에서는 this.state가 없다. 대신 hook을 사용하여 동일한 기능을 수행한다.
@@ -123,9 +127,83 @@ draft = true
  - 통념적으로 'use'로 시작하는 이름을 붙여준다.
  - 호출된 custom hook도 일반 hook과 마찬가지로 중복해서 사용이 가능하며 각 hook들 끼리는 독립적이다.
 
+---
+
+## 각종 모듈
+### Router
+- SPA (Single Page Application) 에서 사용하지 않는 리소스를 로딩하느라 시간이 오래걸리는 것을 방지하기 위해, 소스를 분할처리하여 사용시에만 받을수 있게 하는 모듈
+- 설치 : `npm install react-router-dom`
+- 사용 :
+```
+import { HashRouter, Route, Routes, BrowserRouter} from "react-router-dom";
+const sample = () => {
+    return (
+        <HashRouter>
+          /* can add any components you want */
+          <Routes>
+          /* can only put 'Route' components in 'Routes' */
+          <Route path="/" element={<Home/>} />  // '/' 주소 호출시 Home component를 호출
+          <Route path="/about/*" element={<About/>} />  // 'about' 및 'about/...' 형태의 주소 호출시 About component 호출
+          /* add as you wish */
+          </Routes>
+        </HashRouter>
+    );
+};
+```
+- Route는 위에서부터 순차적으로 적용된다. if-else if 구문으로 생각하면 편하다.
+- 정규식 wild card `*`을 사용할 수 있다. (v5에서 exact 옵션 삭제되고 '*'로대체)
+### Link
+- 특정 페이지로 경로를 전환해 주는 기능을 한다.
+- react-router-dom 모듈 안에 포함되어있다.
+- `<a>` 태그와 동일한 역할을 하지만, React에서는 `<a>`를 사용하면 페이지를 새로 호출하여 React가 지니고 있던 상태들이 모두 초기화되기 때문에 `<a>` 태그 대신 link를 사용하는것이 맞다.
+- link는 페이지의 개념이고, button은 operation의 개념이다. 모두 event를 발생시킬 수 있지만 구분을 하는게 좋다.
+- 설치 : `npm install react-router-dom`
+- 사용 :
+```
+import { Link } from "react-router-dom";
+...
+<Link to="/">Root</Link> // 클릭하면 '/' 경로로 redirect 되는 Link 생성
+```
+### Redirect
+- react-router-dom에서 redirect를 지원하는 방법은 여러가지가 있다.
+1. Navigate 모듈
+- 사용 :
+```
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+...
+<HashRouter>
+  <Routes>
+    <Route path="/" element={<Home/>}
+    <Route path="/about" element={<About/>}
+    /* add as you wish */
+    <Route path="/index" element={<Navigate replace to="/" />} />  // 'index' 페이지를 '/' 경로로 redirect
+    <Route path="*" element={<Navigate to="/" />} />  // 위에서 설정되지 않은 경로에 대해서는 모두 '/'로 redirect
+  </Routes>
+</HashRouter>
+```
+1. useHistory
+- 사용 :
+```
+const history = useHistory();
+history.push("/");  // '/' 경로로 redirect
+```
+1. useNavigation
+- 사용 :
+```
+const navigation = useNavigation()
+navigation("/");  // '/' 경로로 redirect
+```
+
+### cross-env
+- 운영체제마다 환경변수 제공 방식이 달라 절대경로 표시가 어려웠던 점을 해결해주는 모듈
+- 설치 : `npm install cross-env --dev`
+
+
+---
+
 ## 기타
 - `debugger`라는 예약어는, chrome에서 실행할 때 break point역할을 한다. 개발시 코드로 break point를 설정할 수 있다.
-- link는 페이지의 개념이고, button은 operation의 개념이다. 모두 event를 발생시킬 수 있지만 구분을 하는게 좋다.
+
 
 ## 참조
 [React LifeCycle](https://devowen.com/307?category=778540)

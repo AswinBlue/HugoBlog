@@ -58,7 +58,8 @@ const data = await authService.signInWithEmailAndPassword(email, password)  // e
 authService.onAuthStateChanged((user) => { /* something to do */ }});
 ```
 1. 로그아웃
-- 개발시 강제로 로그아웃을 하고 싶다면, 크롬 웹 디버깅 화면에서 'Application'탭에 들어가서 IndexedDB -> firebaseLocalDb 안의 내용을 🚫버튼으로 삭제해 주면 로그인 정보가 사라진다.
+- `authService.signOut()` 함수를 호출하여 로그아웃이 가능하다.
+- 참고로 크롬 웹 디버깅 화면에서 'Application'탭에 들어가서 IndexedDB -> firebaseLocalDb 안의 내용을 🚫버튼으로 삭제해 주면 로그인 정보가 사라진다.
 
 1. 에러
 - `authService`의 함수(`createUserWithEmailAndPassword`, `signInWithEmailAndPassword`, ...) 사용시 에러가 발생할 수 있으므로, try, catch문으로 묶어서 사용한다.
@@ -67,7 +68,8 @@ try {
   let data
   data = await authService.createUserWithEmailAndPassword(email, password)
 } catch(error) {
-  console.log(error) // 에러의 원인이 메시지 형태로 출력된다.
+  console.log(error.code) // 에러의 원인이 코드 형태로 출력된다.
+  console.log(error.message) // 에러의 원인이 메시지 형태로 출력된다.
 }
 ```
   ref) 오류발생 원인

@@ -246,11 +246,12 @@ var C = {...A, three:30} // 깊은복사+값 할당 : one==1, two==2, three==30
 ### promise
 - 비동기 처리시 사용하는 객체
 - promise 객체는 async와 wait를 이용한다.
-  - `async function f1() {}` : async 함수 선언, f1 함수는 비동기로 동작하고, 내부에 await 구문을 사용할 수 있다. 
+  - `async function f1() {}` : async 함수 선언, f1 함수는 비동기로 동작하고, 내부에 await 구문을 사용할 수 있다.
   - `const var = await f1()` : async 함수가 완료될 때 까지 대기하도록 await로 명시
 
 ## Component
-1. js파일에서 컴포넌트를 생성하여 html에 적용
+- React는 js파일에서 정의한 컴포넌트를 html로 컴파일 한다.
+ex)
  - 'Subject'라는 이름의 component를 생성해 본다.
  - 생성된 'Subject'는 custom tag가 된다. HTML에서 tag를 호출하듯 사용 가능하다.
 
@@ -333,7 +334,7 @@ class App extends Component {
 -> App 컴퍼넌트가 생성되면 초기 설정된 state 값으로 Subject 컴퍼넌트를 생성한다.
 - index.js -> App.js -> Subject.js 순으로 호출이 이루어지는데, index.js에서는 App.js의 상태값을 알지 못한다. 즉, 부모에게 자신의 정보를 노출하지 않고 은닉한다.
 
-2. state로 배열 사용
+1. state로 배열 사용
 ```
   class App extends Component {
     constructor(props) {
@@ -382,8 +383,10 @@ class App extends Component {
 
 ※ react에서는 props나 state가 바뀌면, 이를 사용하는 하위 컴퍼넌트들의 `render()` 함수가 모두 다시 호출된다. 즉, 화면이 재구성된다.
 
-3. 조건문
-- `render()` 함수 안에서 javascript로 조건문 설정 가능
+### render
+- component 안의 `render()` 함수는 실제로 랜더링할 때 사용할 로직 및 html 형태를 반환한다.
+- `render()` 함수 안에서 javascript로 로직 구현이 가능하다.
+ex) 조건문
 ```
   class App extends Component {
     constructor(props) {
@@ -407,7 +410,17 @@ class App extends Component {
   }
 ```
 
-4. 이벤트   
+#### return
+- `render()` 함수의 return 값은 html 형태가 되어야 한다.
+- 하지만 return 안에서도 `{}` 구문 안에서 간단한 문법은 사용 가능하다.
+1. 조건문
+- 3항 연산자 : C, java의 3항 연산자와 동일
+`<span>{A ? "True" : "False"}</span>`
+- && : 앞의 내용이 참이면 뒤의 내용 수행
+`<span>{A && "True"}</span>`
+
+### 이벤트   
+- 버튼 클릭, 내용 변경 등 사건이 발생했을 때, 이벤트 함수가 호출된다.
 
  1) onClick
   - html에서 onclick은 'C'가 소문자이지만, react에서는 대문자이다.
