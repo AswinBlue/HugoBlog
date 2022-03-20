@@ -174,3 +174,89 @@ draft = false
     - 모든 사항이 확인되면 관리자에 의해 publish된다.
 
 -> double spending 문제는 해결했지만 centralization 문제가 발생한다. ('관리자' 가 중앙 체제에 해당)
+
+## Decentralization
+- Crypto currency를 구성하기 위해서는 탈 중앙화가 이루어져야 한다.
+- 앞서 보았듯이 거래 장부(transaction)를 관리하기 위해서는 이를 인증해 줄 주체가 필요했다. 이 주체를 분산시키는 것이 필요하다. (Distributed Consensus)
+
+### Dsitributed Consensus
+- 분산의 개념은 암호화 회폐 이전에 서버 동작에서도 논제가 되었다. 여러개의 서버가 병렬로 동작할 때, consistency를 유지하기 위해 distributed consensus protocol이 필요했다.
+- 방법중 하나로 distributed key-value store 방식이 있는데, DNS, public key directory, stock trade 등 여러 방면에서 사용되고 있고, altcoin에도 사용되고 있다.
+
+#### public consensus in crypto currency
+- 암호화 화폐에서는 transaction가 모여 block을 이루고, 이를 모아 block chain을 만든다.
+- block chain에 들어간 모든 block들은 consensus된 내용들이어야 한다.
+- transaction 하나를 consensus 해도 괜찮지만, block 단위로 consensus하여 효율을 높인다.
+- peer to peer 통신은 완벽하지 않기 때문에 여러개의 각기 다른 block들을 비교해야 한다.
+- 비교한 block들 중 특정 block을 block chain 에 추가하면, 어떤 transaction은 빠질 수도 있는데, 이는 다음번 consensus때 까지 대기해야 한다.
+  - Node간 충돌은 consensus protocol이 쉽지 않은 이유중 하나이다.
+  - 모든 Node들이 연결되어 있지 않기 때문에 Node간 충돌은 불가피하다.
+  - network latency 혹은 fault도 Node간 차이를 발생하는 원인이 된다.
+
+
+- Byzantine general problems 는 consensus problem 중 하나이다. Fischer-Lynch-Paterson impossibility result 라는 이름의 증명은 하나의 fault만 존재해도 consensus는 불가능하다는 것을 증명한 내용이다.
+- 그럼에도 불구하고 대표적인 consensus protocol들이 있다. 그중 하나는 Paxos 프로토콜이다.
+  - Paxo 프로토콜은 inconsistent 한 상황은 절대 발생시키지 않지만, 특정한 상황이 되면 dead-lock 처럼 로직이 멈춰 더이상 동작하지 않는 상태가 발생할 수 있다.
+
+- 현실 bitcoin에서는 이론에 비해 consensus가 더 잘 이루어지고 있다. 이론은 아직 실제 현상을 따라잡아 가는 형태이지만, 여전히 이론은 예상치 못한 공격에 대한 대응과 bitcoin 생태계에서의 확신을 주기 위한 존재로서 중요하다.
+
+- 현실의 bitcoin에서는 어떤점이 다른가?  
+  bitcoin에서는 insentive의 개념이 있다. 정직하게 활동한 참여자에게는 insentive를 줌으로써 시스템에 우호적으로 활동할 계기를 준다.
+- 이는 bitcoin이 currency의 개념이기 때문에 가능하며, 이번의 모든 distributed consensus system 에서는 없었던 개념이다.
+- insentive를 통해 bitcoin은 distributed consensus system를 근본적으로 해결하지 않았지만, 해결책을 찾은 셈이다.
+
+- consensus system은 즉각적이지 않고, consensus를 수행하는데도 약 1시간 정도가 소요된다. 하지만 시간이 지날수록 transaction이 반영되지 않거나 잘못될 확률은 exponential하게 줄어들게 된다.
+
+
+#### consensus without identity
+- bitcoin에서는 persistent long term identities 없이 consensus가 이루어진다. 즉, node를 칭할 수 있는 identity가 없다.
+- identity가 있다면 다음과 같은 이점이 있다.
+  1) 실용성(pragmatic) : 프로토콜에서 id를 이용한 로직을 사용할 수 있다.
+  2) 보안(security) : 특정 인물의 malicious한 행동을 tracking 가능하다.
+
+- 그럼에도 불구하고 bitcoin에서 identity를 사용하지 않는 이유는 p2p system의 한계 때문이다.
+  - p2p는 중앙 체제가 없기 때문에 인정받은 identity를 갖기 어렵다.
+  - bitcoin 자체가 현실의 identity를 사용하는 것을 원하지 않는다. (특정 node에서 이루어지는 transaction들은 구분할 수 있지만, 그 node가 현실의 누구 것인지는 알 수 없다.)
+  - 이러한 identity가 없는 특징 때문에 p2p network는 Sybil attack에 취약하다.
+    - Sybil attack : 한 명이 가상의 node들을 다수로 만들어 마치 여러 사람인 것 처럼 보이게 하는 것.
+
+##### weaker assumption
+- node마다 identity를 부여하고, 이 부여받은 identity를 검증하는 작업은 매우 복잡하다.
+- authenticated 된 identity를 부여하는 것 대신 랜덤한 token을 node에 부여한다.
+- token으로 특정 node를 구분할 수 있으며, 특정 사용자가 여러 node들을 만드려 할 경우 해당 node들에 동일한 token을 부여하는 방식으로 Sybil attack을 방지할 수도 있다.
+
+- implicit consensus : 매 round마다 random node가 선택되고, 이 node는 block chain에 들어갈 다음 block을 추천하는 방식.
+  - 이 추천은 일방적이며, consensus 알고리즘이나 투표같은게 없다.  
+  - 다른 node들은 implicitly 하게 이 block을 수락하거나 거절함으로써 malicious한 node의 행위를 막을 수 있다. implicitly 하다는 뜻은, 직접적으로 투표를 행하지는 않지만, 해당 block을 포함한 block chain을 사용하면 찬성하는 것이고, 그렇지 않다면 반대하는 것이다.
+    - block chain에서 특정 block은 마지막 block의 hash를 가지고 있기에 가능하다.
+
+- bitcoin에서 사용되는 consensus algorithm을 간단하게 살펴보면 아래와 같다.
+  1) 신규 transaction은 모든 node들에 broadcast된다.   
+  2) 각 node들은 transaction들을 모아 block을 구성한다.   
+  3) 매 round마다 random node가 선출되고, 그 node에서 생성한 block을 broadcast한다.   
+  4) 다른 node들은 (3)에서 전송된 block을 보고, valid(unspent, valid signature) 하다면 이를 수락한다.   
+  5) Node들은 다음번 만드는 block에다 (3)에서 전송된 block의 hash를 집어넣음으로써 implicit하게 수락을 표현할 수 있다. (그렇지 않으면 거절을 표현한 것)
+
+- 그렇다면 위 방식에 문제는 없을까?
+  - signature 설정 방식이 견고하다면, transaction을 위조할 수 없기 때문에 타인의 coin을 강제로 탈취할 수 없다.
+  - 특정 node가 valid 한 데이터를 계속 deny 하더라도, 해당 node가 다음 round에서 선택되지 않으면 transaction들은 정상적으로 올라가게 된다. 약간의 번거로움만 있을 뿐 전체 시스템에 치명적인 문제가 발생하지는 않는다.
+  - node가 수행할 수 있는 악의적인 행위로는 'double spending attack' 이 있다.
+
+- double spending attack
+  - block chain의 block1을 base로 A가 B에게 coin을 넘겨준 transaction [b1 : A -> B] 이 있다고 하자
+  - 이때, A가 악의적으로 A가 자신의 또다른 계정 A'에게 coin을 넘겨주었다는 거짓 transaction [b1 : A -> A'] 를 추가한다면, 정상적으로 수행된 [b1 : A -> B] transaction과 충돌이 발생한다. 즉, merge conflict가 발생하는 2개의 branch가 생성되는 것이다.
+  - 이는 moral distinction을 요하기 때문에 기술적으로 어렵다. node들은 대체로 먼저 들어온 block을 수락하고, 더 긴 branch를 정당한 branch로 취급한다.
+  - 조작된 transaction [b1: A -> A']이 든 block이 network 지연 등의 이슈로 인해 먼저 broadcast되고, 정당성을 확립하면 실제 transaction[b1 : A -> B] 는 orphan block이 되고, 네트워크에서 사라지게 된다.
+
+- 0 confirmation transaction
+  - double spending attack을 막기 위해, block chain에 내가 coin을 지불받는 transaction이 정상적으로 들어있는 것을 확인한 후 현실 세게에서 물건을 전달하는 방식
+  - 다른 node가 올린 block에서 내 transaction이 정상적으로 적용되었는지 확인할 수 있다. 해당 block 뒤에 더 많은 block이 붙을 수록 'long term consensus chain' 이 될 확률이 높아진다.
+  - double spending attack의 성공 확률은 confirmation의 횟수만큼 exponential 하게 줄어든다.   
+  ```
+  block chain의 형태가 아래와 같을 때,
+
+  [block1] - [block2] - [block3] - [block4] - [block5]
+  block3는 3 confirmation을 받은 상태이다.
+  block4는 2 confirmation을 받은 상태이다.
+  ```
+  - 일반적인 bitcoin에서는 transaction이 정상적으로 이루어진 것을 판단하기 위해서 6 confirmation을 확인한다. 이는 시간과 확률의 trade-off 관계에서 성립된 수치이다.
