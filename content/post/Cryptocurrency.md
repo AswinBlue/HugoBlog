@@ -260,3 +260,12 @@ draft = false
   block4는 2 confirmation을 받은 상태이다.
   ```
   - 일반적인 bitcoin에서는 transaction이 정상적으로 이루어진 것을 판단하기 위해서 6 confirmation을 확인한다. 이는 시간과 확률의 trade-off 관계에서 성립된 수치이다.
+
+
+#### honesty problematic
+- 우리는 탈 중앙화를 위해 랜덤한 node에서 block을 받아 block chain에 적용하기로 했다. 하지만 모든 node가 honest 한지에 대해서는 보장할 수 없다.
+- 각 node들은 현실 정보의 개인정보를 갖고있지 않기 때문에 block chain에 위해를 가하는(double spent 같은 공격) node를 처벌할 수 없다.
+- 대신 올바른 block들을 만들어주는 node들에 대해 보상을 주는 방법은 가능하다. 이는 block chain으로 구성된 내용이 가치를 가지는 crypto currency 이기 때문에 가능하다.
+
+##### incentive
+-
