@@ -453,7 +453,7 @@ x2 (w22)→ [가중합2 -> 활성화함수2]  →    yh2 (w42) → [가중합4 -
   - 은닉층의 가중치 업데이트를 델타식으로 표현하면  `w11(t+1) = w11 * t - δh * x1` 이다.
   - 델타식으로 표현하면 generic 한 형태로 식을 가져갈 수 있어 꼭 필요하다.
 
-  ---
+---
 
 ### 그래디언트 소실(gradient vanishing)
 - 다층 퍼셉트론을 사용할 때, 층이 많을 수록 데이터 분석 능력이 높아지지만, 실제로는 분석 증가량이 미미하다. 이는 활성화 함수 때문이다.  
@@ -477,6 +477,8 @@ x2 (w22)→ [가중합2 -> 활성화함수2]  →    yh2 (w42) → [가중합4 -
 - 단, xavier 방식은 좌우 대칭인 activation function 에서는 효과적이지만, relu와 같은 좌우 비대칭 형태의 activation function에서는 한쪽으로 치우친 결과값이 얻어진다.
 - 이때는 '카밍 히'의 이름을 따서 he 초기값을 사용한다.
   - `√2/n` 의 정규분포 값을 사용한다. (분포 범위를 더 넓게 잡는다)
+
+---
 
 ### 고속 옵티마이저
 - 옵티마이저란 경사하강법을 뜻한다. 고속 옵티마이저란 경사 하강법을 더 효율적으로 하는 방법이다.
@@ -526,6 +528,8 @@ x2 (w22)→ [가중합2 -> 활성화함수2]  →    yh2 (w42) → [가중합4 -
 - 데이터 형태에 따라 취해지는 패턴과 오차 그래프의 모양이 다르기 때문이다.
 - gradient descent, momentum, adagrid, adam, RMSprop 중 어느것이 효과가 좋은지 확인이 필요하다.
 
+---
+
 ### 다중 분류
 - 입력값을 기준으로 단순 0 또는 1을 판단하는게 아니라, 여러 class 중 하나로 분류하는 모델을 알아보자  
 - 출력 node 개수를 분류되는 항목 개수로 설정한다.
@@ -556,9 +560,108 @@ y_k = exp(a_k) / ∑<i=1,n> exp(a_i)
   - ex) 정답이 [0, 1] 이고, 결과가 [1, 0] 인 경우, `E = 0 * log1 + 1 * log0 = ∞`
   - ex) 정답이 [0, 1] 이고, 결과가 [0, 1] 인 경우, `E = 1 * log1 + 0 * log0 = 0`
 
+---
+
+### 오버피팅
+- 훈련 데이터에 지나치게 적응하여 훈련 그 외의 데이터에 대해서는 제대로 평가를 하지 못하는 경우를 일컫는다.
+- 학습 데이터를 통해 경향성만 추출해 내는 것이 가장 바람직한 학습 목표이다.
+- 오버피팅은 모든 데이터를 모으지 못하면 발생할 수 있다. (훈련 데이터가 적을 때)  
+  - 한쪽으로 편향된 데이터를 학습에 사용하거나, 노이즈를 일으키는 데이터를 사용한 경우에 발생할 수 있다.
+- 은닉층이 너무 많거나 각 층의 노드 수가 많아 변수가 복잡해지면 발생할 수 있다.
+- 테스트 셋과 학습 셋이 중복될 때 생기기도 한다.
 
 
+#### 데이터 처리 방법
+- 오버피팅을 줄이기 위해서 데이터를 조작하는 방법을 사용할 수 있다.
 
+1. 학습 데이터셋과 테스트 데이터셋을 구분해서 사용한다.
+- 학습 : 테스트 를 7:3 또는 8:2 정도로 사용하는 것이 일반적이다.
+
+1. 학습 데이터를 '학습' 데이터와 '검증' 데이터로 나눈다.
+- 학습 데이터를 이용하여 모델을 학습시킨다.
+- 학습을 시키면서 중간중간 검증 데이터를 이용하여 학습된 모델을 검증한다.
+- 데이터를 학습시킬수록 '학습' 데이터에 대한 오차는 점점 줄어들지만, '검증' 데이터에 대한 오차는 일정 구간이 되면 증가하게 된다.
+- '검증' 데이터 오차가 증가하는 시점이 over-fitting이 시작되는 구간이므로 학습을 중단한다.
+- '검증' 데이터는 학습에 사용되지 않고, 검증에만 사용됨에 주의한다.
+
+1. Dropout 규제 방법
+- 제프리 힌튼이 2012년에 제안한 방법
+- 매 훈련 step에서 일정 node를 훈련에서 무시하는 방법이다.
+ex) node = {n1, n2, n3, n4} 가 있다면, step 1에서는 n1, n2만 있는 것 처럼 동작하고, step 2에서는 n3, n4만 있는 것 처럼 동작하고 ...
+
+1. 데이터를 증식한다.
+- 관련 데이터를 모두 수집하는것이 최선이지만, 현실적으로 불가능하다.
+- 대신 데이터를 증식하는 방법을 사용한다. 데이터 증식이란, 실제와 같은 훈련 데이터를 생성한다.
+  - 데이터 증식은 인공적으로 만든 샘플과 실제 데이터를 구분할 수 없어야 한다.
+  - 백색소음(white noise)를 추가하는 것은 도움이 되지 않는다. 의미있는 학습 데이터가 필요하다.
+- 데이터 증식은 이미지 데이터를 처리할 때 매우 유용하다. 이미지는 확대, 축소, 이동, 회전, 반전 등을 통해 하나의 이미지로 여러 데이터를 만들 수 있다.
+
+
+#### K겹 교차 검증의 이해
+- 데이터 셋을 학습용과 테스트용으로 나누었을 경우, 테스트에 사용되는 데이터는 극히 일부밖에 되지 않는다
+- 데이터 셋을 k등분 하여, 테스트 셋과 학습 셋을 돌려가며 사용하는 방법을 k겹 교차검증이라 한다.
+  - 전체 데이터를 5개로 나누었다 가정하고, 나눈 데이터의 덩어리를 각각 d1, d2, d3, d4, d5라 하자
+  - 이때 d1을 테스트 데이터로 사용, 나머지를 훈련 데이터로 사용한 경우 결과를 R1이라 하자
+  - d2를 테스트 데이터로 사용, 나머지를 훈련 데이터를 사용한 경우 결과를 R2라 하자
+  - d3, d4, d5도 마찬가지로 하여 R3, R4, R5를 도출해 낸다.
+  - R1~R5를 모두 합치면 최종 결과가 나온다.
+  - 데이터를 5등분 했으므로, 위 방법은 5겹 교차검증이 된다.  
+
+```
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import StratifiedKFold
+
+import numpy
+import pandas as pd
+import tensorflow as tf
+
+numpy.random.seed(777)
+tf.random.set_seed(777)
+
+df = pd.read_csv('sonar.csv', header=None)
+
+dataset = df.values
+x_data = dataset[:,0:60].astype(float)
+y_data = dataset[:,60]
+
+# y_data를 one-hot 으로 처리해 준다.
+
+e = LabelEncoder()
+e.fit(y_data)
+y_data = e.transform(y_data)
+
+# k-fold 알고리즘을 사용할 객체를 형성한다.
+# n_splits : 10등분하여 사용할 것이다.
+# shuffle : 섞어서 사용할 수 있도록 허용
+# random_state : shuffle 사용시 사용할 랜덤한 seed 값
+
+n_fold = 10
+skf = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=48)
+
+accuracy = []
+
+# skf.split() 함수를 통해 x_data와 y_data를 k-fold 알고리즘에 맞게 분해하여 반환한다.
+# for문을 통해 데이터를 반복하여 학습을 수행한다.
+for train, test in skf.split(x_data, y_data):
+    # 모델을 구성한다.
+    # 활성함수로 sigmoid, 오차함수로 binary-binary_crossentropy를 사용할 것이다.
+    model = Sequential()
+    model.add(Dense(30, input_dim=60, activation='relu'))
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+    model.fit(x_data[train], y_data[train], epochs=100, batch_size=5)
+    k_accuracy = "%.3f" % (model.evaluate(x_data[test], y_data[test])[1])
+    accuracy.append(k_accuracy)
+
+print("\n %.f fold accuracy:" % n_fold, accuracy)
+# 결과값은 데이터에 따라 달라질 수 있다. 학습에 사용된 데이터가 편향되어 있는 경우 평가 결과가 떨어지는 모습을 볼 수 있다.
+# k-fold 알고리즘을 사용하면 이러한 경우를 예방할 수 있다.
+```
 
 
 
@@ -584,8 +687,6 @@ y_k = exp(a_k) / ∑<i=1,n> exp(a_i)
 2) 문자열로 된 class 값을 indexing 하고, one-hot-encoding으로 값을 변형해준다.  
 3) class의 개수에 맞게 출력층 node 개수를 설정한다.  
 4) 활성화 함수 및 오차방정식으로 softMax와 categorical cross-entropy를 적용한다.  
-
-
 
 ### 생성 방법
 1. tensorflow.keras.Sequential : Sequential 함수를 이용하는 방법

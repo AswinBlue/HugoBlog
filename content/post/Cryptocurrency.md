@@ -127,6 +127,8 @@ draft = false
   - address가 identity 속성을 갖게 하기 위해서는 다른 address들과 엮어야 하는데, observer가 주기적으로 이 동작을 수행하도록 해야한다.
   - address를 추적하면 address 명의로 수행한 행위들을 추출할 수 있는데, 이 내용으로 특정 개인을 추정할 수 있는 취약점이 있다.
 
+---
+
 ## Cryptocurrency
 - CryptoCurrency(이하 coin)에는 다음과 같은 조건이 필요하다.
 1. public key, unique coin id 를 이용해 coin을 만들 수 있어야 한다.
@@ -261,11 +263,68 @@ draft = false
   ```
   - 일반적인 bitcoin에서는 transaction이 정상적으로 이루어진 것을 판단하기 위해서 6 confirmation을 확인한다. 이는 시간과 확률의 trade-off 관계에서 성립된 수치이다.
 
-
 #### honesty problematic
 - 우리는 탈 중앙화를 위해 랜덤한 node에서 block을 받아 block chain에 적용하기로 했다. 하지만 모든 node가 honest 한지에 대해서는 보장할 수 없다.
 - 각 node들은 현실 정보의 개인정보를 갖고있지 않기 때문에 block chain에 위해를 가하는(double spent 같은 공격) node를 처벌할 수 없다.
 - 대신 올바른 block들을 만들어주는 node들에 대해 보상을 주는 방법은 가능하다. 이는 block chain으로 구성된 내용이 가치를 가지는 crypto currency 이기 때문에 가능하다.
 
-##### incentive
--
+
+### Incentive Algorithm
+- bitcoin은 decentralize를 위해 기술적인 부분(distributed consensus)과 incentive aoglrithm 을 사용한다.
+
+1. block reward
+- block chain의 규칙에 따라, block을 생성하는 node는 특수한 coin-creation transaction을 추가할 수 있다.
+- 이를 통해 coin을 생성하고, 그것을 자신의 계좌로 연결하여 수익을 얻을 수 있다.
+- bitcoin에서 현재(14.08) coin 생성 양은 25 코인으로 고정되어 있는데, 이는 매 4년마다 절반으로 줄어든다. 최초에는 50코인이었다.
+- coin-creation transaction은 다른 transaction과 마찬가지로 취급된다. transaction이 consensus chain에 들어가야 효력이 발생한다.
+  - 즉, 자신의 coin-creation transaction이 든 block이 consensus chain에 포함되려면, 다른 node들이 agree 할 만한 block을 base로 하여 block을 연결하는게 유리하다.
+  - 악의적인 node가 double-spending attack을 위해 길이가 긴 block-chain을 무시하고 임의의 block을 base로 하여 자신의 block을 연결한다면, 다른 node들은 그가 만든 block-chain을 reject 할 것이고, 그가 받는 보상은 무효화 될 것이다.
+  - 이러한 방식으로 node들이 honest하게 동작하도록 유도한다.
+- 새로운 bitcoin은 transaction시 발생하는 coin-creation transaction에 의해서만 생성되고, 현재 규칙이 계속 유지될 경우 2140에는 새로운 coin이 생성되지 않고 21 million 에서 수렴할 것이다.
+
+1. transaction fee
+- transaction을 생성하는 자는(거래를 하는 자) output value를 임의로 설정할 수 있다. (단, output value < input value)
+- 해당 transactio을 최초로 block에 넣는 node는 input-output 의 차액을 가져갈 수 있다.
+- transaction fee는 자발적이고, tip과 같은 느낌이지만, block reward가 점차 감소하는 시점에서 시스템을 유지하기 위해서는 필수적인 요소가 된다.
+
+
+- 이러한 시스템에서도 아직 해결안된 문제는 남아있다.
+1) 어떻게 random 한 node를 선택할 것인가  
+2) 보상을 위해 과도한 경쟁(free-for-all)을 하는 현상을 어떻게 막을 것인가  
+3) Sybil attack 의 방지(2번의 심화 형태)  
+- 위 세가지 문제점은 모두 연관되어 있고, 하나의 방법으로 해결 가능하다.
+
+#### Proof of work
+- 직접 random 한 node를 선택하는 대신, resource(computing power) 의 비율로 다음 node가 선택되게 하는 방법이다.
+- 즉, 각 node들이 각각의 computing power을 이용해 서로 경쟁하도록 하는 것이다.
+- 이러한 경쟁 방법을 Hash puzzle이라 부른다.
+  - block을 [nonce, previous hash, {Tx1, Tx2, ...}] 형태로 구성하도록 한다.
+  - nonce를 포함한 전체 block을 hash 로 취했을 때, 결과값 중 target space(일반적으로 1% 이하의 매우 작은 영역)가 특정한 값이 나오도록 해야한다. (target 값보다 작은 값이 되도록)
+  - hash function이 충분히 secure 하다면, nonce를 찾으려면 random한 nonce 값을 넣으며 계산을 시도해야 하며, 일반적으로 많은 computing power가 필요할 것이다.
+
+- 이를 통해 단순히 node의 숫자를 늘려서 다음 block을 선택할 기회를 얻을 확률을 높일 수 없게 되었다.
+- 또한 누군가가 랜덤한 block을 선출하는 것이 아닌, 경쟁과 확률을 통해 자연적으로 선출될 수 있도록 하였다.
+
+##### Proof of work의 속성
+1. Difficult to compute
+- hash puzzle을 푸는데는 현재(14.8) 기준 block당 약 10^20 hash를 계산해야 한다. (target space의 크기가 1/10^20 이란 의미)
+- 일반적인 PC로는 감당할 수 없고, 많은 양의 computing power을 사용하여야 하는 작업이다.
+- 이렇게 nonce 값을 찾는 것을 흔히 bitcoin mining이라 하는 과정이다.
+
+1. parameterizable cost
+- target space의 범위를 고정된 %로 취하는 것이 아닌, 가변적인 값으로 설정한다.
+- p2p 에 연결된 모든 node들은 자동적으로 매 2주마다 target space를 재 설정하도록 동작한다.
+- target space의 값은 hash puzzle을 푸는데 걸리는 시간이 약 10분이 되도록 하는 것을 목표로 한다.
+  - block 간의 간격이 10분이 되는 이유는, 너무 빨리 block이 갱신되면 한 block에 여러 transaction(현재기준 약 수백개)을 담아 효율적으로 운영할 수 없게 된다.
+  - latency는 기술적으로는 더 낮게 설정할 수도 있지만, 모두의 동의 하에 하한값을 설정하여 작동한다.
+- 특정 node가 다음 block을 설정하게 될 확률은, 전체 node들의 computing power에서 그 node가 갖고 있는 computing power 의 비율에 비례한다.
+
+- 결과적으로, 다량의 computing power을 가지고 mining을 하고 있는 사람들은 대부분이 honest하고, 다음 block 선택을 경쟁적으로 수행하기 때문에 적어도 50% 이상의 확률로 block이 honest node에서 선택되었음을 보장할 수 있다.
+
+- nonce는 확률적으로 밖에 도출될 수 없다. 이는 discrete probability process로, Bernoulii trial 이다.
+  - nonce를 찾는 과정은 Bernoulii trial을 연속적으로 수행하는 poisson process에 속한다.
+  - 전 network에서 누군가가 nonce를 찾는데 걸리는 시간을 확률 밀도함수(probability density)로 표현하면 exponential distribution을 이룬다. (0에 수렴하도록 감소하는 지수 함수)
+
+1. Trivial to verify
+- 특정 node가 hash puzzle을 해결하여 올린 block을 다른 node에서 쉽게 검증할 수 있어야 한다.
+ - `H(block) < target`, block의 모든 값을 hash 계산한 결과가 target 보다 작은지 확인
