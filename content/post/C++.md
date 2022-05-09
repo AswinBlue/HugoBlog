@@ -91,3 +91,18 @@ printf("%d",MULT(2+2,3+3)) // 예상값 (4 * 6) * 2 = 26
 ```
 #pragma once // 일부 컴파일러에서만 지원
 ```
+
+## 입출력 redirection
+1. 입력 재설정
+  - `freopen("in.txt", "r", stdin);` : 'in.txt' 파일을 표준입력 대신 사용
+
+## cin cout
+1. 속도 향상
+  - cin, cout을 사용하면 printf, scanf보다 속도가 느리다.
+  - 아래 코드로 세팅을 해 주면 출력 속도가 빨라진다. 하지만 printf, scanf와 함께 사용하면 순서가 섞이게 되니 설정 후에는 cin, cout만 사용하여야 한다.
+
+  ```
+  ios_base :: sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+  ```

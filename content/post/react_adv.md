@@ -152,6 +152,8 @@ const sample = () => {
 ```
 - Route는 위에서부터 순차적으로 적용된다. if-else if 구문으로 생각하면 편하다.
 - 정규식 wild card `*`을 사용할 수 있다. (v5에서 exact 옵션 삭제되고 '*'로대체)
+- route 하는 대상에 props을 전달하고 싶다면,
+
 ### Link
 - 특정 페이지로 경로를 전환해 주는 기능을 한다.
 - react-router-dom 모듈 안에 포함되어있다.

@@ -75,6 +75,11 @@ ReactDOM.render(
 
 ## 문법
 
+### 주석
+- React 는 react code(typescript)와 JSX(xml) 코드가 있다.
+- typescript에서는 '//' 혹은 '/* */' 로 주석을 사용한다.
+- JSX에서는 '{/* */}' 로 주석을 사용한다.
+
 ### 함수  
 1. 일반 함수
  - javascript와 동일하게 선언 가능하다.
@@ -226,7 +231,7 @@ var b = a.filter(i => i < 4); // b = [1,2,3]
  - 비구조화시 기본값을 설정할 수도 있다. `var {a=1,b=2} = {a:10} // a==10, b==2. b=2를 설정하지 않으면 b==undefined`
  - 다른 key를 사용하고싶다면 다음과 같이 수행한다. `var {a:one, b:two} = {a:10, b:20, c:30} // one==10, two==20, c==30`
  - key값으로 사용불가능한 값이 올 경우 다음과 같이 비구조화 한다. `var {'a-b-c':a_b_c, [key]:A_B_C} = {'a-b-c':10, 'A B C':20} // a_b_c = 10, A_B_C = 20`
- - 재구조화시 전개 연산자를 사용할 수 있지만, 전개연산자는 재정의할 수 없다. `{a:A, ...rest} = {a:10, b:20, c:30} // rest:B 는 불가능`
+ - 재구조화시 전개 연산자를 사용할 수 있지만, 전개연산자를 재정의 할 수는 없다. `{a:A, ...rest} = {a:10, b:20, c:30} // rest:B 는 불가능`
 
 ### 복사
 - 배열
@@ -242,7 +247,12 @@ var A = {one:1, two:2, three:3}
 var B = {...A} // 깊은복사 : one==1, two==2, three==3
 var C = {...A, three:30} // 깊은복사+값 할당 : one==1, two==2, three==30
 ```
+### 조건
+- 특정 조건을 만족할 때에만 내용이 출력되도록 한다.
 
+```
+{CONDITION && <div> ! </div>} // CONDITION 이 true일 때만 '!'를 표시한다.
+```
 ### promise
 - 비동기 처리시 사용하는 객체
 - promise 객체는 async와 wait를 이용한다.

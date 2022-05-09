@@ -25,6 +25,7 @@ draft = false
   - edge는 node에서 계산된 데이터를 다음 node로 이동시킨다.
   - edge는 방향성이 있으며(directed), tensor라 불린다.
 
+  - [archive.ics.uci.edu/ml]() 에서 학습용 데이터를 받아 사용할 수 있다.
 ---
 
 ## 설치
@@ -575,26 +576,26 @@ y_k = exp(a_k) / ∑<i=1,n> exp(a_i)
 - 오버피팅을 줄이기 위해서 데이터를 조작하는 방법을 사용할 수 있다.
 
 1. 학습 데이터셋과 테스트 데이터셋을 구분해서 사용한다.
-- 학습 : 테스트 를 7:3 또는 8:2 정도로 사용하는 것이 일반적이다.
+  - 학습 : 테스트 를 7:3 또는 8:2 정도로 사용하는 것이 일반적이다.
 
 1. 학습 데이터를 '학습' 데이터와 '검증' 데이터로 나눈다.
-- 학습 데이터를 이용하여 모델을 학습시킨다.
-- 학습을 시키면서 중간중간 검증 데이터를 이용하여 학습된 모델을 검증한다.
-- 데이터를 학습시킬수록 '학습' 데이터에 대한 오차는 점점 줄어들지만, '검증' 데이터에 대한 오차는 일정 구간이 되면 증가하게 된다.
-- '검증' 데이터 오차가 증가하는 시점이 over-fitting이 시작되는 구간이므로 학습을 중단한다.
-- '검증' 데이터는 학습에 사용되지 않고, 검증에만 사용됨에 주의한다.
+  - 학습 데이터를 이용하여 모델을 학습시킨다.
+  - 학습을 시키면서 중간중간 검증 데이터를 이용하여 학습된 모델을 검증한다.
+  - 데이터를 학습시킬수록 '학습' 데이터에 대한 오차는 점점 줄어들지만, '검증' 데이터에 대한 오차는 일정 구간이 되면 증가하게 된다.
+  - '검증' 데이터 오차가 증가하는 시점이 over-fitting이 시작되는 구간이므로 학습을 중단한다.
+  - '검증' 데이터는 학습에 사용되지 않고, 검증에만 사용됨에 주의한다.
 
 1. Dropout 규제 방법
-- 제프리 힌튼이 2012년에 제안한 방법
-- 매 훈련 step에서 일정 node를 훈련에서 무시하는 방법이다.
-ex) node = {n1, n2, n3, n4} 가 있다면, step 1에서는 n1, n2만 있는 것 처럼 동작하고, step 2에서는 n3, n4만 있는 것 처럼 동작하고 ...
+  - 제프리 힌튼이 2012년에 제안한 방법
+  - 매 훈련 step에서 일정 node를 훈련에서 무시하는 방법이다.
+  ex) node = {n1, n2, n3, n4} 가 있다면, step 1에서는 n1, n2만 있는 것 처럼 동작하고, step 2에서는 n3, n4만 있는 것 처럼 동작하고 ...
 
 1. 데이터를 증식한다.
-- 관련 데이터를 모두 수집하는것이 최선이지만, 현실적으로 불가능하다.
-- 대신 데이터를 증식하는 방법을 사용한다. 데이터 증식이란, 실제와 같은 훈련 데이터를 생성한다.
-  - 데이터 증식은 인공적으로 만든 샘플과 실제 데이터를 구분할 수 없어야 한다.
-  - 백색소음(white noise)를 추가하는 것은 도움이 되지 않는다. 의미있는 학습 데이터가 필요하다.
-- 데이터 증식은 이미지 데이터를 처리할 때 매우 유용하다. 이미지는 확대, 축소, 이동, 회전, 반전 등을 통해 하나의 이미지로 여러 데이터를 만들 수 있다.
+  - 관련 데이터를 모두 수집하는것이 최선이지만, 현실적으로 불가능하다.
+  - 대신 데이터를 증식하는 방법을 사용한다. 데이터 증식이란, 실제와 같은 훈련 데이터를 생성한다.
+    - 데이터 증식은 인공적으로 만든 샘플과 실제 데이터를 구분할 수 없어야 한다.
+    - 백색소음(white noise)를 추가하는 것은 도움이 되지 않는다. 의미있는 학습 데이터가 필요하다.
+  - 데이터 증식은 이미지 데이터를 처리할 때 매우 유용하다. 이미지는 확대, 축소, 이동, 회전, 반전 등을 통해 하나의 이미지로 여러 데이터를 만들 수 있다.
 
 
 #### K겹 교차 검증의 이해
@@ -646,7 +647,7 @@ accuracy = []
 # for문을 통해 데이터를 반복하여 학습을 수행한다.
 for train, test in skf.split(x_data, y_data):
     # 모델을 구성한다.
-    # 활성함수로 sigmoid, 오차함수로 binary-binary_crossentropy를 사용할 것이다.
+    # 활성함수로 sigmoid, 오차함수로 binary-crossentropy를 사용할 것이다.
     model = Sequential()
     model.add(Dense(30, input_dim=60, activation='relu'))
     model.add(Dense(10, activation='relu'))
@@ -663,7 +664,222 @@ print("\n %.f fold accuracy:" % n_fold, accuracy)
 # k-fold 알고리즘을 사용하면 이러한 경우를 예방할 수 있다.
 ```
 
+---
 
+### 이미지 데이터 모델링
+- MNIST 는 대표적인 이미지 모델링 데이터로, 70,000개의 글자 이미지에 각각 0부터 9까지 정답이 포함되어있는 데이터 셋이다.
+  - train data 6만개, test data 1만개로 나누어져 있다.
+  - 이미지 크기는 28 by 28 크기로 구성되어 있고, 각 픽셀은 0~255 사이의 밝기 값을 가진다.
+
+- 이미지 데이터를 학습할 때는 전처리가 필요하다. MNIST를 예로 들어 알아보자.  
+1) 이미지 데이터는 2차원 데이터이다. 이를 1차원 데이터로 직렬화 하여야 학습이 가능하다.  
+  - `reshape()` 함수를 이용하여 784개의 속성을 가진 1차원 배열로 바꿔준다.
+2) 0~255 값은 데이터 폭이 큰 편이다. 데이터 폭이 크면 분산이 커지므로 이를 줄여주는것이 좋다.  
+  - normalization 을 하거나, scaling을 해 준다.
+  - max 값이 정해져 있으면 단순히 값을 max로 나눠주면 0~1 구간으로 scaling이 된다.
+  - max 값이 미정인 경우는 min-max scaler를 사용할 수 있다.
+    - `(요소값 - 최소값) / (최대값 - 최소값)`
+3) 결과 값이 0~9의 class로 나뉘기 때문에 one-hot encoding을 통해 y 값을 전처리 해준다.  
+
+### CNN
+- 연속하는 layer 상의 모든 node들이 서로 연결되어있는 형태를 'fully connected layer'(FC layer) 라고 한다.
+- 한 장의 컬러 사진은 3차원 데이터이다. 이를 FC 신경망을 이용하여 학습할 시 제약이 많다.
+- 이러한 다차원 데이터 학습을 손실 없이 사용할 수 있도록 만든 모델이 Neural Network이다.
+- 그 중 Convolution Neural Network를 사용하면 이미지의 공간 정보를 유지한 채로 학습이 가능하다.
+
+#### CNN 과 FCNN 비교
+- Fully Connected Neural Network는 2차원 그림을 1차원으로 재구성하여 학습시켰다.
+- CNN은 2차원 배열을 특정 그룹(Kernal, filter)으로 나누어 특징을 추출하는 형태로 학습시키기 때문에 입출력 데이터에 대한 형상 유지가 가능하다.
+- 이미지 공간 정보를 유지하기 때문에 인접 이미지에 대한 특징을 효과적으로 인식할 수 있다.
+- 여러개의 filter(kernal)을 사용함으로써 다양한 특징을 추출하여 학습할 수 있다.
+- filter를 공유 파라미터로 사용하기 때문에 FCNN 보다 학습 파라미터가 적다.
+
+#### CNN 이론
+- CNN 은 이미지의 특징을 추춣해 내는 부분과, 클래스를 분류하는 부분으로 구성된다.
+  - CNN을 통해 특성별로 분류를 하면, fully connected neural network로 값을 전달하여 원하는 class 를 판단하도록 한다.
+- 필터, 커널, 윈도우 라고 부르는 m by n lalyer를 정의한다.
+  - 필터는 원본 데이터보다 크기가 작아야 한다.
+  - 필터도 각 픽셀마다 값을 갖고 있다.
+- 전체 이미지 위에 필터를 겹쳐놓았을 때, 필터와 원본 이미지가 맞닿는 부분을 서로 곱한 다음, 모든 결과물을 합한다.
+- 필터를 한 픽셀씩 움직여 가며, 위 계산을 반복하고, 그 결과물을 m by n 형태로 정렬하면, convolved layer 결과물을 얻을 수 있다.
+
+1. 채널
+  - 한 이미지에 대해 여러 겹으로 쌓여져 있는 형태를 채널이라 한다.
+  - 컬러를 표현하기 위해서는 R,G,B 세 색깔의 채널을 합하면 된다.
+  - 색상이 많을수록 채널은 많아진다.
+
+1. 필터
+  - 일반적으로 (3,3), (4,4) 와 같은 정사각형 행렬로 정의된다.
+  - CNN에서 학습의 대상은 필터 파라미터이다. (필터 안의 픽셀 값)
+  - 필터를 사용해 원본 데이터를 순회하며 채널별로 합성곱을 구하고, 모든 채널의 합성곱을 다시 합해 Feature Map으로 만든다.
+  - 입력 데이터가 여러 채널을 가지는 경우, 필터도 채널의 갯수에 맞게 가져야 한다.
+  - 각 채널별로 필터를 적용하여 feature map을 구하고, 최종적으로 모든 채널의 feature map을 합산하여 최종 feature map을 도출한다.
+
+1. 스트라이드 (stride)
+  - 필터를 순회하는 간격을 stride라 한다.
+  - stride는 (1,1) 과 같은 형태로 표현한다. (가로로 1칸씩 이동, 세로로 1칸씩 이동)
+  - stride와 필터의 크기로 feature map 크기가 결정된다.
+
+1. padding
+  - 원본 데이터의 테두리에 0으로 채운 dummy pixel을 넣어줌으로써 feature map의 크기와 원본의 크기가 같아지도록 하는 것
+
+1. pooling
+  - 필터를 사용해 얻어낸 convolution layer의 모든 값을 더하는게 아닌, 특정 데이터만 뽑아서 feature map을 구성하는 방법이다.
+  - 출력 데이터의 크기를 줄이거나 데이터를 강조하는 용도로 사용한다.
+  - 방법에 따라 max pooling, average pooling, min pooling 등이 있다.
+
+
+```
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow as tf
+
+np.random.seed(3)
+tf.random.set_seed(3)
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# 4차원형태 데이터 구성
+# [batch, x size, y size, channel]
+x_train = x_train.reshape(x_train.shape[0], 28, 28, 1).astype('float32')/255
+x_test = x_test.reshape(x_test.shape[0], 28, 28, 1).astype('float32')/255
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
+
+model = Sequential()
+
+# CNN 모델 구성
+
+# 커널을 32개, 크기는 3 by 3
+# 입력층, 28 by 28 크기에 1채널 사용, relu 사용
+# stride 는 설정 하지 않으면 (1,1) 이 기본
+# padding은 설정하지 않으면 없음.
+# padding이 없고 stride가 (1,1) 이기 때문에 결과값은 (26,26) 크기가 될 것
+model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
+
+# 커널 62개, 3 by 3
+# relu 사용
+model.add(Conv2D(64, (3,3), activation='relu'))
+# pooling 사용
+# max pooling 방법, pool_size = 2 이므로, stride는 자동으로 (2,2) 가 된다. (pooling은 중복되게 필터를 설정하지 않음)
+# 결과값은 절반의 크기(12,12) 가 될 것
+model.add(MaxPooling2D(pool_size=2))
+# dropout layer
+model.add(Dropout(0.25))
+
+# FCNN 모델 구성, 결과값으로 classification
+
+# 입력값이 (12,12,64) 이다. 이를 직렬화(1차원 배열화) 시켜 준다.
+model.add(Flatten())
+# 128 node를 가진 hidden layer
+model.add(Dense(128, activation='relu'))
+# FC에서 over-fitting이 두드러지기 때문에 더 높은 값으로 dropout을 설정하였다.
+model.add(Dropout(0.5))
+# MNIST는 10개중 하나를 선택하므로, 출력 layer의 node는 10개로 설정, softmax 사용
+model.add(Dense(10, activation='softmax'))
+
+# 모델 구조 확인
+model.summary()
+
+
+# 모델 학습 및 평가
+model.compile(loss='categorical_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+result = model.fit(x_train, y_train,
+                   validation_data=(x_test, y_test),  # split 대신 직접 평가용 데이터를 지정하는 방법
+                   epochs=30,
+                   batch_size=200)
+
+print('loss & accuracy:',model.evaluate(x_test, y_test))
+y_vloss = result.history['val_loss']
+y_loss = result.history['loss']
+x_len = np.arange((len(y_loss)))
+plt.plot(x_len, y_vloss, '.', c='red', label='validation loss')
+plt.plot(x_len, y_loss, '.', c='blue', label='train loss')
+plt.legend(loc='best')
+plt.show()
+```
+
+- FC layer를 사용하여 이미지 학습을 한 것 보다 CNN을 활용하여 학습을 한 것이 over-fitting 및 오차가 더 적음을 확인할 수 있다.
+- CNN으로 이미지를 학습시키는게 더 효율적이다.
+
+---
+
+### RNN
+- Recurrent Neural Network 로, 시계열 데이터를 처리하기 위한 모델이다.
+  - 이전 데이터가 아후 데이터에 영향을 주는 데이터를 시계열 데이터라 한다.
+- 데이터가 순서대로 입력되었을 때, 앞서 받은 데이터 처리 결과값을 잠시 기억해 놓는 방법을 사용한다.
+  - 하나의 layer의 node간 연결되는 edge가 생긴다. 한 layer안 node들을 cell이라 칭한다.
+  - cell간 연결된 edge에는 'hidden_state' 데이터가 전달된다.
+  ```
+  x1   →   [A1]  →  h1
+          Whh ↓ h1
+  x2 -Wxh→ [A2]  →  h2
+             ↓ h2
+  x3   →   [A3]  →  h3
+  ```
+
+- RNN 에서 한 layer 내부의 node간 edge에 있는 weight는 hyperbolic tangent를 이용한다.
+`h_t = f(h_t-1, x_t) = tanh(x) = tanh(W_hh * h_t-1 + W_xh * x_t)`
+
+#### RNN 모델링
+- RNN 모델은 '3 tensor'를 사용한다. 3 tensor의 각 요소는 아래와 같다.
+  - batch : 데이터 set의 개수
+  - time step : 데이터 한 set에서 데이터의 개수
+  - input dimension : 입력 데이터를 one-hot encoding 했을 때 크기
+- `output, hidden_state = SimpleRnn(3, return_state=True, return_sequences=True)(input)` :
+  - 결과값으로 크기 3인 데이터를 반환
+  - input으로는 3차원 배열이 필요, batch, time step, input dimension 을 고려한 형태
+  - return_sate가 true이면 output을 반환, 아니면 hidden_state(마지막시점 state)만 반환
+  - return_sequences가 true면 output으로 3차원 값 (각 batch별 학습결과)를 전달, false면 2차원(최종 결과)를 반환
+  - hidden_state 에는
+
+### LSTM
+- RNN은 gradient에 의한 vanishing 문제가 크다. 이를 개선하기 위한 모델이 LSTM 이다.
+- Long Short Term Memory, 중요한 데이터는 길게 기억하고 중요하지 않은 데이터는 짧게 기억한다.
+  - 데이터를 다음 cell에 넘길지 말지 판단하는 절차를 거친다.  
+1) LSTM에서는 'hidden_state'에 더해 'cell_state' 값을 추가로 전달한다.  
+  - cell_state 는 과거로부터 전달되는 값들을 유지할 수 있도록 한다.  
+2) LSTM 에서는 Gate 가 추가된다.  
+  - 데이터를 얼마나 통과할지 필터링 해주는 역할이다.
+  - 총 3개(forget, input, output)의 gate가 있다.
+  - 각각 데이터를 얼마나 잊을지, 입출력으로 들어온 데이터 양 조절을 관장한다.
+
+#### Gate
+1. Input Gate
+  - 최종 cell_state에 현재 cell의 cell_state 값을 얼마나 적용할지 설정
+  - `i_t = σ(W_i * [h_t-1, x_t] + b_i)` : hidden_state와 입력값에 input gate의 weight, bias를 적용한 후 sigmoid를 취함.
+1. Forget Gate
+  - sigmoid 함수로 cell_state 값을 얼마나 통과시킬지 설정
+  - forget gate도 weight와 bias가 존재한다. (W_f, b_f)
+  - `f_t = σ(W_f * [h_t-1, x_t] + b_f)` : hidden_state와 입력값에 forget gate의 weight, bias를 적용한 후 sigmoid를 취함.
+1. Output Gate
+  - 최종 cell_state 값으로 최종 hidden_state 값이 얼마나 출력될지 결정
+  - `o_t = σ(W_o * [h_t-1, x_t] + b_o)` : hidden_state와 입력값에 output gate의 weight, bias를 적용한 후 sigmoid를 취함.
+
+- `C_t = f_t * C_t-1 + i_t * C'_t` : 최종 cell_state는 (forget gate를 통과한 이전 cell_state) + (hidden_state와 입력값으로 hidden_state를 계산하고, input gate를 통과시킨 값)이다.
+  - `C'_t = tanh(W_c * [h_t-1, x_t] + b_c)` : C'_t 값은 입력값과 hidden_state로 현재 cell의 cell_state를 구하는 식이다.
+  - 이를 input gate에 통과시키면 `i_t * C'_t` 값이 된다.
+  - C_t-1 은 이전 cell에서 받은 cell_state 이다.
+  - 이를 forget gate에 통과시키면 `f_t * c_t-1` 값이 된다.
+
+- `h_t = o_t * tanh(C_t)` : 최종 cell_state 를 hyperbolic tangent 취한 값에 output gate를 적용하면 최종 hidden_state 값이 결정된다.
+
+
+- LSTM은 기본 RNN보다 복잡하지만 훨씬 더 좋은 성능을 낼 수 있다.
+
+
+
+
+
+
+---
 
 ## 모델
 - 딥 러닝을 위한 신경망 구조를 모델이라 한다
@@ -672,21 +888,21 @@ print("\n %.f fold accuracy:" % n_fold, accuracy)
 - x 데이터는 attribute, y 데이터는 class라 칭한다.
 
 1. 입력층, 은닉층, 출력층 구성
-- 아래 내용들은 일반적인 경우에 해당하는 경우이므로, 실제 모델 정의시에는 직접 확인해볼 필요가 있다.
-1) 데이터에 맞게 입력층의 node 개수를 결정한다.  
-2) 얕은 신경망보다 심층 신경망이 효율적인 파라미터를 구성한다. (하나씩 layer를 늘려가 본다.)  
-3) 은닉층의 노드 개수를 입력 노드 개수보다 많이 편성한다. (무조건은 아니므로 확인 필요)  
-4) 결정할 수 있는 데이터를 조금씩 줄여 깔때기 모양으로 은닉층을 설정하는게 좋다. (갈수록 node 개수를 줄여감)  
-5) 첫 은닉층의 노드 개수는 과대적합(over fitting)이 시작되기 전까지 뉴런 수를 점진적으로 늘리는 것이 좋다.  
-6) 은닉층이 많아질수록 ReLU 함수를 사용하는것이 좋다.(vanishing 현상 방지)  
-7) 출력층의 활성화 함수를 결정하고, 출력층의 활성화 함수에 따라 오차함수도 결정한다.   
-- 둘중 하나를 선택한다면 sigmoid 함수와 binary_crossentropy 를 사용한다.  
+  - 아래 내용들은 일반적인 경우에 해당하는 경우이므로, 실제 모델 정의시에는 직접 확인해볼 필요가 있다.
+  1) 데이터에 맞게 입력층의 node 개수를 결정한다.  
+  2) 얕은 신경망보다 심층 신경망이 효율적인 파라미터를 구성한다. (하나씩 layer를 늘려가 본다.)  
+  3) 은닉층의 노드 개수를 입력 노드 개수보다 많이 편성한다. (무조건은 아니므로 확인 필요)  
+  4) 결정할 수 있는 데이터를 조금씩 줄여 깔때기 모양으로 은닉층을 설정하는게 좋다. (갈수록 node 개수를 줄여감)  
+  5) 첫 은닉층의 노드 개수는 과대적합(over fitting)이 시작되기 전까지 뉴런 수를 점진적으로 늘리는 것이 좋다.  
+  6) 은닉층이 많아질수록 ReLU 함수를 사용하는것이 좋다.(vanishing 현상 방지)  
+  7) 출력층의 활성화 함수를 결정하고, 출력층의 활성화 함수에 따라 오차함수도 결정한다.   
+  - 둘중 하나를 선택한다면 sigmoid 함수와 binary_crossentropy 를 사용한다.  
 
 1. 다중분류 모델링
-1) 데이터의 속성에 맞게 입력 node의 수 구성  
-2) 문자열로 된 class 값을 indexing 하고, one-hot-encoding으로 값을 변형해준다.  
-3) class의 개수에 맞게 출력층 node 개수를 설정한다.  
-4) 활성화 함수 및 오차방정식으로 softMax와 categorical cross-entropy를 적용한다.  
+  1) 데이터의 속성에 맞게 입력 node의 수 구성  
+  2) 문자열로 된 class 값을 indexing 하고, one-hot-encoding으로 값을 변형해준다.  
+  3) class의 개수에 맞게 출력층 node 개수를 설정한다.  
+  4) 활성화 함수 및 오차방정식으로 softMax와 categorical cross-entropy를 적용한다.  
 
 ### 생성 방법
 1. tensorflow.keras.Sequential : Sequential 함수를 이용하는 방법
@@ -700,15 +916,17 @@ print("\n %.f fold accuracy:" % n_fold, accuracy)
   - node 수가 2개
   - activation function이 sigmoid
   - 입력값이 2차원 형태
-  - input 인자는 첫번 째 hidden layer에만 사용해 주면 된다.
+  - input_dim 인자는 첫번 째 layer에만 사용해 주면 된다.
 - `model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])` : model 객체를 어떤 형태로 학습시킬지 정의
   - binary_crossentropy 를 loss function으로 설정
-  - optimizer로 sdz 설정
+  - optimizer로 sgd 설정
   - 실행될 때 마다 loss 값과 accuracy 값을 출력으로 보여줌
-- `model.fit(x_train, y_train, epochs=50000, batch_size = 10)` : model에 training 실행
+- `result = model.fit(x_train, y_train, epochs=50000, batch_size = 10, validation_split=0.3)` : model에 training 실행
   - x_train, y_train : 학습용 x, y 데이터  
   - epochs : 학습 데이터를 통해 반복 학습시킬 횟수  
   - batch_size : 입력 데이터를 몇 묶음 단위로 전달할지 설정, 하나씩 학습하는 것 보다 학습률 출렁임이 더 안정적이다.  
+  - validation_split : 데이터중 0.3%는 검증용으로 사용, 'validation_data' 로 직접 데이터를 전달할 수도 있음
+  - result : result.history 에서 'loss', 'val_loss', 'accuracy', 'val_accuracy' 키워드로 loss, accuracy 값 확인 가능
 - `model.layers[0].get_weights()[0]` :
   - model.layers 는 입력 layer을 0번째 index로 하여 특정 layer를 반환  
   - get_weights() 는 해당 layer의 [weight, bias] 를 담고 있는 배열을 반환
