@@ -25,3 +25,8 @@ draft = false
 > $ dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart  
 > $ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart  
 > $ wsl --set-default-version 2
+
+## 환경변수
+  - 환경변수 설정시 컴퓨터를 재부팅하지 않고 적용하는 방법
+  - 콘솔에 `taskkill /f /im explorer.exe`, `explorer.exe` 명령을 순서대로 입력한다.
+  - 작업표시줄이 없어졌다 생겨나면 적용이 된 것이다. 켜져있던 탐색기는 복원되지 않으니 주의

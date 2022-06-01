@@ -92,11 +92,12 @@ if __name__ == '__main__':
     print(result[K][N])
 ```
 
-##
+## 순서 정렬
 ### minHeap + maxHeap
 - maxHeap + minHeap 을 사용하여 '상위 n개의 데이터' 혹은 '중앙 값'을 구할 수 있다.
 - 아래와 같이 top과 top이 마주보는 구조로 minHeap과 maxHeap을 사용한다.
 ```
+https://www.acmicpc.net/problem/1655
 /*
  * by using two heap(minH, maxH), always can get middle value at maxH.top()
  *
@@ -105,7 +106,4 @@ if __name__ == '__main__':
  *                              ^
  *                         middle value
  */
-```
-```
-https://www.acmicpc.net/problem/1655
 ```
