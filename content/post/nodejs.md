@@ -20,12 +20,68 @@ draft = false
 ## 기본 명령
 - `npm init` : 패키지 생성
 - `npm install` : 라이브러리 설치
+  - `-P` : package.json에 저장, 기본옵션
+  - `-O` : optionalDependencies에 저장
+  - `-D`, `--no-save` : 기록없이 다운로드
+  - `-g` : 글로벌 설치, 모든 프로젝트에 적용
+  - `MODULE_NAME@VERSION` : 버전 설정, latest는 가장 최근 버전을 의미
 - `node main.js` : 실행(main.js)
 - `npx <package_name>` : 설치하지 않고 일회만 실행
 - `node main.js` : 패키지 실행 (main.js파일)
 
 ## 구조
 - `main.js` : nodejs 실행시 실행할 메인 파일
+- `package.json` : root 경로에 존재하며, npm 프로젝트를 관리하는 파일
+
+### package.json
+- nodejs 설정을 담고있는 파일로, 참조할 내용이 많아 아래에 따로 정리한다.
+
+  - `"//" : "comment"` : 주석을 넣는 방법, json key를 //로 하고, value에 comment를 작성한다.
+  - `scripts` : `npm run SCRIPT`(SCRIPT는 원하는 명령) 명령으로 특정 command를 수행하게 할 수 있음
+    - script 명령은 os별로 명령이 상이할 수 있다. 이때는 다음과 같이 설정하여 각 os별로 다르게 동작할 수 있도록 한다. (npm run test 명령시 자동으로 수행해주는것 같지는 않음)  
+    - os에 따라 명령어가 다를 수 있으므로, `cross-env` 모듈을 설치해서 사용하면 문제를 간단히 해결할 수 있다. ex) `cross-env NODE_ENV=production`
+
+    ```
+    "scripts": {
+      "test": "run-script-os",
+      "test:darwin:linux": "export NODE_ENV=test && mocha",
+      "test:win32": "SET NODE_ENV=test&& mocha"
+    }
+    ```
+
+  - `devDependencies` : 내부에 필요한 모듈들. `npm install -D` 명령어로 dependency를 추가 가능하다.  
+
+  ```
+  {
+    "name": "rankingserver",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "//" : "this line is a comment",
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build:postcss": "NODE_ENV=production postcss src/main/resources/static/css/tailwind.css -o target/classes/static/css/tailwind.css",
+      "watch:postcss": "NODE_ENV=development postcss src/main/resources/static/css/tailwind.css -o src/main/resources/static/css/tailwind.css -w"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/AswinBlue/RankServer.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/AswinBlue/RankServer/issues"
+    },
+    "homepage": "https://github.com/AswinBlue/RankServer#readme",
+    "devDependencies": {
+      "autoprefixer": "^10.4.7",
+      "postcss": "^8.4.14",
+      "postcss-cli": "^9.1.0",
+      "tailwindcss": "^3.0.24"
+    }
+  }
+  ```
 
 ### 모듈 사용
 

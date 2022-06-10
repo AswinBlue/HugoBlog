@@ -96,10 +96,19 @@ draft = false
   }
   ```
 
+1. 폴더 설정
+  - `resources` : html, css 등 화면 구성을 위한 파일들의 root 디렉터리
+    - `resources/static` : html파일에서 href로 참조하면 아래 디렉터리를 root로 경로 설정 가능
+    - `resources/template` : mustache 파일에서 root 디렉터리로 사용
+
 ## 웹 서비스 개발
 1. tomcat
   - spring boot에서 web 패키지를 설치하면 tomcat을 사용하여 web server를 동작시킨다.
-  - localhost:8080으로 default 주소가 처리되어 있고,
+  - localhost:8080으로 default 주소가 처리되어 있고, `application.yml` 파일에서 아래와 같이 수정 가능하다.   
+  ```
+  server:
+    port : 8081
+  ```
 
 ### MVC 모델
 - model, view, control 을 나누어 개발하는 형태를 MVC 모델이라고 한다.
@@ -156,3 +165,110 @@ draft = false
     - model을 만들 때는 layout에 따라 화면에 보여지는 형태를 구성할 수 있다.
     - layout을 template화 하여 사용 가능하다. 재사용 되는 부분을 모듈화 하여 파일로 분리하고, 이를 다른 파일에서 불러올 수 있다.
     - `{{>FILE_NAME}}` 형태로 다른 파일을 호출해 올 수 있다.
+
+#### controller
+- controller class는 `@Controller` annotation을 붙여서 선언하며 함수는 `@GetMapping`, `@RequestMapping` annotation을 사용할 수 있다.
+
+1. 에러 화면
+  - 에러 화면도 controller에 의해 유도되며 BasicErrorController가 이를 담당한다.
+  - `application.yml` 파일에서 따로 설정을 하지 않았다면 `server.error.path=/error` 가 기본이다.
+
+
+#### 데이터 교환
+- view에서 사용자 입력을 받아 처리하는 과정을 다룬다.
+- 서버의 Controller에서 이를 처리 가능하며, 사용자 입력을 Java Class로 대응시킨 형태를 DTO라 칭한다.
+1. view 구현
+  - view쪽에서는 `form` 태그를 사용하여 controller에 데이터를 전송할 수 있다.
+  - `form` 태그의 인자로 `action`, `method`를 적용 가능하다.
+    - `action` : 데이터를 보낼 url을 설정. ex) action="/data/part1"
+    - `method` : 전송 방법을 설정한다. post 혹은 get 적용 가능
+  - `form` 태그 안의 `input`태그를 두고, 인자로 `name`을 설정한다.
+
+2. controller 구현
+  - DTO로 사용할 class를 선언한다. (ex: DtoSample)
+  - controller 를 구현한 java 파일에서 `@PostMapping` annotation을 달고, 인자로 위에서 선언한 DTO를 받는다.   
+  - return 값으로 지정한 이름의 view로 redirect 한다. (ex: returnView)
+  ```
+  @PostMapping("/data/part1")
+  public String handleForm(DtoSample dto) {
+    return "returnView";
+  }
+  ```
+#### DB
+- spring은 mysql, postgress, M2 등 여러 DB를 적용할 수 있다.
+- controller는 Java로 구현되고, DB는 sql로 동작하기 때문에 java로 sql을 조작하기 위한 JPA라는 라이브러리가 필요하다.
+1. JPA
+  - `Entity` : java 객체를 DB가 이해할 수 있게 재구성한 데이터
+  - `Repository` : entity를 DB에 저장하는 역할을 수행하는 객체
+
+1. controller 구현
+  - DTO를 다음과 같이 구현하였다고 하자  
+
+  ```
+  class DtoSample {
+    private String name;
+    public DtoSample(String name) {
+        this.name = name;
+    }
+  }
+  ```
+
+  - DTO에 해당하는 entity를 정의해야하며, 그 형태는 다음과 같다.   
+    - entity는 `@Entity` annotation을 붙여야 한다.
+    - Entity는 primary key를 가져야 하며, 이는 `@Id` annotation으로 지정한다.
+    - DB의 column에 해당하는 값들은 `@Column` annotation을 붙여준다.
+    - `@GeneratedValue`는 자동으로 생성된 값이 들어가도록 한다.
+
+  ```
+  @Entity
+  public class sampleEntity {
+      @Id // 대표값
+      @GeneratedValue // 자동생성
+      private Long id;
+      @Column
+      private String name;
+
+      public sampleEntity(Long id, String name) {
+          this.id = id;
+          this.name = name;
+      }
+
+  }
+  ```
+
+  - Entity를 DB에 저장하기 위한 Repository도 생성한다.
+  - repository는 entity로 DB에 접근하는 방법을 정의하기 위한 객체이다.
+  - spring에서 기본으로 제공하는 형태를 상속받아 사용도 가능하다.   
+
+  ```
+  // CrudRepository<관리대상, 대표값의 type>
+  public interface searchNameRepository extends CrudRepository<sampleEntity, Long> {
+      // CrudRepository 의 기본값을 사용
+  }
+  ```
+
+  - 이전에 만들었던 controller 에 내용을 추가한다.   
+
+  ```
+  @PostMapping("/data/part1")
+  public String handleForm(DtoSample dto) {
+    sampleEntity name = form.toEntity(); // toEntity 구현 필요
+    name = snr.save(name); // 'save'는 저장 및 저장된 데이터를 반환함
+    return "returnView";
+  }
+  ```
+
+  - contorller에서 받은 DTO 데이터를 entity로 변환시켜야 한다.
+  - DTO 파일을 추가로 수정한다.  
+
+  ```
+  class DtoSample {
+    private String name;
+    public DtoSample(String name) {
+        this.name = name;
+    }
+    public sampleEntity toEntity() {
+        return new sampleEntity(null, this.name); // id에 null을 넣는다. @GeneratedValue에 의해 자동으로 생성된다.
+    }
+  }
+  ```

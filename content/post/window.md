@@ -30,3 +30,15 @@ draft = false
   - 환경변수 설정시 컴퓨터를 재부팅하지 않고 적용하는 방법
   - 콘솔에 `taskkill /f /im explorer.exe`, `explorer.exe` 명령을 순서대로 입력한다.
   - 작업표시줄이 없어졌다 생겨나면 적용이 된 것이다. 켜져있던 탐색기는 복원되지 않으니 주의
+
+## batch
+1. call
+  - 기본 command가 아닌 package command를 수행할 경우, batch파일에 명령어를 그대로 넣어서 수행하면 첫번째 줄만 수행될 수 있다.
+  - 이때 `call` 명령어를 사용해주면 여러 라인을 실행 가능하다.
+  ex)  
+  
+  ```
+  call npm run build
+  cd server
+  call gradle wrapper
+  ```
