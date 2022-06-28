@@ -34,66 +34,146 @@ draft = false
 ### 기본 설정
 1. 포트 설정
   - `application.properties` (혹은 yml)파일을 열고, `server.port = 8080` 와 같이 기입하면 동작 포트를 8080으로 설정할 수 있다.
+  - DB, 포트, mvc, thymleaf 등 각종 설정이 포함된 yml 파일 예시는 다음과 같다.
+    
+    ```
+    server:
+      port: 8080
+    
+    spring:
+      # config:
+      #   activate:
+      #     on-profile: test
+      h2:
+        console:
+          enabled: true
+      jpa:
+        database: h2
+        generate-ddl: off
+      datasource:
+        driver-class-name: org.h2.Driver
+        url: jdbc:h2:mem:testdb;MODE=MySQL;
+        username: SA
+        password:
+        initialization-mode: always
+        schema: classpath:schema-h2.sql
+        data: classpath:data-h2.sql
+    
+      mvc:
+        view:
+          prefix: /myApp/
+          suffix: .jsp
+    
+      thymeleaef:
+        cache: false
+        mode: HTML
+        encoding: UTF-8
+        prefix: file:src/main/resources/templates/
+      web:
+        resources:
+          static-locations: file:src/main/resources/static/
+          cache:
+            period: 0
+    ```
 
 1. 빌드 설정
   - gradle 프로젝트는 `./gradlew build` 명령으로 프로젝트를 빌드한다.
   - 이때 `build.gralde` 파일 설정으로 하위 프로젝트의 빌드까지 함께 정의할 수 있다.
   - gradle 파일이 수정되면 `./gradlew build` 명령을 새로 돌려서 업데이트 해 준다.
-  - 아래는 React 프로젝트의 빌드 세팅이다.
+  - 아래는 React 프로젝트의 빌드 세팅이다.   
 
   ```
-  def reactDir = "$projectDir/src/main/webapp/js"; // react 프로젝트 경로 설정
-  sourceSets{
-  	main{
-  		resources{
-  			srcDirs = ["$projectDir/src/main/resources"]
-  		}
-  	}
+  /*********************
+   * 기본 설정 및 dependency
+   *********************/
+  plugins {
+  	id 'org.springframework.boot' version '2.7.1'
+  	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  	id 'java'
   }
-
+  
+  group = 'com.aswinblue'
+  version = '0.0.1-SNAPSHOT'
+  sourceCompatibility = '18'
+  
+  repositories {
+  	mavenCentral()
+  }
+  
+  dependencies {
+  	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.h2database:h2'
+  	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  }
+  
+  tasks.named('test') {
+  	useJUnitPlatform()
+  }
+  
+  /*********************
+   * React 설정
+   *********************/
+  def reactDir = "$projectDir/src/main/webapp"; // react 프로젝트 경로 설정
+  sourceSets{
+    main{
+        resources{
+            srcDirs = ["$projectDir/src/main/resources"]
+        }
+    }
+  }
+  
   // 최초로 수행할 task 지정
   processResources{
-  	dependsOn "copyReactBuildFiles"
+    dependsOn "copyReactBuildFiles"
   }
-
+  
   // $reactDir 위치에서 `npm audit fix` 명령 실행
   task installReact(type:Exec){
-  	workingDir "$reactDir"
-  	inputs.dir "$reactDir"
-  	group = BasePlugin.BUILD_GROUP
-
-  	if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-  		commandLine "npm.cmd", "audit", "fix"
-  		commandLine 'npm.cmd', 'install'
-  	}else{
-  		commandLine "npm", "audit", "fix"
-  		commandLine 'npm', 'install'
-  	}
+    workingDir "$reactDir"
+    inputs.dir "$reactDir"
+    group = BasePlugin.BUILD_GROUP
+  
+    if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
+        commandLine "npm.cmd", "audit", "fix"
+        commandLine 'npm.cmd', 'install'
+    }else{
+        commandLine "npm", "audit", "fix"
+        commandLine 'npm', 'install'
+    }
   }
-
+  
   // installReact task를 호출
   // $reactDir 위치에서 `npm run-script build` 실행
   // react 프로젝트의 `package.json` 파일에 적힌 build 스크립트가 실행됨.
   task buildReact(type:Exec){
-  	dependsOn "installReact"
-  	workingDir "$reactDir"
-  	inputs.dir "$reactDir"
-  	group = BasePlugin.BUILD_GROUP
-
-  	if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-  		commandLine "npm.cmd", "run-script", "build"
-  	}else{
-  		commandLine "npm", "run-script", "build"
-  	}
+    dependsOn "installReact"
+    workingDir "$reactDir"
+    inputs.dir "$reactDir"
+    group = BasePlugin.BUILD_GROUP
+  
+    if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
+        commandLine "npm.cmd", "run-script", "build"
+    }else{
+        commandLine "npm", "run-script", "build"
+    }
   }
-
+  
   // buildReact task를 호출
   // 앞서 지정한 $reactDir 경로의 /build 위치에서 생성된 데이터를 $projectDir/src/main/resources/static 로 복사
   task copyReactBuildFiles(type:Copy) {
-  	dependsOn "buildReact"
-  	from "$reactDir/build"
-  	into "$projectDir/src/main/resources/static"
+    dependsOn "buildReact"
+    from "$reactDir/build"
+    into "$projectDir/src/main/resources/static"
   }
+  ```
+  - 각종 설정을 해주는 batch 파일 예시이다.
+  ```
+  gradle wrapper
+  gradlew build
+  @REM package.json에 script 작성 필요
+  npm run build:postcss
   ```
 
 1. 폴더 설정
@@ -151,7 +231,7 @@ draft = false
   }
   ```
 
-  - model(.mustache파일)은 `resources/templates` 파일 경로 하위에 배치하고, 확장자를 `.mustache`로 지정한다.  
+  - model(.mustache .html 등)은 `resources/templates` 파일 경로 하위에 배치하고, 확장자를 `.mustache`로 지정한다.  
   - html 파일은 사실 view에 가깝지만, mustache 파일은 view에 변수를 적용하여 model에 해당한다.
   - model은 다음과 같이 구성한다.
 
