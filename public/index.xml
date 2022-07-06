@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>©2020 Notepadium.</copyright>
-    <lastBuildDate>Wed, 02 Feb 2022 13:22:27 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jun 2022 20:00:00 +0900</lastBuildDate>
     
         <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Posts</title>
       <link>/post/</link>
-      <pubDate>Wed, 02 Feb 2022 13:22:27 +0900</pubDate>
+      <pubDate>Wed, 29 Jun 2022 20:00:00 +0900</pubDate>
       
       <guid>/post/</guid>
       <description></description>
@@ -30,7 +30,7 @@
       <guid>/about/</guid>
       <description>Written in Go, Hugo is an open source static site generator available under the Apache Licence 2.0. Hugo supports TOML, YAML and JSON data file types, Markdown and HTML content files and uses shortcodes to add rich content. Other notable features are taxonomies, multilingual mode, image processing, custom output formats, HTML/CSS/JS minification and support for Sass SCSS workflows.
 Hugo makes use of a variety of open source projects including:
- https://github.</description>
+https://github.com/russross/blackfriday https://github.</description>
       
     </item>
     

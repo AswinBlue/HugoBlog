@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>©2020 Notepadium.</copyright>
-    <lastBuildDate>Thu, 09 Sep 2021 18:43:28 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 27 Nov 2021 08:15:42 +0900</lastBuildDate>
     
         <atom:link href="/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tensorflow</title>
+      <link>/post/tensorflow/</link>
+      <pubDate>Sat, 27 Nov 2021 08:15:42 +0900</pubDate>
+      
+      <guid>/post/tensorflow/</guid>
+      <description>#Tensorflow TensorFlow는 구글에서 수치연산을 위해 만든 라이브러리이다. 기본 개념 node와 edge로 구성된 graph를 이용해 수치 연산을 수행한다. n</description>
+      
+    </item>
     
     <item>
       <title>Kivy</title>

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.87.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.101.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark"><title>PythonCGI&nbsp;&ndash;&nbsp;AsWindBlew</title><link rel="stylesheet" href="/css/core.min.df05809cfa75ea0a430dc942a79e54236823f6be194b5bc34f0c64744ba5a1b55f91020ad551b34b8af7f2ebee758cc8.css" integrity="sha384-3wWAnPp16gpDDclCp55UI2gj9r4ZS1vDTwxkdEulobVfkQIK1VGzS4r38uvudYzI"><meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="PythonCGI" /><body><section id="header">
+<meta name="twitter:title" content="PythonCGI" /><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2984318617287323"
+     crossorigin="anonymous"></script><body><section id="header">
     <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">AsWindBlew</span></a></span>
         <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="/categories/">Categories</a><a class="nav item" href="/tags/">Tags</a><a class="nav item" href="/about/">About</a><a class="nav item" href="https://gohugo%2eio/"target="_blank">Hugo</a></nav></div></span></div><div class="site slogan"><span class="title">published by AswinBlue</span></div></section><section id="content"><div class="article-container"><section class="article header">
     <h1 class="article title">PythonCGI</h1><p class="article date">Jul 02, 2020<span class="reading-time"> • 3 minutes to read</span></p></section><article class="article markdown-body"><h1 id="python-cgi">python CGI</h1>
@@ -36,9 +37,9 @@ ex) <code>pageId = form['id'].value</code> : page의 id를 가져온다.</li>
 <li>
 <p>input 태그의 name 속성 : input 태그를 특정 이름으로 CGI에 전달함
 ex)</p>
-<pre><code>&lt;p&gt; &lt;input type=&quot;text&quot; name=&quot;title&quot; placeholder=&quot;title&quot;&gt; &lt;/p&gt;
-&lt;p&gt; &lt;textarea rows=&quot;4&quot; name=&quot;description&quot;&gt;&lt;/textarea&gt;&lt;/p&gt;
-&lt;p&gt; &lt;input type=&quot;submit&quot;&gt;&lt;/p&gt;
+<pre tabindex="0"><code>&lt;p&gt; &lt;input type=&#34;text&#34; name=&#34;title&#34; placeholder=&#34;title&#34;&gt; &lt;/p&gt;
+&lt;p&gt; &lt;textarea rows=&#34;4&#34; name=&#34;description&#34;&gt;&lt;/textarea&gt;&lt;/p&gt;
+&lt;p&gt; &lt;input type=&#34;submit&#34;&gt;&lt;/p&gt;
 </code></pre></li>
 <li>
 <p>form 태그 : 특정 파일로 form 태그 안의 태그들을 전송</p>
@@ -46,10 +47,10 @@ ex)</p>
 <li>
 <p>action 속성 : form 안의 내용을 처리할 파일(목적지)를 설정한다. 
 ex)</p>
-<pre><code>&lt;form action=&quot;create.py&quot;&gt;
-   &lt;p&gt; &lt;input type=&quot;text&quot; name=&quot;title&quot; placeholder=&quot;title&quot;&gt; &lt;/p&gt;
-   &lt;p&gt; &lt;textarea rows=&quot;4&quot; name=&quot;description&quot;&gt;&lt;/textarea&gt;&lt;/p&gt;
-   &lt;p&gt; &lt;input type=&quot;submit&quot;&gt;&lt;/p&gt;
+<pre tabindex="0"><code>&lt;form action=&#34;create.py&#34;&gt;
+   &lt;p&gt; &lt;input type=&#34;text&#34; name=&#34;title&#34; placeholder=&#34;title&#34;&gt; &lt;/p&gt;
+   &lt;p&gt; &lt;textarea rows=&#34;4&#34; name=&#34;description&#34;&gt;&lt;/textarea&gt;&lt;/p&gt;
+   &lt;p&gt; &lt;input type=&#34;submit&#34;&gt;&lt;/p&gt;
 &lt;/form&gt;
 </code></pre></li>
 <li>
@@ -64,10 +65,10 @@ ex)</p>
 <li>
 <p>method 속성은 get과 post 방식을 설정할 수 있다. 
 ex)</p>
-<pre><code>&lt;form action=&quot;create.py&quot; method=&quot;post&quot;&gt;
-  &lt;p&gt; &lt;input type=&quot;text&quot; name=&quot;title&quot; placeholder=&quot;title&quot;&gt; &lt;/p&gt;
-  &lt;p&gt; &lt;textarea rows=&quot;4&quot; name=&quot;description&quot;&gt;&lt;/textarea&gt;&lt;/p&gt;
-  &lt;p&gt; &lt;input type=&quot;submit&quot;&gt;&lt;/p&gt;
+<pre tabindex="0"><code>&lt;form action=&#34;create.py&#34; method=&#34;post&#34;&gt;
+  &lt;p&gt; &lt;input type=&#34;text&#34; name=&#34;title&#34; placeholder=&#34;title&#34;&gt; &lt;/p&gt;
+  &lt;p&gt; &lt;textarea rows=&#34;4&#34; name=&#34;description&#34;&gt;&lt;/textarea&gt;&lt;/p&gt;
+  &lt;p&gt; &lt;input type=&#34;submit&#34;&gt;&lt;/p&gt;
 &lt;/form&gt;
 </code></pre></li>
 <li>
@@ -75,10 +76,10 @@ ex)</p>
 ex)</p>
 </li>
 </ul>
-<pre><code>import cgi
+<pre tabindex="0"><code>import cgi
 form = cgi.FieldStorage()
-title = form[&quot;title&quot;].value
-description = form[&quot;description&quot;].value
+title = form[&#34;title&#34;].value
+description = form[&#34;description&#34;].value
 </code></pre><ul>
 <li>form 안의 내용 중 사용자에게 노출이필요 없는 input 태그는 type=&ldquo;hidden&rdquo; 속성을 주어 숨긴다. 
 ex) <code>&lt;input type=&quot;hidden&quot; name=&quot;pageId&quot; value={}&gt;</code></li>

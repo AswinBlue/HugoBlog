@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.87.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.101.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark"><title>Angular&nbsp;&ndash;&nbsp;AsWindBlew</title><link rel="stylesheet" href="/css/core.min.df05809cfa75ea0a430dc942a79e54236823f6be194b5bc34f0c64744ba5a1b55f91020ad551b34b8af7f2ebee758cc8.css" integrity="sha384-3wWAnPp16gpDDclCp55UI2gj9r4ZS1vDTwxkdEulobVfkQIK1VGzS4r38uvudYzI"><meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Angular" /><body><section id="header">
+<meta name="twitter:title" content="Angular" /><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2984318617287323"
+     crossorigin="anonymous"></script><body><section id="header">
     <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">AsWindBlew</span></a></span>
         <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="/categories/">Categories</a><a class="nav item" href="/tags/">Tags</a><a class="nav item" href="/about/">About</a><a class="nav item" href="https://gohugo%2eio/"target="_blank">Hugo</a></nav></div></span></div><div class="site slogan"><span class="title">published by AswinBlue</span></div></section><section id="content"><div class="article-container"><section class="article header">
     <h1 class="article title">Angular</h1><p class="article date">Aug 23, 2021<span class="reading-time"> • 5 minutes to read</span></p></section><article class="article markdown-body"><h1 id="angular">Angular</h1>
@@ -120,34 +121,34 @@ selector : 해당 component가 view에서 어떤 이름으로 표시될지 명�
 <li><code>templateUrl</code> : html 파일의 이름을 지정한다</li>
 <li><code>styleUrls</code> : css파일의 리스트를 나열한다.</li>
 </ul>
-<pre><code> @Input() product;                        // product라는 변수로 input을 받겠다는 선언
+<pre tabindex="0"><code> @Input() product;                        // product라는 변수로 input을 받겠다는 선언
  @Output() notify = new EventEmitter();   // notify 라는 변수를 상위 Component에서 사용 가능하게 하겠다고 선언
  // 한 component에서 다른 component를 호출할 때에는 ts 파일에서 정의한 이름을 태그로 생성한다.
  &lt;app-product-alerts                      // 태그 이름이 곧 component 이름(selector에 정의한)이다.
-   [product]=&quot;product&quot;                    // product라는 변수에 &quot;product&quot;라는 내용을 을 넣을 때 사용한다.
- (notify)=&quot;onNotify()&quot;&gt;                   // notify라는 변수에서 이벤트가 들어오면 onNotify() 함수를 실행, (onNotify() 함수는 class 안에 정의되어 있어야 함)
+   [product]=&#34;product&#34;                    // product라는 변수에 &#34;product&#34;라는 내용을 을 넣을 때 사용한다.
+ (notify)=&#34;onNotify()&#34;&gt;                   // notify라는 변수에서 이벤트가 들어오면 onNotify() 함수를 실행, (onNotify() 함수는 class 안에 정의되어 있어야 함)
  &lt;/app-product-alerts&gt;
 </code></pre><h3 id="routing">Routing</h3>
 <ul>
 <li>app.modules.ts(main component의 ts파일) 파일에서 routing 설정이 가능하다.</li>
 </ul>
-<pre><code>import { RouterModule } from '@angular/router';                                     // Routing을 위해 필요한 모듈
-import { ProductListComponent } from './product-list/product-list.component';`      // ProductListComponent라는 변수에 './product-list/product-list.component파일을 대응
-import { ProudctDetailsComponent } from './product-detail/product-detail.component';
+<pre tabindex="0"><code>import { RouterModule } from &#39;@angular/router&#39;;                                     // Routing을 위해 필요한 모듈
+import { ProductListComponent } from &#39;./product-list/product-list.component&#39;;`      // ProductListComponent라는 변수에 &#39;./product-list/product-list.component파일을 대응
+import { ProudctDetailsComponent } from &#39;./product-detail/product-detail.component&#39;;
 
 @NgModule({
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     RouterModule.forRoot([                            // Router 모듈로 Routing 세팅
-      { path: '', component: ProductListComponent },  // root 경로 '/' 에 위에서 ProductListComponent 변수에 대응시킨 파일을 매칭
-      { path: 'products/:productId', component: ProductDetailsComponent },          // 마찬가지로 '/products/{productId}' 에 ProudctDetailsComponent를 매칭
+      { path: &#39;&#39;, component: ProductListComponent },  // root 경로 &#39;/&#39; 에 위에서 ProductListComponent 변수에 대응시킨 파일을 매칭
+      { path: &#39;products/:productId&#39;, component: ProductDetailsComponent },          // 마찬가지로 &#39;/products/{productId}&#39; 에 ProudctDetailsComponent를 매칭
     ])
   ],
 </code></pre><ul>
 <li>./product-detail/product-detail.component.ts 에서 아래와 같은 설정을 추가로 해주어야 한다.</li>
 </ul>
-<pre><code>import { ActivatedRoute } from '@angular/router';           // routing을 당하는 곳에서 필요한 모듈
+<pre tabindex="0"><code>import { ActivatedRoute } from &#39;@angular/router&#39;;           // routing을 당하는 곳에서 필요한 모듈
 export class ProductDetailsComponent implements OnInit {    // component 를 정의할 class 선언
   product; -&gt; product 변수 선언
 constructor(private route: ActivatedRoute,)                 //  라우팅 관련 정보를 route라는 변수에 받았다.
@@ -156,14 +157,14 @@ constructor(private route: ActivatedRoute,)                 //  라우팅 관련
 
 ngOnInit() {                                                // view 생성시 동작을 정의
   this.route.paramMap.subscribe(params =&gt; {                 // constructor에서 정의한 route를 참조하여
-    this.product = products[+params.get('productId')];      // this.product는 products[index] 값을 가진다. 이때 index는 app.modules.ts에서 설정한 값이다. (url 경로에서 'products/' 다음에 들어간 숫자값)
+    this.product = products[+params.get(&#39;productId&#39;)];      // this.product는 products[index] 값을 가진다. 이때 index는 app.modules.ts에서 설정한 값이다. (url 경로에서 &#39;products/&#39; 다음에 들어간 숫자값)
   });
 }
 </code></pre><ul>
 <li>./product-detail/product-detail.component.html 에서 아래와 같이 설정한다.</li>
 </ul>
-<pre><code>&lt;h2&gt;Product Details&lt;/h2&gt;
-&lt;div *ngIf=&quot;product&quot;&gt;                 // product에 값이 들어가 있다면 아래 수행. 즉, ts파일에서 대입시킨 products[idx] 값이 존재하면 아래 동작 수행
+<pre tabindex="0"><code>&lt;h2&gt;Product Details&lt;/h2&gt;
+&lt;div *ngIf=&#34;product&#34;&gt;                 // product에 값이 들어가 있다면 아래 수행. 즉, ts파일에서 대입시킨 products[idx] 값이 존재하면 아래 동작 수행
 &lt;h3&gt;{{ product.name }}&lt;/h3&gt;           // json 형태의 값을 참조해 대입한다.
 &lt;h4&gt;{{ product.price | currency }}&lt;/h4&gt;
   &lt;p&gt;{{ product.description }}&lt;/p&gt;
@@ -172,17 +173,17 @@ ngOnInit() {                                                // view 생성시 �
 <ul>
 <li>반복, 출력, 링크</li>
 </ul>
-<pre><code>&lt;div *ngFor=&quot;let product of products; index as productId&quot;&gt;
+<pre tabindex="0"><code>&lt;div *ngFor=&#34;let product of products; index as productId&#34;&gt;
 /*
  *ngFor 은 반복을 뜻하는 예약어다. products 안의 원소를 하나씩 꺼내서 product 라 칭한다. 마치 java나 python의 ``for item in array`` 와 같다.
- ';' 로 구문을 구분할 수 있다.
+ &#39;;&#39; 로 구문을 구분할 수 있다.
  productId 변수에 index를 대입한다.
 */
-　　&lt;a [title]=&quot;product.name + ' details'&quot; [routerLink]=&quot;['/products', productId]&quot;&gt;
+　　&lt;a [title]=&#34;product.name + &#39; details&#39;&#34; [routerLink]=&#34;[&#39;/products&#39;, productId]&#34;&gt;
 /*
  [title] 은 마우스를 올릴 때 나오는 텍스트를 뜻한다.
- routerLink는 클릭시 넘어갈 링크이다. 링크를 []로 설정하면 []안의 내용을 appepnd 한 값을 의미한다. 즉 &quot;/product/:productId&quot; 의 주소를 나타낸다.
- &quot;&quot;안의 내용은 ts문법이고, 단순 텍스트는 '' 사이에 집어넣으면 된다.
+ routerLink는 클릭시 넘어갈 링크이다. 링크를 []로 설정하면 []안의 내용을 appepnd 한 값을 의미한다. 즉 &#34;/product/:productId&#34; 의 주소를 나타낸다.
+ &#34;&#34;안의 내용은 ts문법이고, 단순 텍스트는 &#39;&#39; 사이에 집어넣으면 된다.
 */
 　　　　&lt;h3&gt;
 　　　　　　{{ product.name }}       // product 객체의 name 필드를 출력한다.
@@ -192,7 +193,7 @@ ngOnInit() {                                                // view 생성시 �
 </code></pre><ul>
 <li>조건</li>
 </ul>
-<pre><code>&lt;p *ngIf=&quot;product.description&quot;&gt;         // *ngIf는 조건문을 뜻하는 예약어다. product 객체에 description 필드가 존재하면 아래를 실행한다.
+<pre tabindex="0"><code>&lt;p *ngIf=&#34;product.description&#34;&gt;         // *ngIf는 조건문을 뜻하는 예약어다. product 객체에 description 필드가 존재하면 아래를 실행한다.
   Description: {{ product.description }}
 &lt;/p&gt;
 </code></pre><ul>

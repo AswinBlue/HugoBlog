@@ -28,7 +28,7 @@
       <pubDate>Thu, 12 Aug 2021 10:41:00 +0900</pubDate>
       
       <guid>/post/c&#43;&#43;/</guid>
-      <description>C++ basics 매크로 #define MACRO 1 : MACRO 값으로 1을 지정 #undef MACRO : MACRO값에 지정된 내용 해제 여러줄의 매크로 값 지정 : #define PRINT(X) printf(&amp;quot;%d&amp;quot;, X);\ printf(&amp;quot;%d&amp;quot;, (X) + 1);\ printf(&amp;quot;%d&amp;quot;, (X) + 2); 매크로 합성 : #define A 1 #define B 1 #define</description>
+      <description>C++ basics 매크로 #define MACRO 1 : MACRO 값으로 1을 지정 #undef MACRO : MACRO값에 지정된 내용 해제 여러줄의 매크로 값 지정 : #define PRINT(X) printf(&amp;#34;%d&amp;#34;, X);\ printf(&amp;#34;%d&amp;#34;, (X) + 1);\ printf(&amp;#34;%d&amp;#34;, (X) + 2); 매크로 합성 : #define A 1 #define B 1 #define</description>
       
     </item>
     

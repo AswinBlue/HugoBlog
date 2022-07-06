@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.87.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.101.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark"><title>Docker&nbsp;&ndash;&nbsp;AsWindBlew</title><link rel="stylesheet" href="/css/core.min.df05809cfa75ea0a430dc942a79e54236823f6be194b5bc34f0c64744ba5a1b55f91020ad551b34b8af7f2ebee758cc8.css" integrity="sha384-3wWAnPp16gpDDclCp55UI2gj9r4ZS1vDTwxkdEulobVfkQIK1VGzS4r38uvudYzI"><meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Docker" /><body><section id="header">
+<meta name="twitter:title" content="Docker" /><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2984318617287323"
+     crossorigin="anonymous"></script><body><section id="header">
     <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">AsWindBlew</span></a></span>
         <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="/categories/">Categories</a><a class="nav item" href="/tags/">Tags</a><a class="nav item" href="/about/">About</a><a class="nav item" href="https://gohugo%2eio/"target="_blank">Hugo</a></nav></div></span></div><div class="site slogan"><span class="title">published by AswinBlue</span></div></section><section id="content"><div class="article-container"><section class="article header">
     <h1 class="article title">Docker</h1><p class="article date">Aug 12, 2021<span class="reading-time"> • 4 minutes to read</span></p></section><article class="article markdown-body"><h1 id="docker">Docker</h1>
@@ -129,14 +130,14 @@
 <li>docker 실행시 명령어를 미리 작성해 놓은 스크립트라고 보면 된다.</li>
 <li><code>docker-compose up</code> 명령으로 docker-compose 파일 빌드 가능. 하위 경로에 Dockerfile들이 각각의 서비스에 해당됨</li>
 </ul>
-<pre><code>version: '3' 				// 도커 컴퍼즈 버전 3이상 요구
+<pre tabindex="0"><code>version: &#39;3&#39; 				// 도커 컴퍼즈 버전 3이상 요구
 	services: 				// 서비스 내용들이 아래에 옴
 		service1: 			// 서비스 이름으로, 마음대로 정의 가능
 			build: ./S1 		// docker-compose 파일로부터 경로를 지정
 			volumes:
 				- ./S1:/home/root 	//	docker run -v 옵션 적용과 동일
 			ports:
-				- &quot;1234:1234&quot;		// docker run -p 옵션 적용과 동일
+				- &#34;1234:1234&#34;		// docker run -p 옵션 적용과 동일
 			environment:
 				- DEBUG_LEVEL=debug	//	환경변수 설정 가능
 			links: // docker-compose 3부터는 필요없어진 기능, 네트워크 연결을 위해 사용

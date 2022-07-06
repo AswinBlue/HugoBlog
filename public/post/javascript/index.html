@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.87.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.101.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark"><title>JavaScript&nbsp;&ndash;&nbsp;AsWindBlew</title><link rel="stylesheet" href="/css/core.min.df05809cfa75ea0a430dc942a79e54236823f6be194b5bc34f0c64744ba5a1b55f91020ad551b34b8af7f2ebee758cc8.css" integrity="sha384-3wWAnPp16gpDDclCp55UI2gj9r4ZS1vDTwxkdEulobVfkQIK1VGzS4r38uvudYzI"><meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="JavaScript" /><body><section id="header">
+<meta name="twitter:title" content="JavaScript" /><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2984318617287323"
+     crossorigin="anonymous"></script><body><section id="header">
     <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">AsWindBlew</span></a></span>
         <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="/categories/">Categories</a><a class="nav item" href="/tags/">Tags</a><a class="nav item" href="/about/">About</a><a class="nav item" href="https://gohugo%2eio/"target="_blank">Hugo</a></nav></div></span></div><div class="site slogan"><span class="title">published by AswinBlue</span></div></section><section id="content"><div class="article-container"><section class="article header">
     <h1 class="article title">JavaScript</h1><p class="article date">Jun 23, 2020<span class="reading-time"> • 3 minutes to read</span></p></section><article class="article markdown-body"><h1 id="javascript">JavaScript</h1>
@@ -17,10 +18,10 @@
 <p>document를 호출하고, .으로 함수를 호출한다.</p>
 </li>
 <li>
-<p>querySelector('')로 원하는 element 선택 가능, &lsquo;&lsquo;안의 내용은 css 선택자 문법과 같음</p>
+<p>querySelector(&rsquo;&rsquo;)로 원하는 element 선택 가능, &lsquo;&lsquo;안의 내용은 css 선택자 문법과 같음</p>
 </li>
 <li>
-<p>querySelectorAll('')로 원하는 속성의 element들을 nodeList(배열과 유사)형태로 선택 가능</p>
+<p>querySelectorAll(&rsquo;&rsquo;)로 원하는 속성의 element들을 nodeList(배열과 유사)형태로 선택 가능</p>
 <p>ex ) <code>document.querySelector('body')</code></p>
 <p>ex ) <code>document.querySelector('#new')</code></p>
 <p>ex ) <code>document.write(&quot;hello world&quot;)</code></p>
@@ -125,7 +126,7 @@
 </li>
 <li>String
 <ul>
-<li>' ' 나 &quot; &quot; 로 묶어서 사용</li>
+<li>&rsquo; &rsquo; 나 &quot; &quot; 로 묶어서 사용</li>
 <li>+ 으로 concatenate 가능</li>
 </ul>
 </li>
@@ -134,7 +135,7 @@
 </li>
 <li>Object</li>
 </ul>
-<h2 id="에벤트">에벤트</h2>
+<h2 id="이벤트">이벤트</h2>
 <ul>
 <li>onclick : 클릭 이벤트가 일어났을 때</li>
 <li>onchange : 텍스트 에디터의 내용이 변경되었을 경우</li>
@@ -142,11 +143,17 @@
 </ul>
 <h2 id="메소드">메소드</h2>
 <ul>
-<li>alert(&rsquo; &lsquo;) : 브라우저의 경고창에 '&rsquo; 안의 내용을 띄움</li>
+<li>alert(&rsquo; &lsquo;) : 브라우저의 경고창에 &rsquo;&rsquo; 안의 내용을 띄움</li>
 <li>.length : 문자열의 길이를 반환, 배열의 길이를 반환</li>
 <li>.indexOf(&rsquo; &lsquo;) : 문자열 중 &lsquo;&lsquo;에 속하는 문자 혹은 문자열이 시작되는 index를 반환, 0부터 카운팅</li>
 <li>.trim() : 문자열의 공백을 제거</li>
 <li>.value : element의 값을 뜻하는 변수 호출</li>
+</ul>
+<h2 id="함수">함수</h2>
+<ul>
+<li><code>var repeat = setInterval(function, time)</code> : time 만큼 delay를 주고 function을 반복한다. 독립 thread로 동작한다.</li>
+<li><code>clearInterval(repeat)</code> : 인자로 받은 interval 반복함수를 정지한다.</li>
+<li><code>var result = setTimeout(function, time)</code> : time만큼 delay후 function을 실행한다. 실행후 result에는 &rsquo;true&rsquo;가 저장된다.</li>
 </ul>
 <h2 id="jquery">Jquery</h2>
 <ul>

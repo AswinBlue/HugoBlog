@@ -7,10 +7,90 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>©2020 Notepadium.</copyright>
-    <lastBuildDate>Wed, 02 Feb 2022 13:22:27 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jun 2022 20:00:00 +0900</lastBuildDate>
     
         <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>thymeleaf</title>
+      <link>/post/thymeleaf/</link>
+      <pubDate>Wed, 29 Jun 2022 20:00:00 +0900</pubDate>
+      
+      <guid>/post/thymeleaf/</guid>
+      <description>Thymeleaf 서버에서 view를 구성할 때 사용하는 라이브러리 태그 형식의 문법을 사용하며 vue와 유사하다. 기본 문법 thymeleaf 공식 튜토리얼 에서 기본적인 문법을 확인할 수 있다</description>
+      
+    </item>
+    
+    <item>
+      <title>Tailwind</title>
+      <link>/post/tailwind/</link>
+      <pubDate>Thu, 02 Jun 2022 21:55:38 +0900</pubDate>
+      
+      <guid>/post/tailwind/</guid>
+      <description>Tailwind Css 프레임워크로 빠르고 효율적으로 css를 설정할 수 있는 툴이다. 설치 npm install -D tailwindcss@latest 명령을 사용하여 설치가 가능하다. npx tailwindcss init -P 명령을 사용하면 tailwind.config.js 파일이 생성되며</description>
+      
+    </item>
+    
+    <item>
+      <title>Spring_boot</title>
+      <link>/post/spring_boot/</link>
+      <pubDate>Mon, 30 May 2022 19:20:23 +0900</pubDate>
+      
+      <guid>/post/spring_boot/</guid>
+      <description>Spring Boot Spring boot는 서버 생성을 위한 도구로, spring 프레임워크에 편의성을 향상시킨 프레임워크이다. Java, Kitlin, Groovy 등의 언어로 구현이 가능하다. 개발환경 java 기반으로 동작하</description>
+      
+    </item>
+    
+    <item>
+      <title>Algorithm</title>
+      <link>/post/algorithm/</link>
+      <pubDate>Sun, 24 Apr 2022 18:16:23 +0900</pubDate>
+      
+      <guid>/post/algorithm/</guid>
+      <description>Algorithm 그래프 탐색 DFS 용도 : 경로가 있는지 확인할 때 사용 가능 자로구조 : stack 방법 : 시작 node를 stack에 넣는다. stack이 모두 빌때까지 아래 동작을 반복한</description>
+      
+    </item>
+    
+    <item>
+      <title>VsCode</title>
+      <link>/post/vscode/</link>
+      <pubDate>Sat, 16 Apr 2022 09:07:48 +0900</pubDate>
+      
+      <guid>/post/vscode/</guid>
+      <description>VS code visual studio code 사용법 개발환경 C / C++ 컴파일러 gcc 혹은 mingw 설치가 필요하다. 인터넷에서 설치하도록 한다. 설정파일 컴파일 및 실행을 위해서는 launch.json, setting.json, tasks.json 파일이 필요하다.</description>
+      
+    </item>
+    
+    <item>
+      <title>C&#43;&#43;_stl</title>
+      <link>/post/c&#43;&#43;_stl/</link>
+      <pubDate>Tue, 12 Apr 2022 19:17:21 +0900</pubDate>
+      
+      <guid>/post/c&#43;&#43;_stl/</guid>
+      <description>C++ STL 자료구조 map key-value 쌍으로 이루어진 tree형태의 자료구조 중복을 허용하지 않음 C++에서는 red black tree로 구현되어 삽입,삭제가 O(log n) 안에 이루어진다. 내부</description>
+      
+    </item>
+    
+    <item>
+      <title>Window</title>
+      <link>/post/window/</link>
+      <pubDate>Sat, 19 Mar 2022 08:29:51 +0900</pubDate>
+      
+      <guid>/post/window/</guid>
+      <description>#MS Window MS window 사용시 필요한 편이 기능들을 나열 WSL2 윈도우에서 리눅스를 실행하는 방법이다. windows 10 이상부터 지원 가능하며, microsoft store에서 ubuntu를 설치하는 방</description>
+      
+    </item>
+    
+    <item>
+      <title>Firebase_react</title>
+      <link>/post/firebase_react/</link>
+      <pubDate>Sat, 12 Feb 2022 19:32:34 +0900</pubDate>
+      
+      <guid>/post/firebase_react/</guid>
+      <description>Firebase with React react에서 firebase를 활용하는 방법 firebase SDK를 설치하거나 웹상에서 설치없이 사용하는 방법은 firebase 기본을 참조 인증 (Auth) firebase 로 계정 생성 및 로그인 firebase</description>
+      
+    </item>
     
     <item>
       <title>Cryptocurrency</title>
@@ -23,12 +103,32 @@
     </item>
     
     <item>
+      <title>Firebase</title>
+      <link>/post/firebase/</link>
+      <pubDate>Wed, 19 Jan 2022 21:02:46 +0900</pubDate>
+      
+      <guid>/post/firebase/</guid>
+      <description>firebase firebase는 실시간 db로 유명하며, google에 인수되고 폭이 넓어졌다. Amazon의 Amplify가 firebase와 유사하다. 일정</description>
+      
+    </item>
+    
+    <item>
       <title>Golang</title>
       <link>/post/golang/</link>
       <pubDate>Fri, 14 Jan 2022 21:52:14 +0900</pubDate>
       
       <guid>/post/golang/</guid>
-      <description>Go 설치 및 프로젝트 생성 구글 검색을 통해 설치파일을 다운받는다. root 디렉터리 설정이 필요하다.(&amp;lsquo;C:\Go, &amp;lsquo;/usr/local/go/bin/&#39;) 이후 생성할 프로젝트는 이 root 디렉</description>
+      <description>Go 설치 및 프로젝트 생성 구글 검색을 통해 설치파일을 다운받는다. root 디렉터리 설정이 필요하다.(&amp;lsquo;C:\Go, &amp;lsquo;/usr/local/go/bin/&amp;rsquo;) 이후 생성할 프로젝트는 이 root 디렉</description>
+      
+    </item>
+    
+    <item>
+      <title>Tensorflow</title>
+      <link>/post/tensorflow/</link>
+      <pubDate>Sat, 27 Nov 2021 08:15:42 +0900</pubDate>
+      
+      <guid>/post/tensorflow/</guid>
+      <description>#Tensorflow TensorFlow는 구글에서 수치연산을 위해 만든 라이브러리이다. 기본 개념 node와 edge로 구성된 graph를 이용해 수치 연산을 수행한다. n</description>
       
     </item>
     
@@ -118,7 +218,7 @@
       <pubDate>Thu, 12 Aug 2021 10:41:00 +0900</pubDate>
       
       <guid>/post/c&#43;&#43;/</guid>
-      <description>C++ basics 매크로 #define MACRO 1 : MACRO 값으로 1을 지정 #undef MACRO : MACRO값에 지정된 내용 해제 여러줄의 매크로 값 지정 : #define PRINT(X) printf(&amp;quot;%d&amp;quot;, X);\ printf(&amp;quot;%d&amp;quot;, (X) + 1);\ printf(&amp;quot;%d&amp;quot;, (X) + 2); 매크로 합성 : #define A 1 #define B 1 #define</description>
+      <description>C++ basics 매크로 #define MACRO 1 : MACRO 값으로 1을 지정 #undef MACRO : MACRO값에 지정된 내용 해제 여러줄의 매크로 값 지정 : #define PRINT(X) printf(&amp;#34;%d&amp;#34;, X);\ printf(&amp;#34;%d&amp;#34;, (X) + 1);\ printf(&amp;#34;%d&amp;#34;, (X) + 2); 매크로 합성 : #define A 1 #define B 1 #define</description>
       
     </item>
     
@@ -178,7 +278,7 @@
       <pubDate>Mon, 20 Jul 2020 20:40:05 +0900</pubDate>
       
       <guid>/post/nodejs/</guid>
-      <description>Node.js 기본 명령 npm init : 패키지 생성 npm install : 라이브러리 설치 node main.js : 실행(main.js) npx &amp;lt;package_name&amp;gt; : 설치하지 않고 일회만 실행 node main.js : 패키지 실행 (main.js파일)</description>
+      <description>Node.js 기본 명령 npm init : 패키지 생성 npm install : 라이브러리 설치 -P : package.json에 저장, 기본옵션 -O : optionalDependencies에 저장</description>
       
     </item>
     
@@ -208,7 +308,7 @@
       <pubDate>Tue, 23 Jun 2020 20:38:45 +0900</pubDate>
       
       <guid>/post/javascript/</guid>
-      <description>JavaScript 기본적으로 HTML 위에서 돌아가는 코드 body 태그 안에 태그를 넣고 안에 작성 document를 호출하고, .으로 함수를 호출한다. querySelector(&#39;</description>
+      <description>JavaScript 기본적으로 HTML 위에서 돌아가는 코드 body 태그 안에 태그를 넣고 안에 작성 document를 호출하고, .으로 함수를 호출한다. querySelector(&amp;</description>
       
     </item>
     
