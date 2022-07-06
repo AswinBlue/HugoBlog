@@ -100,3 +100,6 @@ draft = false
         "watch:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o src/main/resources/static/css/tailwind.css -w"
       }
       ```
+
+     - tailwind를 적용할 파일들을 앞서 tailwind.config.js 파일에서 'content' 항목에 넣어 지정했었다. 이 파일들에 새로운 class를 사용하였다면 postcss 명령으로 새로 build를 해줘야 한다.
+     - build가 아닌 watch를 사용했다면 실시간으로 변경점이 적용된다.
