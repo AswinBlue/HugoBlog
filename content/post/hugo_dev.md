@@ -91,6 +91,13 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
  - 프로젝트 root디렉터리에 (3)에서 만든 소스용 git을 연동시킨다.
  - /public 디렉터리에 (3)에서 만든 publish용 git을 연동시킨다.
     - git 폴더 안에 git을 연동하려면 `git submodule add <URL>`명령어를 이용한다.
+6. 테마를 선택한다. 
+ - 인터넷에서 hugo 테마를 검색하여, 원하는 테마의 git repository를 `/themes` 경로에 clone 한다. 
+ - 이후, 해당 테마에서 지원하는 config 파일을 root 경로에 복사한다.
+   - config 파일은 toml, yaml, json 형태로 작성이 가능하며, hugo에서는 위 순서대로 config파일을 찾아 적용한다. (즉, config.toml파일이 있으면 config.yml파일은 적용되지 않음)
+7. 기본 탬플릿을 설정한다. 
+ - `/archtypes/default.md` 파일을 수정하면, `hugo new NEW_POST.md` 를 이용해 새로운 파일을 생성할 때 사용되는 기본 md파일 탬플릿을 정의할 수 있다. 
+   - 파일 생성시 .md 확장자가 붙여야 정상 동작함에 주의한다. 
 
 ## 기본 동작
 
@@ -110,12 +117,11 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 	```
 	hugo -t <THEME>
 	```
-
-- 본인은 hugo-PaperMod 테마를 사용했다. 
-- config파일을 만들어서 쉽게 빌드할 수도 있는데, config 파일은 toml, yaml, json 형태로 작성이 가능하며, hugo에서는 위 순서대로 config파일을 찾아 적용한다. (즉, config.toml파일이 있으면 config.yml파일은 적용되지 않음)
-- config파일을 적용하는 방식은 config파일에 따라 `hugo --config config.yml` 와 같이 명령어를 사용하면 된다.
+- config파일에 따라 `hugo --config config.yml` 와 같이 명령어를 사용할 수도 있다.
+- 본 페이지는 hugo-PaperMod 테마를 사용했다. 
 
 - 문서 최상단에 +++로 둘러쌓인 부분은 설정 부분이다. draft=false로 설정을 해야 화면에 표시됨에 주의한다.
+  - toml을 사용한다면 `+++`로 formatter를 구성 하고, yaml은 `---`, json은 `{}` 을 사용한다. 
 
 - public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
 	```
