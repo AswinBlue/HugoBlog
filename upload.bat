@@ -1,6 +1,7 @@
 ::build project
 ::hugo -t hugo-notepadium
-hugo -t hugo-PaperMod
+::hugo -t hugo-PaperMod
+hugo --config config.yml
 
 ::add & commit public
 cd public
