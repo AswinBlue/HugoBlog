@@ -94,35 +94,41 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 
 ## 기본 동작
 
-새로운 Hugo 사이트를 생성하는 명령어, <NAME> 폴더 안에 Hugo 구조에 맞게 폴더 및 파일이 자동 생성된다.
-```
-hugo new site <NAME>
-```
+1. 프로젝트 생성
+- 새로운 Hugo 사이트를 생성하는 명령어, <NAME> 폴더 안에 Hugo 구조에 맞게 폴더 및 파일이 자동 생성된다.
+	```
+	hugo new site <NAME>
+	```
 
-생성된 <NAME> 폴더에서 새로운 post를 생성하는 명령어, content 폴더 안에 archtype에 맞게 내용을 적어 파일을 생성한다.
-```
-hugo new <POST>.md
-ex) hugo new post/hugo.md
-```
+- 생성된 <NAME> 폴더에서 새로운 post를 생성하는 명령어, content 폴더 안에 archtype에 맞게 내용을 적어 파일을 생성한다.
+	```
+	hugo new <POST>.md
+	ex) hugo new post/hugo.md
+	```
 
-테마에 맞는 형식으로 content 폴더 안의 내용을 이용해 public 폴더 안에 내용을 생성한다.
-```
-hugo -t <THEME>
-```
-본인은 hugo-notepadium 테마를 사용했다. 문서 최상단에 +++로 둘러쌓인 부분은 설정 부분이다. draft=false로 설정을 해야 화면에 표시된다. (이걸 몰라서 한참을 헤맸다.)
+- 테마에 맞는 형식으로 content 폴더 안의 내용을 이용해 public 폴더 안에 내용을 생성한다.
+	```
+	hugo -t <THEME>
+	```
 
-public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
-```
-hugo server [--theme <THEME_PATH>]
-```
-서버 실행 후 http://localhost:1313 경로에서 웹 브라우저로 내용을 확인할 수 있다.
+- 본인은 hugo-PaperMod 테마를 사용했다. 
+- config파일을 만들어서 쉽게 빌드할 수도 있는데, config 파일은 toml, yaml, json 형태로 작성이 가능하며, hugo에서는 위 순서대로 config파일을 찾아 적용한다. (즉, config.toml파일이 있으면 config.yml파일은 적용되지 않음)
+- config파일을 적용하는 방식은 config파일에 따라 `hugo --config config.yml` 와 같이 명령어를 사용하면 된다.
 
-내용이 완벽하다면 public 폴더 안의 git을 push 하면 `<GIT_ID>.github.io` 주소에서 방금 본 내용을 볼 수 있다. `ex : aswinblue.github.io`
+- 문서 최상단에 +++로 둘러쌓인 부분은 설정 부분이다. draft=false로 설정을 해야 화면에 표시됨에 주의한다.
 
-Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.
+- public 폴더에 생성한 내용을 push 하기 전 테스트 해 본다.
+	```
+	hugo server [--theme <THEME_PATH>]
+	```
+- 서버 실행 후 http://localhost:1313 경로에서 웹 브라우저로 내용을 확인할 수 있다.
+
+- 내용이 완벽하다면 public 폴더 안의 git을 push 하면 `<GIT_ID>.github.io` 주소에서 방금 본 내용을 볼 수 있다. `ex : aswinblue.github.io`
+
+- Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.
 
 ## Adsense 추가
-구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
-1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `adsense.html` 파일을 만들고, 애드센스에 필요한 script를 붙여넣은 후 저장한다.
-1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
-1. `hugo -t 원하는_테마` 명령으로 다시 빌드하고, 서버에 push한다.
+- 구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
+	1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `adsense.html` 파일을 만들고, 애드센스에 필요한 script를 붙여넣은 후 저장한다.
+	1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
+	1. `hugo -t 원하는_테마` 명령으로 다시 빌드하고, 서버에 push한다.
