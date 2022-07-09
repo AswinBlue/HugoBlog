@@ -24,3 +24,20 @@ categories: ["dev",]
   - submodule에서 commit을 작성하고, 부모 repository에서 commit을 작성하는 순으로 진행해야 모든 변경점이 정상적으로 반영될 수 있다. (child -> parent 순)
   - remote에서 local로 변경점을 받아올 때는, parent를 먼저 pull 하고 submodule을 pull 한다. (parent -> child 순)
 
+## CRLF LF
+- 윈도우 형태의 EOL(\n) 과 리눅스 형태의 EOL(\r\n) 차이 떄문에 git은 autocrlf 명령을 통해 자동으로 개행문자를 바꿔주는 기능을 지원한다. 
+- `git config <--system> core.autocrlf <false>` 명령으로 이 기능을 조절할 수 있다.
+  - `--system` : per-system solution
+  - `--global` : per-user solution
+  - `--local`  : per-project solution
+  - `true`  : LF -> CRLF
+  - `input` : LF -> LF
+  - `false` : don't change
+  
+- 개행 문자 차이 때문에 윈도우에서 정상동작 하던 SHA-256이 리눅스 환경에서 비정상 동작을 할 수 있다. 
+- 이때는 아래 명령을 순서대로 입력하여 git에서 발생한 개행문자 오류를 해결할 수 있다.   
+  ```
+  git config --global core.autocrlf input
+  git rm --cached -r .
+  # 이후 commit 수행하면 됨
+  ```
