@@ -13,6 +13,16 @@ categories: ["dev",]
 - Cache 확인: `git ls-files --stage FILE_PATH`
 - Cache 삭제: `git rm -r --cached FILE_PATH`
   - `'PATH' already exists in the index` 오류가 발생했을 때, cache를 확인하고 삭제하면 해결 가능하다. 
+## config
+- `git config` 명령으로  git 관련 setting을 확인 및 설정할 수 있다. 
+- `git config --list` : 설정된 내용 확인
+- `git config --add` : 설정 추가
+  - `--system` : 컴퓨터 환경에 적용
+  - `--global` : 사용자 환경에 적용
+  - `--local` : repository별로 설정 적용, default값
+    - `git config --global user.name <USER_NAME>` : 사용자 이름 설정, 구역 인자를 붙이면 --add 는 생략가능
+    - `git config --global user.email <EMAIL>` : 사용자 email 설정, 구역 인자를 붙이면 --add 는 생략가능
+- `git config --unset` : 설정 제거
 
 ## Submodule
 1. 생성
