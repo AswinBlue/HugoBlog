@@ -265,6 +265,15 @@ draft = false
   - `save(ENTITY)` : 저장, DB의 insert / update 에 해당
   - `delete(ENTITY)` : 특정 Entity 삭제, DB의 delete에 해당
 
+   - 상세 내용은 링크를 참조한다.
+     <details><summary>JPA Usage Links</summary>
+       
+     - [JPA Repository Query function](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#jpa.query-methods.query-creation)
+     - [JPA Repository Query annotation](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#repositories.query-streaming)
+     -  [JPA Repository get Top x result](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#repositories.limit-query-result)
+     -  [JPA update data from DTO](https://www.baeldung.com/spring-data-partial-update#1-mapping-strategy)
+     </details>
+     
 1. DTO 정의
    - 서버의 Controller에서 이를 처리 가능하며, 사용자 입력을 Java Class로 대응시킨 형태를 DTO라 칭한다.
    - DTO를 다음과 같이 정의하였다고 하자  
@@ -315,9 +324,12 @@ draft = false
     }
     ```
    - 직접 구상한 쿼리를 사용하고 싶다면 camelcase로 구성된 함수 이름으로 쿼리를 추가할 수 있다.
-   - 상세 내용은 링크를 참조한다.
-     - [JPA Repository Query function](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#jpa.query-methods.query-creation)
-     - [JPA Repository Query annotation](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#repositories.query-streaming)
+       <details> <summary> Tips </summary>
+         
+         [no property ~ found for type ~ 오류 해결법](https://stackoverflow.com/questions/19733464/order-by-date-asc-with-spring-data)
+       </details>
+     
+     
      ```
      public interface searchNameRepository extends CrudRepository<SampleEntity, Long> {
          // select * from SampleEntity where name = ?1     
@@ -372,7 +384,15 @@ draft = false
       - `action` : 데이터를 보낼 url을 설정. ex) action="/data/part1"
       - `method` : 전송 방법을 설정한다. post 혹은 get 적용 가능
     - `form` 태그 안의 `input`태그를 두고, 인자로 `name`을 설정한다.
-
+      ```
+      <form action="/data/userRank" method="post">
+        <label>type your character name</label>
+        <input type="text" name="userName">
+        <br/>
+        <button>see table</button>
+        <br/>
+      </form>
+      ```
 1. controller 구현
     - DTO로 사용할 class를 선언한다. (ex: DtoSample)
     - controller 를 구현한 java 파일에서 `@PostMapping` annotation을 달고, 인자로 위에서 선언한 DTO를 받는다.   
@@ -383,3 +403,88 @@ draft = false
           return "returnView";
         }
       ```
+
+
+### Bean
+- Spring boot를 실행하면 container가 동작하는데, 이 container가 관리하는 객체를 bean이라고 한다.
+1. 선언
+   1. Component 사용
+      - `@Component` annotation을 class에 붙여주면, 해당 class가 bean으로 등록된다.
+      - 직접 구현한 객체를 bean으로 적용할 떄 사용할 수 있다.
+      - `@AutoWired` annotation을 이용해 의존성을 정의할 수 있다.
+        ```
+        @Component
+        class C {
+          // C가 bean으로 등록
+          public C() {
+            System.out.println("use C as bean");
+          }
+        
+          @AutoWired
+          private D d; // D 라는 class에 대한 dependency 정의
+        }
+        ```
+   1. Bean 사용
+      - `@Configuration` annotation을 class에 붙여주고, 해당 class에 선언된 함수에 `@Bean` annotation을 붙여준다.
+      - `@Bean` 이 붙은 함수에서 반환되는 값들은 모두 Bean으로 관리된다.
+      - 3rd party에서 구현된 객체를 bean으로 적용할 때 사용할 수 있다.
+      - bean으로 반환할 객체 생성자에 인자를 넣어 의존성을 정의할 수 있다. 
+        ```
+        class Foo {
+          public Foo() {
+            System.out.println("use Foo as bean");
+          }
+        }
+        class Bar {
+          public Bar() {
+            System.out.println("Bar as dependency");
+          }
+        }
+
+        @Configuration
+        class configure {
+          @Bean
+          public Bar bar() {
+            return new Bar(); // Bar을 bean으로 선언
+          }
+          @Bean
+          public Foo foo() {
+            return new Foo(new Bar()); // Foo가 Bar의 의존성을 가짐을 표현
+          }
+        }
+        ```
+   
+   - spring은 `@ComponentScan` annotation이 붙은 class에서 component(bean)을 찾아가기 시작한다.
+     - spring 프로젝트를 생성하면 main 함수가 있는 class가 있는데, 이 clalss에 붙은 `@SpringBootApplication` annotation이 `@ComponentScan` annotation을 포함하고 있다.
+     - `@Configuration` annotation 도 `@Component` annotation을 포함하고 있어 scan 대상이 된다.
+     - `@Controller` 로 선언된 class들도 bean으로 관리되는데, 이는 `@Controller`가 `@Component` annotation을 포함하고 있기 때문이다.
+
+
+## Annotation 및 기능
+### Value
+- `@Value` annotation을 변수에 선언하면 프로젝트 설정파일(application.yml) 에서 변수를 가져올 수 있다.
+    ```
+    @Value(${server.port})
+    private int port;
+    ```
+### Scheduled
+- spring boot로 특정 주기마다 반복 동작을 수행하는 기능을 구현할 수 있다.
+1. main 함수가 선언된 class에 `@EnableScheduling` 을 선언한다.
+2. schedule을 관리할 class(Scheduler)를 선언하고, `@Component` annotation을 붙인다. 
+3. 에서 생성한 Scheduler class에 함수를 선언하고, `@Scheduled` annotation을 붙인다.
+   - `@Scheduled(cron = "1 2 3 4 5 ?")` : 매 5월4일3시2분1초 에 동작
+     - 숫자대신 *을 하면 모든 값에 동작하도록 설정 가능
+     - 앞에서부터 초,분,시,일,월,요일이며 요일은 0이 일요일 6이 토요일, 7또한 일요일이다. 
+     - [상세 내용은 공식 document 참조](https://spring.io/blog/2020/11/10/new-in-spring-5-3-improved-cron-expressions)
+   - `fixedDelay=1000` : 매 1초마다 동작(함수 종료 시점부터 1초)
+   - `fixedRate=1000` : 매 1초마다 동작(함수 시작 시점부터 1초)
+
+### SLF4J
+- 로그를 쉽게 설정하기 위한 툴
+
+## 참조한 사이트
+1. https://allonsyit.tistory.com/43
+1. https://galid1.tistory.com/494
+1. https://atoz-develop.tistory.com/entry/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B9%88Bean%EC%9D%98-%EA%B0%9C%EB%85%90%EA%B3%BC-%EC%83%9D%EC%84%B1-%EC%9B%90%EB%A6%AC
+1. https://goateedev.tistory.com/128
+1. https://itworldyo.tistory.com/40
