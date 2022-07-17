@@ -403,6 +403,16 @@ draft = false
           return "returnView";
         }
       ```
+     - parameter를 꼭 DTO 형태로 받지 않을 수도 있다.
+       - `@RequestBody`, `@RequestParam` annotation을 이용하여 데이터를 받을 수 있다.
+           ```
+             public String handleUserNameForm(@RequestBody String userName, Model model) {}
+             // userName = "userName=TESTNAME" 과 같이 데이터가 받아진다.
+           ```
+           ```
+             public String handleUserNameForm(@RequestParam String userName, Model model) {}
+             // userName = "TESTNAME" 과 같이 데이터를 받을 수 있다.
+           ```
 
 
 ### Bean
@@ -488,3 +498,4 @@ draft = false
 1. https://atoz-develop.tistory.com/entry/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B9%88Bean%EC%9D%98-%EA%B0%9C%EB%85%90%EA%B3%BC-%EC%83%9D%EC%84%B1-%EC%9B%90%EB%A6%AC
 1. https://goateedev.tistory.com/128
 1. https://itworldyo.tistory.com/40
+1. https://docs.spring.io/spring-data/jpa/docs/current/reference/html/

@@ -20,7 +20,7 @@ draft = false
 - 태그 형식의 문법을 사용하며 vue와 유사하다.
 
 ## 기본 문법
-- [thymeleaf 공식 튜토리얼](https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#attribute-precedence) 에서 기본적인 문법을 확인할 수 있다.
+- [thymeleaf 공식 튜토리얼](https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html) 에서 기본적인 문법을 확인할 수 있다.
 - 태그 안에  `th:속성="값"` 형태의 속성을 추가하는 형태로 사용한다.
 
 1. text
