@@ -39,14 +39,14 @@ draft = false
 2. src 경로에 javascript파일들 구성
  - 'index.js' 에 메인 화면에 사용된 객체가 정의되어 있다. 아래 내용은 id가 'root' 인 division에 'App'을 적용하겠다는 의미이다.
 
-```
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-```
+    ```
+    ReactDOM.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+      document.getElementById('root')
+    );
+    ```
 
  - 'index.js'에서 `<App/>` 라 되어있는 사용자 정의 태그를 생성했는데, `App`은 'App.js'에 정의되어 있고, 'index.js'에서 'App.js'를 참조한다.
  - 'App.js'에서 선언된 'App' 이라는 이름의 함수가 반환하는 값이 'App'태그에 치환된다고 보면 된다.
@@ -90,36 +90,36 @@ ReactDOM.render(
 1. 일반 함수
  - javascript와 동일하게 선언 가능하다.
 
-```
-function Subject() {
-    return (
-	    <div>
-        <a href="/" onClick={ function(e) {
-          e.preventDefault();
-          this.props.onChangePage();  // 상위 컴퍼넌트로 부터 받은 함수 실행
-        }
-		</div>
-	);
-```
+    ```
+    function Subject() {
+        return (
+    	    <div>
+            <a href="/" onClick={ function(e) {
+              e.preventDefault();
+              this.props.onChangePage();  // 상위 컴퍼넌트로 부터 받은 함수 실행
+            }
+    		</div>
+    	);
+    ```
 
 2. arrow 함수
  - `FUNCTION_NAME = (VARIABLES) => { BODY }` 형태로 이루어져 있다.
  - VARIABLES는 ','로 나누어져 두개 이상의 인자를 선언할 수 있고, BODY에서 사용될 수 있다.
  - 위 함수를 호출하려면 `FUNCTION_NAME(VARIABLES)` 형태로 호출 가능하다.
 
-```
-highlightSquares = i => {
-  if (this.props.winningSquares.length > 0) {
-    if (this.props.winningSquares.indexOf(i) > -1) {
-      return "square winningSquares";
-    } else {
-      return "square";
-    }
-  } else {
-    return "square";
-  }
-};
-```
+    ```
+    highlightSquares = i => {
+      if (this.props.winningSquares.length > 0) {
+        if (this.props.winningSquares.indexOf(i) > -1) {
+          return "square winningSquares";
+        } else {
+          return "square";
+        }
+      } else {
+        return "square";
+      }
+    };
+    ```
 
 ### 변수
  - hoisting : javascript에서는 변수를 scope(함수 혹은 블록)의 가장 위로 끌어올려서, 먼저 선언된것처럼 인식하는 기능이 있다.
@@ -128,61 +128,61 @@ highlightSquares = i => {
   - var는 function-scoped 변수이다. 함수가 끝나기까지 해당 변수는 유지된다. (hoisting)
   - var를 block-scoped로 낮추기 위해서는 IIFE, 'use strict' 등의 방법을 사용할 수도 있지만 let으로 선언하는게 빠르다.
 
-```
-function TEST() {
-  for (var i = 0; i < 10; i++) {
-    console.log('i: ', i); // 정상출력
-  }
-  console.log('i: ', i); // 정상출력
-}
-console.log('i: ', i); // 오류
-```
+    ```
+    function TEST() {
+      for (var i = 0; i < 10; i++) {
+        console.log('i: ', i); // 정상출력
+      }
+      console.log('i: ', i); // 정상출력
+    }
+    console.log('i: ', i); // 오류
+    ```
 
 - 동일한 이름의 변수를 재선언할 수 있고, hoisting에 의해 나중에 선언한 변수를 먼저 사용할수도 있다. (오류를 일으키기 좋은 허용이다)
 
-```
-var A = 1
-var A = 2 // 가능
-
-str='abcd' // 가능
-var str
-```
+  ```
+  var A = 1
+  var A = 2 // 가능
+  
+  str='abcd' // 가능
+  var str
+  ```
 
  2. let
   - es2015에서 추가된 문법
   - 재선언 불가능
   - hoisting 동작 안함
 
-```
-let A = 1
-let A = 2 // 불가능
-A = 3 // 가능
-
-str='abcd' // 불가능
-let str
-```
+    ```
+    let A = 1
+    let A = 2 // 불가능
+    A = 3 // 가능
+    
+    str='abcd' // 불가능
+    let str
+    ```
 
  3. const
   - es2015에서 추가
   - 선언과 동시에 값 할당 필요, 재정의 불가능
   - hoisting 동작 안함
 
-```
-const A = 1
-const A = 2 // 불가능
-A = 3 // 불가능
-
-str='abcd' // 불가능
-const str // 불가능
-```
+    ```
+    const A = 1
+    const A = 2 // 불가능
+    A = 3 // 불가능
+    
+    str='abcd' // 불가능
+    const str // 불가능
+    ```
 
  4. 선언없이 정의
   - 아무 타입을 붙이지 않고 선언하면 전역변수로 선언된다.
 
-```
-str='12345'
-A=5
-```
+    ```
+    str='12345'
+    A=5
+    ```
 
 #### string
 - 문자열을 담는 변수로, 아래와 같은 함수들을 지원한다.
@@ -196,45 +196,45 @@ A=5
  - 전개 연산자 이후 다른 변수가 오면 오류가 난다. `[a, b, ...c, d] = [1,2,3,4,5] // 오류`
  - 선언된 변수를 전개연산자로 다른 변수에 넣을수도 있다.
  - `ARRAY.indexOf(ITEM)` : ARRAY 배열안의 ITEM의 index를 반환한다.
-```
-var A = [1, 2, 3, 4, 5]
-var B = [...A] // B = [1, 2, 3, 4, 5]
-```
+    ```
+    var A = [1, 2, 3, 4, 5]
+    var B = [...A] // B = [1, 2, 3, 4, 5]
+    ```
 
 #### 반복(순회)
 - 배열 내용을 순회하는 방법은 다음과 같다.   
 1) map 함수
-```
-var A = [1,2,3]
-A.map((a) => {
-  // 원하는 동작을 입력하면 된다.
-})
-A.map(Math.sqrt) // lambda함수 외 일반함수를 넣어도 된다.
-```
+    ```
+    var A = [1,2,3]
+    A.map((a) => {
+      // 원하는 동작을 입력하면 된다.
+    })
+    A.map(Math.sqrt) // lambda함수 외 일반함수를 넣어도 된다.
+    ```
 2) for-of
-```
-var A = [1,2,3]
-for (var a of A) {
-  // java의 for( : ) 와 같다
-}
-```
+    ```
+    var A = [1,2,3]
+    for (var a of A) {
+      // java의 for( : ) 와 같다
+    }
+    ```
 - 객체의 배열도 동일한 방법으로 순회가 가능하다. 다만 비구조화(destructing)가 포함된다.
-```
-var B = [{a:1, b:2, c:3}, {a:4, b:5, c:6}]
-B.map({a,b,c} => {
-  // 원하는 동작 수행
-})
-for (var {a:aa, b:bb, c:cc} of B) {
-  // key가 마음에들지 않으면 재정의도 가능하다.
-}
-```
+  ```
+  var B = [{a:1, b:2, c:3}, {a:4, b:5, c:6}]
+  B.map({a,b,c} => {
+    // 원하는 동작 수행
+  })
+  for (var {a:aa, b:bb, c:cc} of B) {
+    // key가 마음에들지 않으면 재정의도 가능하다.
+  }
+  ```
 
 #### 비교
 - filter 함수를 이용하여 조건에 맞는 요소만 선택 가능하다.
-```
-var a = [1,2,3,4,5,6,7]
-var b = a.filter(i => i < 4); // b = [1,2,3]
-```
+  ```
+  var a = [1,2,3,4,5,6,7]
+  var b = a.filter(i => i < 4); // b = [1,2,3]
+  ```
 
 ### 객체
  - Json형태로 이루어져 있다. `var obj = {'a':10, b:20}` key값은 ''를 붙여도 되고 안붙여도 된다.
@@ -248,34 +248,34 @@ var b = a.filter(i => i < 4); // b = [1,2,3]
 - 전개 연산자 `...` 을 사용하여 객체 내용을 나열할 있다.
 ex)
 
-```
-const obj = () => {
-  var value = "value";
-  var onChange = () => {console.log("onchange")}
-  return {value, onChange};
-}
-
-...
-
-// 아래 두 줄은 같은 효과를 가진다.
-<input placeholder="" {...obj}><input/>
-<input placeholder="" value = {obj.value} onchange={obj.onChange}><input/>
-```
+  ```
+  const obj = () => {
+    var value = "value";
+    var onChange = () => {console.log("onchange")}
+    return {value, onChange};
+  }
+  
+  ...
+  
+  // 아래 두 줄은 같은 효과를 가진다.
+  <input placeholder="" {...obj}><input/>
+  <input placeholder="" value = {obj.value} onchange={obj.onChange}><input/>
+  ```
 
 ### 복사
 - 배열
-```
-var a = [1,2,3]
-var b = [...a] // 깊은복사
-var [...c] = a // 깊은복사
-var d = a // 얕은복사
-```
+  ```
+  var a = [1,2,3]
+  var b = [...a] // 깊은복사
+  var [...c] = a // 깊은복사
+  var d = a // 얕은복사
+  ```
 - 객체
-```
-var A = {one:1, two:2, three:3}
-var B = {...A} // 깊은복사 : one==1, two==2, three==3
-var C = {...A, three:30} // 깊은복사+값 할당 : one==1, two==2, three==30
-```
+  ```
+  var A = {one:1, two:2, three:3}
+  var B = {...A} // 깊은복사 : one==1, two==2, three==3
+  var C = {...A, three:30} // 깊은복사+값 할당 : one==1, two==2, three==30
+  ```
 ### 조건
 - 특정 조건을 만족할 때에만 내용이 출력되도록 한다.   
   `{CONDITION && <div> ! </div>} // CONDITION 이 true일 때만 '!'를 표시한다.`  
@@ -297,27 +297,27 @@ ex)
  - 생성된 'Subject'는 custom tag가 된다. HTML에서 tag를 호출하듯 사용 가능하다.
 
  1) class형태로 만들기
-```
-class Subject extends Component {
-   render() {
-	   return (
-		   <header>
-         <h1>Hello</h1>
-       </header>
-     );
-   }
-}
-```
+    ```
+    class Subject extends Component {
+       render() {
+    	   return (
+    		   <header>
+             <h1>Hello</h1>
+           </header>
+         );
+       }
+    }
+    ```
  2) 함수 형태로 만들기
-```
-function Subject() {
-    return (
-	    <div>
-		    <h1>Hello</h1>
-		  </div>
-	  );
-}
-```
+    ```
+    function Subject() {
+        return (
+    	    <div>
+    		    <h1>Hello</h1>
+    		  </div>
+    	  );
+    }
+    ```
  -> 함수형은 자원을 덜 사용하고, 선언하기 쉬운 장점이 있다.
  - 'index.js'가 default라 가정하고, 'App.js'에서 App 객체 안에 `<Subject></Subject>` 와 같이 태그를 생성한다. (다른 파일에 선언했다면 해당 파일을 'App.js'에서 참조 필요)   
  ※  _'App.js' 파일은 확장자가 js이지만 코드 문법은 javascript가 아니다._
@@ -326,30 +326,30 @@ function Subject() {
 - props를 활용하여 js파일에서 컴포넌트 태그 생성시 속성을 설정 가능하다.   
 `<Subject title="TITLE", content="CONTENT">` : title 값으로 "TITLE", content 값으로 "CONTENT" 설정
 - Subject 객체 생성시 `{this.prop.title}`, `{this.prop.content}`와 같이 참조하여 사용한다.
-```
-function Subject() {
-    return (
-	    <div>
-		    <h1>{this.prop.title}</h1>
-        <h2>{this.prop.content}</h2>
-		</div>
-	);
-}
-```
+  ```
+  function Subject() {
+      return (
+  	    <div>
+  		    <h1>{this.prop.title}</h1>
+          <h2>{this.prop.content}</h2>
+  		</div>
+  	);
+  }
+  ```
 
 - 응용하여 아래와 같은 활용도 가능하다.
 
-```
-function Subject() {
-    {title, content} = {this.prop}
-    return (
-	    <div>
-		    <h1>{title}</h1>
-        <h2>{content}</h2>
-		</div>
-	);
-}
-```
+  ```
+  function Subject() {
+      {title, content} = {this.prop}
+      return (
+  	    <div>
+  		    <h1>{title}</h1>
+          <h2>{content}</h2>
+  		</div>
+  	);
+  }
+  ```
 
 ### state
 - props는 부모 컴퍼넌트가 자식에게 설정해 주는 값이라면, state는 컴퍼넌트가 자기 자신을 위해 사용하는 값이다.
@@ -357,124 +357,125 @@ function Subject() {
 1. state 세팅
  - constructor : 컴퍼넌트가 생성되었을 때 최초로 실행되는 함수. 초기화를 담당한다.
 
-```
-class App extends Component {
-  constructor(props) {
-    super(props);       // constructor 함수 기본
-    this.state : {    // state 초기화
-      subject:{title:"TITLE", content: "CONTENT"}
+    ```
+    class App extends Component {
+      constructor(props) {
+        super(props);       // constructor 함수 기본
+        this.state : {    // state 초기화
+          subject:{title:"TITLE", content: "CONTENT"}
+        }
+      }
+      render() {
+        return (
+          <div ClassName = "APP">
+            <Subject title={this.state.subject.title} content={this.state.subject.content}></Subject>     // html형태의 return값 안에서 javascript문법을 사용하려면 '{}'로 묶어준다.
+          </div>
+        );
+      }
     }
-  }
-  render() {
-    return (
-      <div ClassName = "APP">
-        <Subject title={this.state.subject.title} content={this.state.subject.content}></Subject>     // html형태의 return값 안에서 javascript문법을 사용하려면 '{}'로 묶어준다.
-      </div>
-    );
-  }
-}
-```
+    ```
 
 -> App 컴퍼넌트가 생성되면 초기 설정된 state 값으로 Subject 컴퍼넌트를 생성한다.
 - index.js -> App.js -> Subject.js 순으로 호출이 이루어지는데, index.js에서는 App.js의 상태값을 알지 못한다. 즉, 부모에게 자신의 정보를 노출하지 않고 은닉한다.
 
 1. state로 배열 사용
 
-```
-  class App extends Component {
-    constructor(props) {
-      super(props);       // constructor 함수 기본
-      this.state = {    // state 초기화
-        subject:{title:"TITLE", content: "CONTENT"},
-        contents:[
-          {id:1, title:'title1', desc:'desc1'},
-          {id:2, title:'title2', desc:'desc2'},
-          {id:3, title:'title3', desc:'desc3'},
-        ]
+    ```
+      class App extends Component {
+        constructor(props) {
+          super(props);       // constructor 함수 기본
+          this.state = {    // state 초기화
+            subject:{title:"TITLE", content: "CONTENT"},
+            contents:[
+              {id:1, title:'title1', desc:'desc1'},
+              {id:2, title:'title2', desc:'desc2'},
+              {id:3, title:'title3', desc:'desc3'},
+            ]
+          }
+        }
+        render() {
+          return (
+            <div ClassName = "APP">
+              <TOC data={this.state.contents}></TOC>
+            </div>
+          );
+        }
       }
-    }
-    render() {
-      return (
-        <div ClassName = "APP">
-          <TOC data={this.state.contents}></TOC>
-        </div>
-      );
-    }
-  }
-
-  class TOC extends Component {
-    render() {
-      var lists = [];
-      var data = this.props.data;
-      var i = 0;
-      while (i < data.length) {
-        lists.push(<li key={i}><a href={"/content/" + data[i].id}>{data[i].title}</a></li>)
-        /*
-         * 반복문을 통해 여러 객체를 만들 때, react에서는 'key'라는 유니크한 속성을 요구한다.
-         *
-         */
-        i = i + 1;
+    
+      class TOC extends Component {
+        render() {
+          var lists = [];
+          var data = this.props.data;
+          var i = 0;
+          while (i < data.length) {
+            lists.push(<li key={i}><a href={"/content/" + data[i].id}>{data[i].title}</a></li>)
+            /*
+             * 반복문을 통해 여러 객체를 만들 때, react에서는 'key'라는 유니크한 속성을 요구한다.
+             *
+             */
+            i = i + 1;
+          }
+          return (
+            <nav>
+              <ul>
+                {lists} // lists에 <li>태그들을 넣어놓은 것들이 그대로 출력된다.
+              </ul>
+            </nav>
+          );
+        }
       }
-      return (
-        <nav>
-          <ul>
-            {lists} // lists에 <li>태그들을 넣어놓은 것들이 그대로 출력된다.
-          </ul>
-        </nav>
-      );
-    }
-  }
-```
+    ```
 
 ※ react에서는 props나 state가 바뀌면, 이를 사용하는 하위 컴퍼넌트들의 `render()` 함수가 모두 다시 호출된다. 즉, 화면이 재구성된다.
 
 ### render
 - component 안의 `render()` 함수는 실제로 랜더링할 때 사용할 로직 및 html 형태를 반환한다.
-- `render()` 함수 안에서 javascript로 로직 구현이 가능하다.
-ex) 조건문
-
-```
-  class App extends Component {
-    constructor(props) {
-      super(props);       // constructor 함수 기본
-      this.state = {    // state 초기화
-        mode: 'read'
-    }
-    render() {
-      var _mode = state.mode;
-      if (_mode == 'read') {    // 조건문
-
-      } else if (_mode == 'write') {
-
+- `render()` 함수 안에서 javascript로 로직 구현이 가능하다.   
+  ex) 조건문   
+    ```
+    class App extends Component {
+      constructor(props) {
+        super(props);       // constructor 함수 기본
+        this.state = {    // state 초기화
+          mode: 'read'
       }
-      return (
-        <div ClassName = "APP">
-          <TOC data={this.state.contents}></TOC>
-        </div>
-      );
+      render() {
+        var _mode = state.mode;
+        if (_mode == 'read') {    // 조건문
+  
+        } else if (_mode == 'write') {
+  
+        }
+        return (
+          <div ClassName = "APP">
+            <TOC data={this.state.contents}></TOC>
+          </div>
+        );
+      }
     }
-  }
-```
+    ```
 
 #### return
 - `render()` 함수의 return 값은 html 형태가 되어야 한다.
 - 하지만 return 안에서도 `{}` 구문 안에서 간단한 문법은 사용 가능하다.
 1. 조건문
-- 3항 연산자 : C, java의 3항 연산자와 동일
-`<span>{A ? "True" : "False"}</span>`
-- && : 앞의 내용이 참이면 뒤의 내용 수행
-`<span>{A && "True"}</span>`
+  - 3항 연산자 : C, java의 3항 연산자와 동일   
+    `<span>{A ? "True" : "False"}</span>`
+  - && : 앞의 내용이 참이면 뒤의 내용 수행   
+    `<span>{A && "True"}</span>`
+  - {``} : 문자열 편집, 문자열 안에 연산을 추가할 수 있다.   
+    ```<div className={`bg-white' ${flag ? 'flex' : 'flex-2'}\`}>```
 
 ### 이벤트   
 - 버튼 클릭, 내용 변경 등 사건이 발생했을 때, 이벤트 함수가 호출된다.
 
   1) onClick
-  - html에서 onclick은 'C'가 소문자이지만, react에서는 대문자이다.
-  - onClick은 인자로 함수를 받는다.
-    - 인자로 들어가는 함수는 'event' 객체를 인자로 받는다.
-    - 이 함수를 이벤트 함수라 한다.
+    - html에서 onclick은 'C'가 소문자이지만, react에서는 대문자이다.
+    - onClick은 인자로 함수를 받는다.
+      - 인자로 들어가는 함수는 'event' 객체를 인자로 받는다.
+      - 이 함수를 이벤트 함수라 한다.
 
-```
+      ```
       class App extends Component {
         constructor(props) {
           super(props);  
@@ -493,70 +494,70 @@ ex) 조건문
           );
         }
       }
-```
+      ```
 
 - 이벤트 함수 안에서 `this.state.mode='write'`와 같이 state를 변경하면 react가 변경 여부를 확인하지 못해 render()함수를 다시 호출하지 않아 화면이 갱신되지 않는다.   
 `this.setState({mode:'write'});`와 같이 state를 수정하도록 하자.
 
   2) onChange
-  - 'input' 등 항목에서 내용이 변경되었을 경우
-  - 아래와 같이 사용 가능
+    - 'input' 등 항목에서 내용이 변경되었을 경우
+    - 아래와 같이 사용 가능
 
-  ```
-  const onChange = (event) => {
-    // console.log(event.target.name);
-    const {target: {name, value}} = event;  // get some values from 'event'
-    ...
-  ```
+      ```
+      const onChange = (event) => {
+        // console.log(event.target.name);
+        const {target: {name, value}} = event;  // get some values from 'event'
+        ...
+      ```
 
 
 \+) bind
- - 이벤트 함수는 기본적으로 'this'를 가지지 않는다. 이때 강제로 this를 주입시키는 함수가 bind이다.  
- - 이벤트 함수 안에서는 기본적으로 'this'를 호출해도 아무것도 bind되어있지 않다.
- - `onClick={function(e) { ... }.bind(this)}` 와 같이 this를 bind해주면 this를 사용할 수 있게된다.
+   - 이벤트 함수는 기본적으로 'this'를 가지지 않는다. 이때 강제로 this를 주입시키는 함수가 bind이다.  
+   - 이벤트 함수 안에서는 기본적으로 'this'를 호출해도 아무것도 bind되어있지 않다.
+   - `onClick={function(e) { ... }.bind(this)}` 와 같이 this를 bind해주면 this를 사용할 수 있게된다.
 
-```
-  var obj = {name:'obj'};
-  functiotn bindTest() {
-    console.log(this.name);
-  }
-  bindTest(); // 아무 반응이 없다.
-  bindTest.bind(obj); // obj가 bindTest의 this가 된다.
-```
+      ```
+      var obj = {name:'obj'};
+      functiotn bindTest() {
+        console.log(this.name);
+      }
+      bindTest(); // 아무 반응이 없다.
+      bindTest.bind(obj); // obj가 bindTest의 this가 된다.
+      ```
 
  \+) custom event
- - 함수를 하위 컴퍼넌트에 전달해 준다.
+   - 함수를 하위 컴퍼넌트에 전달해 준다.
 
-```
-  class App extends Component {
-    render() {
-      return (
-        <div ClassName = "APP">
-          <Subject
-            title={this.state.subject.title}
-            content={this.state.subject.content}
-            onChangePage={
-              function(){
-                alert("page chaged"); // 경고창 출력
-              }.bind(this);
-            }
-          >
-          </Subject>
-        </div>
-      );
-    }
-  }
-  function Subject() {
-      return (
-  	    <div>
-          <a href="/" onClick={ function(e) {
-            e.preventDefault();
-            this.props.onChangePage();  // 상위 컴퍼넌트로 부터 받은 함수 실행
-          }
-  		</div>
-  	);
-  }
-```
+      ```
+      class App extends Component {
+        render() {
+          return (
+            <div ClassName = "APP">
+              <Subject
+                title={this.state.subject.title}
+                content={this.state.subject.content}
+                onChangePage={
+                  function(){
+                    alert("page chaged"); // 경고창 출력
+                  }.bind(this);
+                }
+              >
+              </Subject>
+            </div>
+          );
+        }
+      }
+      function Subject() {
+          return (
+            <div>
+              <a href="/" onClick={ function(e) {
+                e.preventDefault();
+                this.props.onChangePage();  // 상위 컴퍼넌트로 부터 받은 함수 실행
+              }
+          </div>
+        );
+      }
+      ```
 
  - 하위 컴퍼넌트를 수정하지 않고 하위 컴퍼넌트의 태그 클릭시 수행할 작업을 변경할 수 있다.
  - 하위 컴퍼넌트에서 상위 컴퍼넌트의 state를 변경할 수 있게 된다.
@@ -600,20 +601,20 @@ ex) 조건문
  - 일반 function 안에서 this를 호출하면 자신이 종속된 객체에 접근한다.
  - arrow function 안에서 this를 호출하면 자신이 종속된 인스턴스(컴퍼넌트)에 접근한다.
 
- ```
-   function func1() {
-     this.name = "func1"
-     return {
-         name : "return"
-         arrow : () => {
-           console.log(this.name) // 'func1' 출력
-         }
-         normal : function() {
-           console.log(this.name) // 'return' 출력
-         }
+   ```
+     function func1() {
+       this.name = "func1"
+       return {
+           name : "return"
+           arrow : () => {
+             console.log(this.name) // 'func1' 출력
+           }
+           normal : function() {
+             console.log(this.name) // 'return' 출력
+           }
+       }
      }
-   }
- ```
+   ```
 
 ---
 
@@ -644,7 +645,7 @@ ex) 조건문
    - 이 배열 요소의 값이 바뀔경우 useEffect의 첫번째 인자로 들어간 함수를 실행시킨다. (componentDidUpdate와 유사하게 특정 변수가 변할때 rerendering을 할 수 있다.)
    - 또한, 이 배열 요소의 값이 바뀌기 직전, 첫번째 인자로 들어간 함수의 return 값이 실행된다.
 
- ```
+     ```
      // return 없는 함수만 오는 경우
      useEffect( () => {
        console.log("componentDidUpdate");
@@ -663,8 +664,8 @@ ex) 조건문
          () => { console.log("value will be change")}
        )
      }, [value])
-
- ```
+    
+     ```
 
  - class 의 componentdidMount와 같은 함수에 비해 간단하고 직관적으로 사용할 수 있다.
 
@@ -687,22 +688,22 @@ ex) 조건문
 - 설치 : `npm install react-router-dom`
 - 사용 :
 
-```
-import { HashRouter, Route, Routes, BrowserRouter} from "react-router-dom";
-const sample = () => {
-    return (
-        <HashRouter>
-          /* can add any components you want */
-          <Routes>
-          /* can only put 'Route' components in 'Routes' */
-          <Route path="/" element={<Home/>} />  // '/' 주소 호출시 Home component를 호출
-          <Route path="/about/*" element={<About/>} />  // 'about' 및 'about/...' 형태의 주소 호출시 About component 호출
-          /* add as you wish */
-          </Routes>
-        </HashRouter>
-    );
-};
-```
+  ```
+  import { HashRouter, Route, Routes, BrowserRouter} from "react-router-dom";
+  const sample = () => {
+      return (
+          <HashRouter>
+            /* can add any components you want */
+            <Routes>
+            /* can only put 'Route' components in 'Routes' */
+            <Route path="/" element={<Home/>} />  // '/' 주소 호출시 Home component를 호출
+            <Route path="/about/*" element={<About/>} />  // 'about' 및 'about/...' 형태의 주소 호출시 About component 호출
+            /* add as you wish */
+            </Routes>
+          </HashRouter>
+      );
+  };
+  ```
 
 - Route는 위에서부터 순차적으로 적용된다. if-else if 구문으로 생각하면 편하다.
 - 정규식 wild card `*`을 사용할 수 있다. (v5에서 exact 옵션 삭제되고 '*'로대체)
@@ -716,45 +717,45 @@ const sample = () => {
 - 설치 : `npm install react-router-dom`
 - 사용 :
 
-```
-import { Link } from "react-router-dom";
-...
-<Link to="/">Root</Link> // 클릭하면 '/' 경로로 redirect 되는 Link 생성
-```
+    ```
+    import { Link } from "react-router-dom";
+    ...
+    <Link to="/">Root</Link> // 클릭하면 '/' 경로로 redirect 되는 Link 생성
+    ```
 
 ### Redirect
 - react-router-dom에서 redirect를 지원하는 방법은 여러가지가 있다.
 1. Navigate 모듈
 - 사용 :
 
-```
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
-...
-<HashRouter>
-  <Routes>
-    <Route path="/" element={<Home/>}
-    <Route path="/about" element={<About/>}
-    /* add as you wish */
-    <Route path="/index" element={<Navigate replace to="/" />} />  // 'index' 페이지를 '/' 경로로 redirect
-    <Route path="*" element={<Navigate to="/" />} />  // 위에서 설정되지 않은 경로에 대해서는 모두 '/'로 redirect
-  </Routes>
-</HashRouter>
-```
+  ```
+  import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+  ...
+  <HashRouter>
+    <Routes>
+      <Route path="/" element={<Home/>}
+      <Route path="/about" element={<About/>}
+      /* add as you wish */
+      <Route path="/index" element={<Navigate replace to="/" />} />  // 'index' 페이지를 '/' 경로로 redirect
+      <Route path="*" element={<Navigate to="/" />} />  // 위에서 설정되지 않은 경로에 대해서는 모두 '/'로 redirect
+    </Routes>
+  </HashRouter>
+  ```
 
 1. useHistory
 - 사용 :
 
-```
-const history = useHistory();
-history.push("/");  // '/' 경로로 redirect
-```
+  ```
+  const history = useHistory();
+  history.push("/");  // '/' 경로로 redirect
+  ```
 1. useNavigation
 - 사용 :
 
-```
-const navigation = useNavigation()
-navigation("/");  // '/' 경로로 redirect
-```
+  ```
+  const navigation = useNavigation()
+  navigation("/");  // '/' 경로로 redirect
+  ```
 
 ### cross-env
 - 운영체제마다 환경변수 제공 방식이 달라 절대경로 표시가 어려웠던 점을 해결해주는 모듈
@@ -764,17 +765,18 @@ navigation("/");  // '/' 경로로 redirect
 - react에서 기본적으로 제공하는 함수이다.
 ex)
 
-```
-var x = 1;
-if (typeof(x) === 'number') {
-  ...
-}
-```
+  ```
+  var x = 1;
+  if (typeof(x) === 'number') {
+    ...
+  }
+  ```
 
 - 반환하는 결과값은 다음과 같다.
 > undefined, object, number, boolean, bigint, string, symbol, function
 
 [정의되는 값 참조](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/typeof)
+
 ---
 
 ## DOM
@@ -786,30 +788,30 @@ if (typeof(x) === 'number') {
 
 - react에서는 위 방식 대신, hook과 document 인자를 사용하여 아래와 같이 작성한다.   
 
-```
-const [calendarApiLoaded, setCalendarApiLoaded] = useState(false);
-useEffect( ()=> {
-  // check api is loaded
-  const existingCheck = document.getElementById('gapi');
-  // if not loaded, load
-  if (!existingCheck) {
-    const gapiScript = document.createElement('script');
-    gapiScript.src = "https://apis.google.com/js/api.js"
-    const gisScrpit = document.createElement('script');
-    gisScrpit.src = "https://accounts.google.com/gsi/client"
-
-    // merge two scripts
-    gapiScript.append(gisScrpit);
-    gapiScript.id = 'gapi';
-
-    // append to body
-    document.body.appendChild(gapiScript);
-
-    // change state
-    setCalendarApiLoaded(true);
-  }
-});
-```
+  ```
+  const [calendarApiLoaded, setCalendarApiLoaded] = useState(false);
+  useEffect( ()=> {
+    // check api is loaded
+    const existingCheck = document.getElementById('gapi');
+    // if not loaded, load
+    if (!existingCheck) {
+      const gapiScript = document.createElement('script');
+      gapiScript.src = "https://apis.google.com/js/api.js"
+      const gisScrpit = document.createElement('script');
+      gisScrpit.src = "https://accounts.google.com/gsi/client"
+  
+      // merge two scripts
+      gapiScript.append(gisScrpit);
+      gapiScript.id = 'gapi';
+  
+      // append to body
+      document.body.appendChild(gapiScript);
+  
+      // change state
+      setCalendarApiLoaded(true);
+    }
+  });
+  ```
 ### window 변수
 - window는 전역번수를 attach된 모든 script에서 접근할 수 있는 변수이며, react에서도 마찬가지로 `window.value` 혹은 `window['value']` 형태로 접근이 가능하다.
 
@@ -835,20 +837,20 @@ useEffect( ()=> {
 - 이미지는 /resources 파일에 첨부하고, import로 가져와 사용할 수 있다.
 - 확장자가 없으면 js파일로 취급하니 확장자도 꼭 적어주도록 한다.   
 
-```
-import screen_img from '../resources/screen_img.webp'
-
-...
-
-    // INFO: React JSX에서 style 설정
-    var _style = {
-        'top': 0 //- scrollPos
-    }
-    var _style_img = {
-        'background-image': "url(" + screen_img + ")",
-        'top': -694 - scrollPos * 4/5
-    };
-```
+  ```
+  import screen_img from '../resources/screen_img.webp'
+  
+  ...
+  
+      // INFO: React JSX에서 style 설정
+      var _style = {
+          'top': 0 //- scrollPos
+      }
+      var _style_img = {
+          'background-image': "url(" + screen_img + ")",
+          'top': -694 - scrollPos * 4/5
+      };
+  ```
 
 ### key 숨기기
 - API key 등 사용자에게 드러내지 않고싶은 정보들을 react가 아닌 다른 곳에 저장해야 한다. **react app에 저장하게 되면 개발 도구를 사용해 Client에서 어떻게든 내용을 확인할 수 있다.**

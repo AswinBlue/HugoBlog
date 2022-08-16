@@ -34,19 +34,26 @@ draft = false
 ### 기본 설정
 1. 포트 설정
     - `application.properties` (혹은 yml)파일을 열고, `server.port = 8080` 와 같이 기입하면 동작 포트를 8080으로 설정할 수 있다.
-    - DB, 포트, mvc, thymleaf 등 각종 설정이 포함된 yml 파일 예시는 다음과 같다.
+1. devtools 설정
+  - 정적 파일들을 갱신했을 때, 서버 재실행 없이 explorer만 reload 해 주면 변경점이 반영될 수 있도록 한다.
+  
+  - 이 외에 DB, 포트, mvc, thymleaf 등 각종 설정이 포함된 yml 파일 예시는 다음과 같다.
       
         ```
+        # web 서버 동작 설정
         server:
+          # 포트 설정
           port: 8080
-        
+        # spring boot 설정
         spring:
-          # config:
-          #   activate:
-          #     on-profile: test
+           config:
+             activate:
+               on-profile: deploy
+          # h2 database 설정
           h2:
             console:
               enabled: true
+          # jpa 설정
           jpa:
             database: h2
             generate-ddl: off
@@ -58,22 +65,44 @@ draft = false
             initialization-mode: always
             schema: classpath:schema-h2.sql
             data: classpath:data-h2.sql
-        
+          # spring의 MVC 모델 설정
           mvc:
+            # view로 사용할 static resources의 위치 및 파일 확장자 설정
+            # thymeleaf가 view역할을 하기 때문에 본 프로젝트에서는 mvc 모듈 내용 활용 안됨
             view:
               prefix: /myApp/
               suffix: .jsp
-        
+      
+          # thymeleaf 설정, MVC에서 view를 담당
           thymeleaef:
             cache: false
             mode: HTML
             encoding: UTF-8
             prefix: file:src/main/resources/templates/
+          # web 서버 동작시 설정
           web:
             resources:
+              # resource 위치, html파일에서 참조시 연결될 root 디렉터리
               static-locations: file:src/main/resources/static/
               cache:
                 period: 0
+      
+          # devtools 설정, apply static resources instantly
+          devtools:
+            livereload:
+              enabled: true
+      
+        # SLF4J 설정, 로그 시스템
+        logging:
+          file:
+            name: ${user.dir}/log/test.log  # Log file path
+            max-history: 7 # delete period
+            max-size: 10MB  # max size of single log file
+          level:  # set log level to each package
+            com.aswinblue.RankServer : debug
+          pattern:
+            console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+            file: "%d %p %c{1.} [%t] %m%n"
         ```
 
 1. 빌드 설정
@@ -106,6 +135,7 @@ draft = false
       	implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'com.h2database:h2'
       	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        implementation 'org.springframework.boot:spring-boot-devtools' //devtools
       }
       
       tasks.named('test') {
