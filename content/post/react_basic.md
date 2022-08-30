@@ -36,6 +36,7 @@ draft = false
 ## 기본 구조
 1. /public/index.html 에서 기본 화면 구성
  - 'root' 이름으로 된 division이 있는데, 이 division에 대한 설정은 javascript로 정의되어있다.
+ 
 2. src 경로에 javascript파일들 구성
  - 'index.js' 에 메인 화면에 사용된 객체가 정의되어 있다. 아래 내용은 id가 'root' 인 division에 'App'을 적용하겠다는 의미이다.
 
@@ -54,7 +55,47 @@ draft = false
  - 리턴값은 무조건 특정 태그 안에 들어가 있어야 한다. <div>태그로 감싸주도록 한다.
 3. src경로에 css파일 구성
  - index.css에서 css설정 구성
- -
+
+4. 디렉터리
+ - src 하위에 디렉터리를 만들 수 있고, 각 디렉터리에는 index.jsx 파일을 넣을 수 있다.
+ - index.js 파일은 아래와 같이 디렉터리 안의 파일들에서 export 된 내용들을 export한다.
+   
+     ```
+     // src/component/index.js
+     export { default as Navbar } from './Navbar'; // src/component/Navbar.jsx에서 Navbar을 default로 export한 경우
+     export { Footer } from './Footer'; // src/component/Footer.jsx에서 Footer을 export한 경우
+     ```
+ - 이렇게 export 된 내용들을 다른 폴더에서는 디렉터리만 import 하고 해당 모듈을 사용할 수 있다.
+     ```
+     // src/App.js
+     import { Navbar Footer } from component
+     ```
+## 모듈 import / export
+- 특정 모듈을 export하고, 이를 다른 파일에서 import하여 사용할 수 있다.
+- export 방법으로는 default 방법과, 일반 방법이 있습니다.
+  - default 방법
+    ```
+      // A.jsx
+      export default A; // import A from './A'
+      // 혹은 import B from './A'도 가능
+    
+      export {default as A}; // import {A} from './A'
+    ```
+  - 일반 방법
+    ```
+      // A.jsx
+      export { A }; // inport { A } from './A'
+    ```
+
+  - 위 두가지 예시를 보면 알겠지만, default로 export를 하면 다른 파일에서 import를 할 때 중괄호 없이 import가 가능하며, 그 이름도 아무렇게나 정할 수 있다.
+  - default 없이 export를 하면 중괄호 안에서 받아야 하며, 변수 명도 동일해야 한다.
+- import나 export에는 wildcard * 을 사용할 수 있다.
+    ```
+    export * from './A' // 보통 index.jsx에서 사용
+    import * as A from './A' // A.jsx에서 export한 것들을 모두 받아와 A로 사용.
+    // 받아온 컴포넌트는 A.name, A.number 와 같이 사용하게 됨
+    ```
+
 ## 배포
  - `npm run start`로 'create-react-app'으로 만든 앱을 실행시킬 수는 있지만, 이는 개발자용 실행 방식이다.
   - 웹 브라우저에서 페이지에 접속하고 다운로드받은 용량을 확인해보면 아무 기능이 없어도 MB단위가 다운받아짐을 확인할 수 있다.
@@ -119,6 +160,11 @@ draft = false
         return "square";
       }
     };
+    ```
+- arrow 함수는 javascript를 반환할 수도 있고, html을 반환할 수도 있다. 방법은 아래와 같이 구분된다.    
+    ```
+    const js = () => { // 함수 내용 }
+    const html = () => ( // html )
     ```
 
 ### 변수
@@ -864,6 +910,14 @@ ex)
 ### Custom Tag
 - Custom tag 'CAT' 를 새로 만든다고 할때, `<CAT name={name}/>` 과 같이 생성하였다.
 - Custom tag 안에 다른 내용을 집어넣고 싶으면, `<CAT name={name}> {props.children} </CAT>` 형태로 사용하면 된다.
+- Custom tag를 정의할 때, tag 사이에 든 child를 포함하여 아래와 같이 구조를 정의할 수 있다.
+    ```
+    const CAT ({child}) => {
+      <div>start</div>
+        {child}
+      <div>end</div>
+    };
+    ```
 
 ## 참조
 [자바스크립트 문법](https://yuddomack.tistory.com/entry/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8-%EB%AC%B8%EB%B2%95-%EB%B9%84%EA%B5%AC%EC%A1%B0%ED%99%94-%ED%95%A0%EB%8B%B9)
