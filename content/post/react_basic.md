@@ -70,6 +70,17 @@ draft = false
      // src/App.js
      import { Navbar Footer } from component
      ```
+ - ❗ 단, index.js에 의해 세팅이 되는 시점이 App.js가 랜더 되는 시점보다 느리다는점에 주의한다. 아래는 이 문제로 발생할 수 있는 오류.   
+   ```
+   // component/index.js
+   export { default as Button } from './Button'
+   
+   // App.js
+   import Navbar from './component/Navbar' // navbar을 import하는 라인이 먼저 호출됨
+   
+   // component/Navbar.js
+   import { Button } from '.' // button을 import하기 전에 App.js에서 Navbar을 호출했기 때문에 오류 발생, App.js를 구성하지 못해 빈 화면이 보여짐
+   ```
 ## 모듈 import / export
 - 특정 모듈을 export하고, 이를 다른 파일에서 import하여 사용할 수 있다.
 - export 방법으로는 default 방법과, 일반 방법이 있습니다.
@@ -248,7 +259,7 @@ draft = false
     ```
 
 #### 반복(순회)
-- 배열 내용을 순회하는 방법은 다음과 같다.   
+- 배열 내용을 순회하는 방법은 다음과 같다.
 1) map 함수
     ```
     var A = [1,2,3]
@@ -274,6 +285,24 @@ draft = false
     // key가 마음에들지 않으면 재정의도 가능하다.
   }
   ```
+3) foreach
+ - map과 유사하게 동작한다. 하지만 map은 callback함수에서 조작한 내용으로 새로운 배열을 구성하고, foreach는 단순 반복만 수행한다.
+```
+const lists = ['1', '2', '3']
+return(
+  // map
+  {lists.map(element => {
+    console.log('name', element);
+    return <div> {element} </div>
+  })}  // -> <div>1</div>, <div>2</div>, <div>3</div> 이 화면에 출력되고, 로그가 출력된다. 
+  
+  // foreach
+  {lists.foreach(element => {
+    console.log('name', element);
+    return <div> {element} </div>
+  })}  // -> 화면에는 아무것도 나오지 않고 로그만 출력된다.
+)
+```
 
 #### 비교
 - filter 함수를 이용하여 조건에 맞는 요소만 선택 가능하다.
@@ -724,6 +753,18 @@ ex)
  - 통념적으로 'use'로 시작하는 이름을 붙여준다.
  - 호출된 custom hook도 일반 hook과 마찬가지로 중복해서 사용이 가능하며 각 hook들 끼리는 독립적이다.
 
+6.Reference hook
+- `useRef()` 함수가 속한다.
+- `import { useRef } from 'react'` 구문으로 참조 가능
+- 랜더링과 독립적으로 변하지 않는 데이터를 저장한다.
+- useRef는 변경될 시 페이지를 재 랜더링 하지 않는다. 
+- ref = useRef(null) 형태로 선언하며, reference object를 생성한다. 
+  - null대신 저장하고싶은 데이터를 넣어도 된다.
+  - ref.current 로 저장한 데이터를 참조한다. ex) `if (ref.current == null)`
+  - useContext와 함께 사용하여 다른 component들에서 이 값을 참조하도록 할 수 있다. 
+  - 객체 생성 후 값을 대입하려면 `ref.current = data` 형태로도 가능하다. 
+  - `<textarea ref={textareaRef}/>` 형태로도 대입이 가능하다. textarea 객체 자체를 reference 하는 형태가 된다.
+    - 'ref' 는 변수 명이 아니고 고정 속성값임에 주의
 ---
 
 ## 각종 모듈

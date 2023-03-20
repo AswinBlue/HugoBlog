@@ -1,4 +1,4 @@
-+++
+./+++
 title = "Docker"
 date = 2021-08-12T10:41:00+09:00
 lastmod = 2021-08-12T10:41:00+09:00
@@ -25,7 +25,79 @@ draft = false
 [링크 참조](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
 ## 실행
-### 오류 및 각종 이   
+1. DockerFile 이름의 파일을 생성하고 내용을 채워넣는다. 
+https://docs.docker.com/engine/reference/builder/
+ 
+**DockerFile 명령어**
+ - FROM: base image를 지정하는 명령어
+   - DockerFile의 시작은 무조건 FORM 이 필요하다.  
+   - `FROM <IMAGE>:<VERSION>` 형태로 사용한다.
+   `FROM base:${CODE_VERSION}`
+ - ARG: 변수를 선언  
+   - `ARG CODE_VERSION=latest`
+   - 선언한 변수는 `${CODE_VERSION}` 형태로 참조 가능하며, build시 자동으로 argument로 사용된다. 
+   - `ARG port` 와 같이 값을 정의하지 않고 선언만 한 경우에는, --build-arg 옵션으로 값 설정이 가능하다.  
+     - `docker build --build-arg port=80`
+ - CMD: 컨테이너 실행 시 디폴트로 실행할 커맨드를 설정
+   - `CMD ["executable","param1","param2"]` 형태로 사용
+   - ENTRYPOINT와 조합하여 사용 가능하며, ENTRYPOINT에서 "executable"(명령어) 를 선언한 상태라면 CMD에서 executable 없이 param만 선언 가능하다. `CMD ["param1","param2"]`
+   - 여러개의 CMD를 선언하면 가장 마지막의 것만 동작
+   - `CMD /code/run-app` 와 같이 사용
+ - COPY: 호스트 컴퓨터의 디렉터리나 파일을 Docker 이미지의 파일 시스템으로 복사
+   - `COPY: <SRC> <DEST>`
+   - `COPY: ["<SRC1>", "<SRC2>", ... <DEST>]`
+ - ADD: COPY의 상위호환 명령어로, 압축 파일이나 링크상의 파일도 추가 가능하다. 
+ - ENV: 환경변수를 설정하기 위한 명령어
+ - EXPOSE: 컨테이너로 유입되는 트래픽에 대한 처리
+   - `EXPOSE <port> [<port>/<protocol>...]`
+   - 프로토콜은 tcp,udp 중 선택 가능
+ - ENTRYPOINT: 컨테이너 시작시 수행할 명령어
+   - `ENTRYPOINT ["<CMD>", "<PARAM1>", "<PARAM2>"]` 형태로 사용
+   - `ENTRYPOINT ["npm", "start"]`
+ - LABEL: 이미지에 metadata를 정의하는 명령어
+   - `LABEL <key>=<value> <key>=<value> <key>=<value> ...`
+ - STOPSIGNAL: 시스템이 종료하기 위한 SIGNAL을 설정한다. 
+   - SIGINT, SIGKILL 등을 설정할 수 있으며, 이를 전달받으면 컨테이너가 종료하게 된다.
+   - 설정하지 않으면 SIGTERM 이 자동으로 세팅된다. 
+ - USER: 
+ - RUN: 쉘 프롬프트에 명령어를 입력하는 효과
+ - VOLUME: 볼륨을 mount 하기 위한 자리를 세팅하는 명령어
+ - WORKDIR: 컨테이너에서 작업 디렉터리 이동
+   - 리눅스의 cd 명령과 유사
+ - ONBUILD: 빌드 후에 동작해야 할 명령들을 설정하는 명령어
+   - DockerFile 명령어는 이미지 빌드를 위한 명령어이며, 빌드 할 때 마다 동일한 결과물을 산출한다. 하지만 빌드된 이미지의 결과물을 다음 빌드 때 사용하고 싶다면 이 명령을 사용한다.
+        ```
+        ONBUILD
+        Learn more about the "ONBUILD" Dockerfile command.
+         ADD . /app/src
+        ONBUILD RUN /usr/local/bin/python-build --dir /app/src
+        ```
+   - 다음 빌드 때 ONBUILD가 호출된 순서대로 명령이 동작한다. 
+   - `docker inspect` 명령어로 확인 가능
+
+예시
+```
+# python:3.10의 이미지로 부터
+FROM python:3.9
+# 제작자 및 author 기입
+LABEL maintainer="huisam@naver.com"
+
+# 해당 디렉토리에 있는 모든 하위항목들을 '/app/server`로 복사한다
+COPY . /app/server
+
+# image의 directory로 이동하고
+WORKDIR /app/server
+
+# 필요한 의존성 file들 설치
+RUN pip3 install -r requirements.txt
+
+# 환경 설정 세팅
+RUN python setup.py install
+
+# container가 구동되면 실행
+ENTRYPOINT ["python", "Server.py"]
+```
+### 오류 와 해결방법
 1. is docker daemon running? 에러
   - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
   - `service docker start` 명령으로 daemon 실행
@@ -34,7 +106,6 @@ draft = false
       - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
     - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
 [참조](https://velog.io/@pop8682/Docker-Cannot-connect-to-the-Docker-daemon-at-unixvarrundocker.sock.-Is-the-docker-daemon-running-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0)   
-
 
 2. init 프로세스(PID 1)이 /bin/bash로 실행되지 않을 때, docker 실행 방법   
 `docker run -t -i ubuntu:16.04 /bin/bash`
