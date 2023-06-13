@@ -18,7 +18,9 @@ draft = false
 # Algorithm
 
 ## 그래프 탐색
-### DFS
+### SP(Shortest Path)
+단일 출발점에서 단일 목적지까지 최단 경로를 찾는 알고리즘
+#### DFS
 1. 용도 :
   - 경로가 있는지 확인할 때 사용 가능
 2. 자로구조 :
@@ -35,7 +37,7 @@ draft = false
 4. 예시 :
 
 
-### BFS
+#### BFS
 1. 용도 :
   - 최단경로 탐색에 사용 가능
 2. 자로구조 :
@@ -47,6 +49,37 @@ draft = false
   - 현재 node에서 이동 가능한 node가 있는지 확인하고, 이동 가능하다면 모두 queue에 push한다.
   - queue에 push하면서 해당 경로는 'visited' 처리를 한다.
     - (주의) queue에 넣으면서 visited 처리를 하고, queue에 넣기전에 방문 여부를 판단해야 메모리 부족을 예방할 수 있다.
+
+### SSSP (Single Source Shortest Path)
+단일 출발점에서 모든 node까지 최단 경로를 찾는 알고리즘
+#### Dijkstra
+1. 용도: 
+ - cycle이 없는 graph
+ - 음수 node가 없는 graph
+2. 자료구조 : 
+ - list, heap
+3. 방법:
+ - 출발점 S에서 각 node까지 거리를 list에 표현한다.
+ - 현재 S에서 최적의 거리를 가진 node M을 선택한다. (heap 사용)
+ - M을 거쳐서 각 node까지 이동하는 경로와 현재 list에 표기된 값을 비교해 최적을 선택한다.
+ ```
+ for (edge in graph[M]) { // M에서 발생되는 모든 edge들에 대해
+	if (list[M] + edge.cost < list[edge.destination]) { // S -> * -> M -> T 까지 거리가 S -> * -> T 거리보다 짧다면
+	// S -> * -> T 거리 = list[M], M -> T 거리 = edge.cost
+		list[edge.destination] = list[M] + edge.cost // 값 갱신
+	}
+ ```
+#### Bellman-Ford
+1. 용도:
+2. 자료구조:
+3. 방법:
+### APSP (All Pair Shortest Path)
+모든 node에서 모든 node로 가는 최적 경로를 찾는 알고리즘
+#### Floyd-Warshall
+1. 용도:
+2. 자료구조:
+3. 방법:
+
 
 ## Dynamic Programming
 
