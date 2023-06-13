@@ -6,12 +6,6 @@
 	path = public
 	url = https://github.com/AswinBlue/AswinBlue.github.io
 	branch = master
-[submodule "themes/hugo-notepadium"]
-	path = themes/hugo-notepadium
-	url = https://github.com/cntrump/hugo-notepadium.git
 [submodule "themes/hugo-PaperMod"]
 	path = themes/hugo-PaperMod
-	url = https://github.com/adityatelange/hugo-PaperMod
-[submodule "public/AswinBlue.github.io"]
-	path = public/AswinBlue.github.io
-	url = https://github.com/AswinBlue/AswinBlue.github.io
+	url = https://github.com/AswinBlue/hugo-PaperMod
