@@ -219,3 +219,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
 ```
+
+### 오류 해결
+1. fatal: remote error: upload-pack: not our ref 7821df1a10579b4a62917f0f07d3a5c482e872f6
+ - github actions/checkout@v3 에서 submodule의 특정 commit으로 checkout 이 안되는 현상이다. 
