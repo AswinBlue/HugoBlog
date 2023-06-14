@@ -11,6 +11,6 @@ git push origin master
 cd ..
 
 ::add & commit source
-git add content/*
+git add *
 git commit -m "%date% %time%"
 git push origin master
