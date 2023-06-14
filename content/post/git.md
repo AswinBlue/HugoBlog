@@ -38,8 +38,9 @@ categories: ["dev",]
 
 1. 관리
   - submodule에서 commit을 작성하고, 부모 repository에서 commit을 작성하는 순으로 진행해야 모든 변경점이 정상적으로 반영될 수 있다. (child -> parent 순)
+    - 부모 repository는 submodule의 변경점을 직접적으로 관리하지는 않지만, 최종 형태(commit)은 관리한다. 
   - remote에서 local로 변경점을 받아올 때는, parent를 먼저 pull 하고 submodule을 pull 한다. (parent -> child 순)
-
+  - submodule을 push하지 않고 parent를 push할 경우, submodule의 현재 commit은 local에만 있고, remote에는 없는 상황이다. 이떄 `git clone --recursive` 명령어를 사용하여 전체 프로젝트를 받으려 하면, submodule을 clone할 때 remote에 없는 commit을 참조하려 하여 오류가 발생한다. 
 ## CRLF LF
 - 윈도우 형태의 EOL(\n) 과 리눅스 형태의 EOL(\r\n) 차이 떄문에 git은 autocrlf 명령을 통해 자동으로 개행문자를 바꿔주는 기능을 지원한다. 
 - `git config <--system> core.autocrlf <false>` 명령으로 이 기능을 조절할 수 있다.

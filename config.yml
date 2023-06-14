@@ -14,7 +14,7 @@ pygmentsUseClasses: true
 
 minify:
   disableXML: true
-  # minifyOutput: true
+  minifyOutput: true
 
 languages:
   en:
@@ -107,12 +107,15 @@ outputs:
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  description: "Dev Blog by AswinBlue"
+  description: Dev Blog by AswinBlue
+  title: Dev Note
   author: AswinBlue
   # author: ["Me", "You"] # multiple authors
+  keywords: [Blog, Portfolio, PaperMod]
+
 
   defaultTheme: auto
-  # disableThemeToggle: true
+  disableThemeToggle: false
   ShowShareButtons: true
   ShowReadingTime: true
   # disableSpecial1stPost: true
@@ -123,7 +126,7 @@ params:
   ShowRssButtonInSectionTermList: true
   ShowToc: true
   # comments: false
-  images: ["cover.png"]
+  # images: ["cover.png"]
 
   profileMode:
     enabled: false

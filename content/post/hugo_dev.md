@@ -94,7 +94,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 6. 테마를 선택한다. 
  - 인터넷에서 hugo 테마를 검색하여, 원하는 테마의 git repository를 `/themes` 경로에 clone 한다. 
  - 이후, 해당 테마에서 지원하는 config 파일을 root 경로에 복사한다.
-   - config 파일은 toml, yaml, json 형태로 작성이 가능하며, hugo에서는 위 순서대로 config파일을 찾아 적용한다. (즉, config.toml파일이 있으면 config.yml파일은 적용되지 않음)
+   - config 파일은 toml, yaml, json 형태로 작성이 가능하며, hugo에서는 toml -> yaml -> json 순서대로 config파일을 찾아 적용한다. (즉, config.toml파일이 있으면 config.yml파일은 적용되지 않음)
 7. 기본 탬플릿을 설정한다. 
  - `/archtypes/default.md` 파일을 수정하면, `hugo new NEW_POST.md` 를 이용해 새로운 파일을 생성할 때 사용되는 기본 md파일 탬플릿을 정의할 수 있다. 
    - 파일 생성시 .md 확장자가 붙여야 정상 동작함에 주의한다. 
@@ -133,11 +133,42 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 
 - Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.
 
+## 문법
+1. Hugo 문법
+ - hugo는 html 안에 `{{ }}` 형태로 hugo용 구문을 넣을 수 있다. `{{ }}`안에 `--`, `%%`, `<>` 를 넣어 용도에 따라 다양한 변형이 있을 수 있다.
+   - `{{- }}`, `{{ -}}`, `{{- -}}` 를 사용하면 앞/뒤쪽의 줄바꿈 및 빈 여백을 모두 제거해 준다. 
+2. 변수 선언
+ - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
+   - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
+ - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 내에서 변수를 선언하는
+3.  조건문
+ - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
+  
+
 ## Adsense 추가
 - 구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
 	1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `adsense.html` 파일을 만들고, 애드센스에 필요한 script를 붙여넣은 후 저장한다.
-	1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
-	1. `hugo -t 원하는_테마` 명령으로 다시 빌드하고, 서버에 push한다.
+	2. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
+	3. `hugo -t 원하는_테마` 명령으로 다시 빌드하고, 서버에 push한다.
+
+- sidebar 형태의 구문을 넣고싶다면, `baseof.html` 파일을 수정해야 한다. `<div class="grid-container">` 태그로 main을 감싸고, main과 sidebar을 동일한 level에 배치한다. 
+
+```
+# before
+<main class="main">
+    {{- block "main" . }}{{ end }}
+</main>
+```
+```
+# after
+<div class="grid-container">
+    {{ partial "sidebar.html" . }}
+    <main class="main">
+        {{- block "main" . }}{{ end }}
+    </main>
+</div>
+```
+
 
 ## github page 자동화
 github에서 제공하는 CI/CD 인 github actions 를 사용하면 push시 자동으로 배포를 할 수 있다.
