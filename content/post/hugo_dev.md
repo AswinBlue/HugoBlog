@@ -221,5 +221,7 @@ jobs:
 ```
 
 ### 오류 해결
-1. fatal: remote error: upload-pack: not our ref 7821df1a10579b4a62917f0f07d3a5c482e872f6
+1. `fatal: remote error: upload-pack: not our ref 7821df1a10579b4a62917f0f07d3a5c482e872f6`  
  - github actions/checkout@v3 에서 submodule의 특정 commit으로 checkout 이 안되는 현상이다. 
+2. `render of "page" failed: "C:\HugoBlog\themes\hugo-PaperMod\layouts\_default\baseof.html:5:8": execute of template failed: template: _default/single.html:5:8: executing "_default/single.html" at <partial "head.html" .>: error calling partial: execute of template failed: template: partials/templates/opengraph.html:5:14: executing "partials/templates/opengraph.html" at <.Params.cover.image>: can't evaluate field image in type string`  
+ - 빌드 했을 때 위와같은 오류가 발생 한다면, golang과 hugo 버전 차이에 따라 페이지가 파싱이 제대로 되지 않는 경우이다. hugo 문법에 따라 페이지를 수정하거나 golang, hugo 버전을 최신으로 업데이트 해 본다. 
