@@ -113,11 +113,9 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 	ex) hugo new post/hugo.md
 	```
 
-- 테마에 맞는 형식으로 content 폴더 안의 내용을 이용해 public 폴더 안에 내용을 생성한다.
-	```
-	hugo -t <THEME>
-	```
+- 테마에 맞는 형식으로 content 폴더 안의 내용을 이용해 public 폴더 안에 내용을 생성한다. : `hugo -t <THEME>`  
 - config파일에 따라 `hugo --config config.yml` 와 같이 명령어를 사용할 수도 있다.
+  - config파일에서 baseURL을 설정하는 부분이 있는데, github에 hugo를 올린다면 이를 공백(`""`)으로 설정해야 css 및 javascript가 정상 동작 한다.
 - 본 페이지는 hugo-PaperMod 테마를 사용했다. 
 
 - 문서 최상단에 +++로 둘러쌓인 부분은 설정 부분이다. draft=false로 설정을 해야 화면에 표시됨에 주의한다.
