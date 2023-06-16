@@ -85,7 +85,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
  - 한개는 글 작성용, 한개는 publish용이다. (이 경우, `<GITHUB_ID>.github.io` 이름으로 repository를 생성한다. 그렇지 않으면 정상동작하지 않는다.)   
  `ex) github.com/AswinBlue/AswinBlue.github.io`
  - 작성용은 소스코드에 해당하며 publish용은 컴파일된 바이너리에 해당한다고 보면 된다.
-4. 프로젝트를 생성한다.
+4. 로컬PC에서 Hugo 프로젝트를 생성한다.
  - `hugo new site <SITE>` 명령으로 새로운 hugo 프로젝트를 생성한다.
 5. 생성한 프로젝트를 git과 연동시킨다.
  - 프로젝트 root디렉터리에 (3)에서 만든 소스용 git을 연동시킨다.
