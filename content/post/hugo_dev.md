@@ -116,6 +116,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 - 테마에 맞는 형식으로 content 폴더 안의 내용을 이용해 public 폴더 안에 내용을 생성한다. : `hugo -t <THEME>`  
 - config파일에 따라 `hugo --config config.yml` 와 같이 명령어를 사용할 수도 있다.
   - config파일에서 baseURL 을 페이지 주소로 설정해야 css 및 javascript가 정상 동작 한다.
+  - html에서 hugo문법으로 config파일에 선언된 baseURL을 가져오는 것은 `{{ .Page.Site.BaseURL }}` 와 같이 사용하면 된다.
 - 본 페이지는 hugo-PaperMod 테마를 사용했다. 
 
 - 문서 최상단에 +++로 둘러쌓인 부분은 설정 부분이다. draft=false로 설정을 해야 화면에 표시됨에 주의한다.
@@ -141,7 +142,10 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
  - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 내에서 변수를 선언하는
 3.  조건문
  - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
-  
+
+4. RelPermalink vs Permalink
+ - YOUR_CUSTOM_PATH.RelPermalink : baseurl을 / 로 처리한 링크 (/YOUR_CUSTOM_PATAH)
+ - YOUR_CUSTOM_PATH.Permalink : baseurl을 앞에 붙인 링크 (https://localhost:1313/YOUR_CUSTOM_PATAH)
 
 ## Adsense 추가
 - 구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
@@ -251,8 +255,8 @@ jobs:
 
 ## 오류 해결
 ### 배포 페이지 CSS 동작 오류
-  - 배포한 github에 asset폴더가 있지만, github.io 페이지에 접근해서 F12로 소스코드를 확인했을 떄 asset폴더가 보이지 않는다면, index.html에서 `stylesheet` 를 검색하여 stylesheet의 url이 baseurl을 포함하고 있는지 확인한다. 
-  - css가 제대로 동작하지 않는다면 stylesheet를 선언하는 부분(보통 theme/선택한_테마/layouts/partials/head.html에 있음) 에서 baseurl이 포함되도록 수정한다. 
+  - hugo server로 로컬에서 동작시키면 css가 정상적으로 나오지만, 배포한 github page에서 css가 제대로 동작하지 않는다면 stylesheet를 선언하는 부분(보통 theme/선택한_테마/layouts/partials/head.html에 있음) 에서 baseurl이 포함되도록 수정이 필요하다. 
+    - `href="{{ $stylesheet.RelPermalink }}"` 에서 RelPermalink를 Permalink로 변경 해 준다.
 ### github page 자동화 오류
 1. `fatal: remote error: upload-pack: not our ref 7821df1a10579b4a62917f0f07d3a5c482e872f6`  
  - github actions/checkout@v3 에서 submodule의 특정 commit으로 checkout 이 안되는 현상이다. 
