@@ -20,7 +20,7 @@ draft = false
 # HTML
 - W3C에서 HTML 규칙을 규정, 웹 브라우저 제작사들이 이를 참조하여 브라우저를 만든다.
 
-## 태그
+1. 태그
 
 - element라고 칭하기도 한다.
 - 부모 자식 관계가 존재
@@ -32,8 +32,11 @@ draft = false
 - body : 본문을 묶는 태그
 - head : 본문을 설명하는 태그
 
-### body 태그
+2. 속성(attribute)
+<TAG_NAME ATTRIBUTE> 와 같은 형태로 태그 이름 뒤에 붙음
 
+## body
+### 속성
 - strong : 굵은 글씨
 - u : 밑줄
 - h1 : 제목 1
@@ -76,14 +79,19 @@ draft = false
   - method : 데이터를 어떻게 전송할지 나타내는 속성. post/get을 사용 가능하다.
 
 
-### head 태그
-
+### head
 - title : 제목
 - meta :
   - <meta charset="utf-8">
   - 현재는 사용되자 않음
 - style : CSS 코드 삽입부
 
+### link
+[참조](https://www.tcpschool.com/html-tags/link)
+- rel 
+  - [참조](http://www.tcpschool.com/html-tag-attrs/link-rel)
+  - preload : href값에 선언된 리소스를 페이지 로드전에 요청해서 받아오게 지정한다. as 속성과 함께 사용된다. [상세설명](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload)
+    - 예시: `<link rel="preload" href="style.css" as="style" />`
 
-## 속성(attribute)
-<TAG_NAME ATTRIBUTE> 와 같은 형태로 태그 이름 뒤에 붙음
+
+

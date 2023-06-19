@@ -139,6 +139,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 2. 변수 선언
  - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
    - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
+   - page 변수는 `hugo new` 를 사용하여 만든 각 페이지(.md파일) 최상단에 작성된 메타데이터(+++ 혹은 --- 로 감싸진 구역의 데이터)를 의미한다.
  - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 내에서 변수를 선언하는
 3.  조건문
  - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
@@ -255,8 +256,21 @@ jobs:
 
 ## 오류 해결
 ### 배포 페이지 CSS 동작 오류
-  - hugo server로 로컬에서 동작시키면 css가 정상적으로 나오지만, 배포한 github page에서 css가 제대로 동작하지 않는다면 stylesheet를 선언하는 부분(보통 theme/선택한_테마/layouts/partials/head.html에 있음) 에서 baseurl이 포함되도록 수정이 필요하다. 
-    - `href="{{ $stylesheet.RelPermalink }}"` 에서 RelPermalink를 Permalink로 변경 해 준다.
+  - hugo server로 로컬에서 동작시키면 css가 정상적으로 나오지만, 배포한 github page에서 css가 제대로 동작하지 않는다면 stylesheet를 선언하는 부분(보통 theme/선택한_테마/layouts/partials/head.html에 있음) 에서 baseurl이 정상적으로 설정되었는지 확인한다. 
+  - stylesheet는 `href="{{ $stylesheet.RelPermalink }}"` 와 같이 정상적으로 설정했는지 확인한다. (url을 직접 string으로 입력하기보다 url을 세팅해주는 함수를 사용하는것을 권장)
+### Failed to find a valid digest in the 'integrity' attribute for resource
+ - hugo에서 제공하는 `.Data.Integrity` 기능을 사용하여 html tag에 `integrity` 속성을 부여했을 경우 발생한다.  
+ - config파일에서 minify 설정을 해 놓으면, 파일의 불필요한 줄바꿈, 공백을 제거하는데, minify 하기 전 값을 sha256으로 인코딩 하여, 결과가 틀려지는 것이다.    
+ ```
+ # minify 설정
+ minify:
+  disableXML: true
+  minifyOutput: true
+ ```
+
+ - 위와 같은 설정이 config파일에 있다면, fingerprint를 사용하기 전에 minify를 먼저 수행하라. `{{- $stylesheet := $stylesheet | minify | fingerprint "sha256"}}`. fingerprint의 default값은 sha256이므로, sha256은 제거해도 무관
+
+ 
 ### github page 자동화 오류
 1. `fatal: remote error: upload-pack: not our ref 7821df1a10579b4a62917f0f07d3a5c482e872f6`  
  - github actions/checkout@v3 에서 submodule의 특정 commit으로 checkout 이 안되는 현상이다. 
