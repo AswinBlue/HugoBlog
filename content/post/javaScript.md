@@ -120,6 +120,15 @@ draft = false
     * Symbol
  - Object
 
+### 문자열 (String)
+ - `.startWith(STRING)` : 문자열이 STRING 으로 시작하면(prefix) true를 반환, 아니면 false를 반환 
+ - `.slice(VALUE)` : 시작점으로 부터 VALUE만큼의 글자를 제거 (문자열 자르기)
+ - `.substring(VALUE)` : 시작점으로 부터 VALUE만큼의 글자를 제거 ()
+ - `.replace("/^AB", '')` : 정규식을 이용, AB로 시작하는 prefix 제거 (문자열 치환)
+ 
+### Json
+ - `.hasOwnProperty(KEY)` : json 데이터에 KEY 라는 key가 존재한다면 true를 반환, 아니면 false를 반환
+
 ## 이벤트
  - onclick : 클릭 이벤트가 일어났을 때
  - onchange : 텍스트 에디터의 내용이 변경되었을 경우
@@ -131,6 +140,7 @@ draft = false
  - .indexOf(' ') : 문자열 중 ''에 속하는 문자 혹은 문자열이 시작되는 index를 반환, 0부터 카운팅
  - .trim() : 문자열의 공백을 제거
  - .value : element의 값을 뜻하는 변수 호출
+
 
 ## 함수
  - `var repeat = setInterval(function, time)` : time 만큼 delay를 주고 function을 반복한다. 독립 thread로 동작한다.
