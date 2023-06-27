@@ -28,10 +28,14 @@ draft = false
 - `node main.js` : 실행(main.js)
 - `npx <package_name>` : 설치하지 않고 일회만 실행
 - `node main.js` : 패키지 실행 (main.js파일)
+- `npm audit` : 의존성 문제가 발생했을 때, 
+  - `npm audit fix` : 의존성 문제를 자동으로 해결하는 명령어, 일부 해결을 할 수는 있지만 package.json 파일을 수정할 수 있으므로 주의. --fix 옵션을 넣어서 강제로 수정할 수도 있지만, 오히려 되던 기능이 안 될 수도 있으므로 추천하지 않는다. 
+- `npm cache clean` : 캐싱된 데이터를 정리할 수 있다. --force 옵션을 넣어 강제로 처리 가능
 
 ## 구조
 - `main.js` : nodejs 실행시 실행할 메인 파일
 - `package.json` : root 경로에 존재하며, npm 프로젝트를 관리하는 파일
+- `/node_modules` : 프로젝트에서 사용되는 모듈들이 저장되는 파일이다. npm install 명령 사용시 모듈들이 다운받아지는 경로이다. 
 
 ### package.json
 - nodejs 설정을 담고있는 파일로, 참조할 내용이 많아 아래에 따로 정리한다.
