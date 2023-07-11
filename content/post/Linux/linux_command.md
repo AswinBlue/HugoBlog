@@ -35,5 +35,23 @@ draft = false
 - `sed '1,2d' list.txt` : 처음 1줄, 2줄을 지운다.
 - `sed '/^$/d list.txt` : 공백라인을 삭제하는 명령이다
 
+## 압축
+압축과 해제는 `tar` 명령어로 수행 가능하다. 
+ - `tar -xvf <FILE_NAME>` : 압축 해제
+ - `tar -cvf <FILE_NAME>` : 압축
+### 에러와 해결
+1. tar (child): xz: Cannot exec: No such file or directory
+ - `sudo apt-get install xz-utils` 명령으로 모듈을 설치 해 주어야 한다.
+```
+tar (child): xz: Cannot exec: No such file or directory
+tar (child): Error is not recoverable: exiting now
+tar: Child returned status 2
+tar: Error is not recoverable: exiting now
+```
+
+
+이때 확장자가 gz로 되어있는 경우에는 옵션에 'z'를 추가해준다. (tar -zxvf, tar-zcvf)
+
+
 ## 참조
 http://m.egloos.zum.com/slog2/v/3689816

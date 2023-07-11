@@ -99,9 +99,9 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
  - `/archtypes/default.md` 파일을 수정하면, `hugo new NEW_POST.md` 를 이용해 새로운 파일을 생성할 때 사용되는 기본 md파일 탬플릿을 정의할 수 있다. 
    - 파일 생성시 .md 확장자가 붙여야 정상 동작함에 주의한다. 
 
-## 기본 동작
+## Quick Start
 
-1. 프로젝트 생성
+### 프로젝트 생성
 - 새로운 Hugo 사이트를 생성하는 명령어, <NAME> 폴더 안에 Hugo 구조에 맞게 폴더 및 파일이 자동 생성된다.
 	```
 	hugo new site <NAME>
@@ -132,23 +132,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 
 - Go와 Hugo의 설치만 잘 하면 사용 가이드는 인터넷에 잘 정리된 글들이 많다. 참조하면 활용에 문제는 없을 것이다.
 
-## 문법
-1. Hugo 문법
- - hugo는 html 안에 `{{ }}` 형태로 hugo용 구문을 넣을 수 있다. `{{ }}`안에 `--`, `%%`, `<>` 를 넣어 용도에 따라 다양한 변형이 있을 수 있다.
-   - `{{- }}`, `{{ -}}`, `{{- -}}` 를 사용하면 앞/뒤쪽의 줄바꿈 및 빈 여백을 모두 제거해 준다. 
-2. 변수 선언
- - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
-   - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
-   - page 변수는 `hugo new` 를 사용하여 만든 각 페이지(.md파일) 최상단에 작성된 메타데이터(+++ 혹은 --- 로 감싸진 구역의 데이터)를 의미한다.
- - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 내에서 변수를 선언하는
-3.  조건문
- - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
-
-4. RelPermalink vs Permalink
- - YOUR_CUSTOM_PATH.RelPermalink : baseurl을 / 로 처리한 링크 (/YOUR_CUSTOM_PATAH)
- - YOUR_CUSTOM_PATH.Permalink : baseurl을 앞에 붙인 링크 (https://localhost:1313/YOUR_CUSTOM_PATAH)
-
-## Adsense 추가
+### Adsense 추가
 - 구글 애드센스를 휴고 Blog에 넣고싶다면, 아래와 같은 절차를 거치면 된다.
 	1. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `adsense.html` 파일을 만들고, 애드센스에 필요한 script를 붙여넣은 후 저장한다.
 	2. `themes/원하는_테마/layouts/partials/` 디렉터리 안에 `head.html` 파일을 열고, `{{- partial "adsense.html" . -}}` 한줄을 추가하고 저장한다.
@@ -173,7 +157,7 @@ Go언어는 apt-get 대신 인터넷에서 tar파일을 받아서 압축을 풀�
 ```
 
 
-## github page 자동화
+### github page 자동화
 github에서 제공하는 CI/CD 인 github actions 를 사용하면 push시 자동으로 배포를 할 수 있다.
 1. github actions -> Categories:Pages -> Hugo 선택
 2. 템플릿 파일로 `HugoBlog/.github/workflows/hugo.yml` 파일을 제공한다. 본인의 상황에 맞게 작성한 후 remote branch에 반영한다.
@@ -253,6 +237,61 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
 ```
+
+## 문법
+1. Hugo 문법
+ - hugo는 html 안에 `{{ }}` 형태로 hugo용 구문을 넣을 수 있다. `{{ }}`안에 `--`, `%%`, `<>` 를 넣어 용도에 따라 다양한 변형이 있을 수 있다.
+   - `{{- }}`, `{{ -}}`, `{{- -}}` 를 사용하면 앞/뒤쪽의 줄바꿈 및 빈 여백을 모두 제거해 준다. 
+2. 변수 선언
+ - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
+   - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
+   - page 변수는 `hugo new` 를 사용하여 만든 각 페이지(.md파일) 최상단에 작성된 메타데이터(+++ 혹은 --- 로 감싸진 구역의 데이터)를 의미한다.
+ - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 변수로 'isHidden' 를 선언하는 예시
+3.  조건문
+ - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
+
+4. RelPermalink vs Permalink
+ - YOUR_CUSTOM_PATH.RelPermalink : baseurl을 / 로 처리한 링크 (/YOUR_CUSTOM_PATAH)
+ - YOUR_CUSTOM_PATH.Permalink : baseurl을 앞에 붙인 링크 (https://localhost:1313/YOUR_CUSTOM_PATAH)
+
+5. 파일 import
+ - 페이지 내부에서 다른 파일을 import 해오려면 `{{template 파일명}}` 혹은 `{{partial 파일명}}` 을 사용하면 된다. 
+ - 이때 인자로 dictionary 데이터를 전달 할 수 있다. `{{ template 파일명 dict ("Pages" .Site.RegularPages )}}` 와 같이 사용하면 호출된다.
+ - 이런 방식으로 subpage들을 recursive하게 참조할 수 있다.
+  ```
+  {{ define "sample" }}
+    ...
+    {{- $subSections := where .Site.Sections "Parent" .Sections }}
+    {{ template sample dict ("Sections" $subSections) }}
+    ...
+  {{ end }}
+  ```
+
+6. define
+ - `{{- define 이름 -}} {{ end }}` 을 세트로 사용하여 사이에 있는 모든 구문을 "이름" 으로 정의한다.
+ - template이나 partial을 통해 define 된 구문을 호출할 수 있다. : `{{ tempalte 이름 }}`
+
+## 구조
+### Scope
+- `.` 혹은 `$.` 으로 변수를 호출하면 context 에 선언된 변수를 호출하는 것이다. 
+- context는 page를 생성할 때 전달해 줄 수 있다. `{{ template FILE_NAME CONTEXT_NAME CONTEXT_VALUE}}` 와 같이 사용하면 해당 파일 안에서 `.`은 CONTEXT_VALUE를 의미하게 된다.
+- 여러 데이터를 주고 싶다면 `dict()` 함수를 사용해서 dictionary 형태를 전달할 수도 있다. `{{ template FILE_NAME dict("v1" v1 "v2" v2)}}`
+
+
+### Site & Page & Section
+- Site는 전체 프로젝트, Page는 내용물을 담고 있는 파일, Section은 폴더(디렉터리) 로 이해하면 편하다. 
+- 각각 변수 scope를 갖고 있어서 `.Site.변수이름`, `.Page.변수이름`, `Section.변수이름` 으로 변수를 참조 및 선언할 수 있다. 
+- 하지만, config파일에서 선언하지 않는 한, 다른 파일에서 선언한 변수는 같은 page라도 참조가 되지 않는다. (필요시 전달할 수 있는 방법은 있다)
+
+1. Site
+(https://gohugo.io/variables/site/)
+2. Page
+(https://gohugo.io/variables/page/)
+3. Section
+(https://gohugo.io/content-management/sections/)
+- Section이 되기위한 조건으로는 1) content 폴더의 직속 디렉터리 이거나, 2) 안에 _index.md 파일을 지녀야 한다.
+- _index.md 파일을 지닌 디렉터리는 중간 가지 역할을 하고, index.md 파일을 지닌 디렉터리는 leaf node 역할을 하며, index.md 파일과 동일한 디렉터리에 들어있는 파일들은 각각의 페이지가 생성되지 않는다. 
+
 
 ## 오류 해결
 ### 배포 페이지 CSS 동작 오류

@@ -142,7 +142,7 @@ params:
         url: tags
 
   homeInfoParams:
-    Title: "Stay still brings regression"
+    Title: "Staying still makes you regress"
     Content: >
       Dev Blog made from Hugo
         - Tracks of my dev life

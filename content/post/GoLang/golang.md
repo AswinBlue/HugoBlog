@@ -23,3 +23,9 @@ draft = false
  - 이후 생성할 프로젝트는 이 root 디렉터리 하위 경로에 생성된다. 외부 경로에는 프로젝트를 생성할 수 없다.
 2.  root 디렉터리 안 src 디렉터리에 프로젝트를 생성한다.
  - Go는 npm, pip 와 같이 패키지 매니저가 없다. git 등에서 코드를 받아오면 src 디렉터리 안에 도메인별로 정리해서 관리하는게 정석이다.
+
+## 문법
+### printf
+1. format specifier
+- `%v`: used as a placeholder for the default format representation of a value
+- `%+v`: a detailed representation of the value, including all the fields and their corresponding values for structs and maps.
