@@ -1,7 +1,7 @@
 ---
-title: "Algorithm"
-date: 2023-07-16T09:21:30+09:00
-lastmod: 2023-07-16T09:21:30+09:00
+title: "Hugo"
+date: 2023-07-16T09:22:55+09:00
+lastmod: 2023-07-16T09:22:55+09:00
 tags: []
 categories: []
 imgs:  []

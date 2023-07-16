@@ -1,7 +1,7 @@
 ---
-title: "Algorithm"
-date: 2023-07-16T09:21:30+09:00
-lastmod: 2023-07-16T09:21:30+09:00
+title: "MachineLearning"
+date: 2023-07-16T09:23:14+09:00
+lastmod: 2023-07-16T09:23:14+09:00
 tags: []
 categories: []
 imgs:  []

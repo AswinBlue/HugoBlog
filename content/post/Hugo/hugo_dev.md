@@ -240,24 +240,24 @@ jobs:
 
 ## 문법
 1. Hugo 문법
- - hugo는 html 안에 `{{ }}` 형태로 hugo용 구문을 넣을 수 있다. `{{ }}`안에 `--`, `%%`, `<>` 를 넣어 용도에 따라 다양한 변형이 있을 수 있다.
-   - `{{- }}`, `{{ -}}`, `{{- -}}` 를 사용하면 앞/뒤쪽의 줄바꿈 및 빈 여백을 모두 제거해 준다. 
+   - hugo는 html 안에 `{{ }}` 형태로 hugo용 구문을 넣을 수 있다. `{{ }}`안에 `--`, `%%`, `<>` 를 넣어 용도에 따라 다양한 변형이 있을 수 있다.
+     - `{{- }}`, `{{ -}}`, `{{- -}}` 를 사용하면 앞/뒤쪽의 줄바꿈 및 빈 여백을 모두 제거해 준다. 
 2. 변수 선언
- - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
-   - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
-   - page 변수는 `hugo new` 를 사용하여 만든 각 페이지(.md파일) 최상단에 작성된 메타데이터(+++ 혹은 --- 로 감싸진 구역의 데이터)를 의미한다.
- - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 변수로 'isHidden' 를 선언하는 예시
+  - 변수는 site, page 에 따라 다르게 선언 할 수 있다. config.yml 파일에 선언하면 site 단위로 선언되며, 전역 변수처럼 모든 page에서 참조 가능하다. 
+    - `.Params` 은 page 변수를 참조하며, `site.Params` 은 site 변수를 참조하는 방식이다. 
+    - page 변수는 `hugo new` 를 사용하여 만든 각 페이지(.md파일) 최상단에 작성된 메타데이터(+++ 혹은 --- 로 감싸진 구역의 데이터)를 의미한다.
+  - `{{- $isHidden := Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}` : page 변수로 'isHidden' 를 선언하는 예시
 3.  조건문
- - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
+  - `{{- if (.Param "ShowToc") }}`  : page변수에서 ShotToc가 있는지 체크
 
 4. RelPermalink vs Permalink
- - YOUR_CUSTOM_PATH.RelPermalink : baseurl을 / 로 처리한 링크 (/YOUR_CUSTOM_PATAH)
- - YOUR_CUSTOM_PATH.Permalink : baseurl을 앞에 붙인 링크 (https://localhost:1313/YOUR_CUSTOM_PATAH)
+   - YOUR_CUSTOM_PATH.RelPermalink : baseurl을 / 로 처리한 링크 (/YOUR_CUSTOM_PATAH)
+   - YOUR_CUSTOM_PATH.Permalink : baseurl을 앞에 붙인 링크 (https://localhost:1313/YOUR_CUSTOM_PATAH)
 
 5. 파일 import
- - 페이지 내부에서 다른 파일을 import 해오려면 `{{template 파일명}}` 혹은 `{{partial 파일명}}` 을 사용하면 된다. 
- - 이때 인자로 dictionary 데이터를 전달 할 수 있다. `{{ template 파일명 dict ("Pages" .Site.RegularPages )}}` 와 같이 사용하면 호출된다.
- - 이런 방식으로 subpage들을 recursive하게 참조할 수 있다.
+   - 페이지 내부에서 다른 파일을 import 해오려면 `{{template 파일명}}` 혹은 `{{partial 파일명}}` 을 사용하면 된다. 
+   - 이때 인자로 dictionary 데이터를 전달 할 수 있다. `{{ template 파일명 dict ("Pages" .Site.RegularPages )}}` 와 같이 사용하면 호출된다.
+   - 이런 방식으로 subpage들을 recursive하게 참조할 수 있다.
   ```
   {{ define "sample" }}
     ...
@@ -268,8 +268,11 @@ jobs:
   ```
 
 6. define
- - `{{- define 이름 -}} {{ end }}` 을 세트로 사용하여 사이에 있는 모든 구문을 "이름" 으로 정의한다.
- - template이나 partial을 통해 define 된 구문을 호출할 수 있다. : `{{ tempalte 이름 }}`
+   - `{{- define 이름 -}} {{ end }}` 을 세트로 사용하여 사이에 있는 모든 구문을 "이름" 으로 정의한다.
+   - template이나 partial을 통해 define 된 구문을 호출할 수 있다. : `{{ tempalte 이름 }}`
+
+7. 반복문
+   - `{{ range $itr := LIST}} {{ end }}` : LIST 안의 내용을 하나씩 itr 에 담아서 반복한다. 이때, range 문 안에서는 '.' 문자는 $itr 을 의미하게 되므로, 주의한다.
 
 ## 구조
 ### Scope

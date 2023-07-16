@@ -106,3 +106,8 @@ printf("%d",MULT(2+2,3+3)) // 예상값 (4 * 6) * 2 = 26
   cin.tie(NULL);
   cout.tie(NULL);
   ```
+
+## std library
+### printf
+- `printf("%*d", width, value)` : value를 width글자 수만큼 앞에 공백을 두고 출력
+- `printf("%0*d", width, value)` : value를 width글자 수만큼 앞에 0을 두고 출력

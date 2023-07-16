@@ -16,7 +16,7 @@ draft = false
 +++
 
 # CMake
-Cmake란 : C,C++ 언어 컴파일시 make 툴을 이용할 때, 규모가 큰 프로젝트에서 컴파일 의존성 관리를 쉽게 하기 위한 도구
+- Cmake란 : C,C++ 언어 컴파일시 make 툴을 이용할 때, 규모가 큰 프로젝트에서 컴파일 의존성 관리를 쉽게 하기 위한 도구
 
 ## 명령어
 - `cmake CMakeList.txt` : CMakeList.txt파일 안의 내용을 수행한다.
@@ -48,9 +48,3 @@ ex) ``add_dependencies(<생성한 객체이름> <모듈1> <모듈2> ...)``
 
 ## 참조
 https://nowonbun.tistory.com/712
-
-
-# make
-
-## 명령어
-- `make install` : 해당 경로의 소스를 컴파일하여 /usr/local/lib, /usr/local/bin 폴더로 .so파일과 .bin파일 복사

@@ -3,6 +3,7 @@ title: AswinBlue
 paginate: 5
 theme: hugo-PaperMod
 
+enableGitInfo: true
 enableInlineShortcodes: true
 enableRobotsTXT: true
 buildDrafts: false
@@ -11,6 +12,23 @@ buildExpired: false
 enableEmoji: true
 pygmentsUseClasses: true
 # googleAnalytics: UA-123-45
+
+frontmatter:
+  date:
+  - date
+  - publishDate
+  - lastmod
+  expiryDate:
+  - expiryDate
+  lastmod:
+  - :git
+  - lastmod
+  - date
+  - publishDate
+  publishDate:
+  - publishDate
+  - date
+
 
 minify:
   disableXML: true

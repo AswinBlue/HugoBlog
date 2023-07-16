@@ -1,7 +1,7 @@
 ---
-title: "Algorithm"
-date: 2023-07-16T09:21:30+09:00
-lastmod: 2023-07-16T09:21:30+09:00
+title: "C++"
+date: 2023-07-13T20:59:07+09:00
+lastmod: 2023-07-13T20:59:07+09:00
 tags: []
 categories: []
 imgs:  []
