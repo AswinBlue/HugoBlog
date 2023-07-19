@@ -18,6 +18,7 @@ draft = false
 - `stty -a`: 시그널 단축키들의 값 확인
 - `strace FILE_NAME`: 실행파일이 실행되는 상세 과정을 라인별로 보여준다.
 
+
 ## sed
 - 기본적인 기능은 ed에서 따 왔으며, 이 기능들은 모두 sed에 적용이 된다.
 - ed는 대화형 편집기이며, sed는 스트리밍 편집기
@@ -56,12 +57,21 @@ tar: Error is not recoverable: exiting now
 
 이때 확장자가 gz로 되어있는 경우에는 옵션에 'z'를 추가해준다. (tar -zxvf, tar-zcvf)
 
+
 ## 파일 관리 / 접근
 - `wc FILE_NAME` : 파일의 라인, 단어, 글자 수를 출력 (단어는 공백문자(줄바꿈, 공백, 탭) 으로 구분된 글자 집합)
 - `wc -c FILE_NAME`: 파일 크기를 byte단위로 출력
-
 - `xxd FILE_NAME`: binary파일의 hexdump 출력
+- `file FILE_NAME`: 파일이 어떤 종류의 내용을 담고 있는지(C language, text ...)를 확인할 수 있다.
+- `readelf FILE_NAME`: ELF 파일의 meta data를 확인한다. 
+  - ELF란 Executable and Linkable Format을 의미한다. (*.o 형태의 파일이다)
+- `objdump -S FILE_NAME`: object file을 어셈블리 형태로 주소별로 출력 해주는 명령이다. 
 
+
+### 리다이렉션
+- `CMD1 > FILE_NAME` 표준 출력을 리다이렉션, 동작1의 결과를 FILE_NAME에 저장한다.
+- `CMD1 2> FILE_NAME` 표준 에러를 리다이렉션, 동작1에서 발생한 에러를 FILE_NAME에 저장한다.
+- `CMD1 >> FILE_NAME` 표준 출력을 리다이렉션, 동작1의 결과를 FILE_NAME에 저장하되, 기존 파일 뒤부터 이어서 쓴다.
 
 ## 참조
 http://m.egloos.zum.com/slog2/v/3689816

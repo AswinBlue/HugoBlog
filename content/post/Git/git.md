@@ -1,7 +1,7 @@
 ---
 title: "Git"
 date: 2022-07-09T10:58:55+09:00
-draft: true
+draft: false
 lastmod: 2022-07-09T10:58:55+09:00
 tags: ["git",]
 categories: ["dev",]

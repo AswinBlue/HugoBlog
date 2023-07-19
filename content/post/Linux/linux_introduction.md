@@ -27,7 +27,7 @@ draft: false
   ---
 
 ### GNU 
- - Richard Stallman이 창시한 FSF(Free Software Foundation) 의 프로젝트 GNU 
+ - Richard Stallman이 창시한 FSF(Free Software **Fo**undation) 의 프로젝트 GNU 
  - 리눅스도 GNU의 GPL(General Public License) 에 의해 배포된다.
    1) 무료로 사용 가능하며
    2) GPL 소스를 적용된 코드를 수정하여 재판매가 가능하지만, 해당 코드를 공개해야 하며,
