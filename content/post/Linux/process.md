@@ -44,6 +44,18 @@ draft: false
     - 반환값은 자식프로세스의 process id를 의미하며, 리눅스 명령어 `ps -ef` 로 pid를 확인 할 수 있다.
 - Race Condition : 일단 fork가 되어 프로세스가 부모 자식으로 나뉘면, 프로세스의 실행은 병렬적으로 이루어지며, 같은 코드라도 어느 것이 먼저 동작할지 알 수 없다.
 
+### wait
+- fork() 로 자식 프로세스를 생성한 후 자식 프로세스가 exit()를 호출하여 종료될 때, 부모 process는 자식 process의 종료 결과를 `wait()` 으로 받을수 있다. 
+- `wait(statloc *status)` : 자식 process에서 호출된 exit() 함수 안에 들어간 인자값을 status(인자는 4byte int지만, 사용하는 부분은 2byte) 에 담아낸다. 
+- status 값은 상위 1byte와 하위 1byte를 구분해서 사용한다. 
+  - 정상적으로 종료가 된경우는 exit() 함수에 의한 종료를 의미하며, status의 상위 1byte에 exit의 인자값을 담아낸다. 
+  - 비정상 종료는 signal에 의한 종료를 의미하며, signal 번호 값을 status의 하위 1byte에 담아낸다.
+  - 0~7번 bit : 자식 process 정상종료시 종료 status
+  - 8번 bit : core dump 여부
+  - 9~15번 bit : 시그널 번호
+  - status값을 인자로 받아 종료 사유를 회신하는 매크로 함수를 사용하면 쉽게 판단할 수 있다. 
+    - WIFEXITED, WEXITEDSTATUS, WIFSIGNALED ...
+
 
 ### 메모리 
 - 부모 프로세스를 복사해 자식 프로세스를 생성해도 code 영역은 공유된다. 
@@ -51,7 +63,7 @@ draft: false
 - 자식 프로세스는 부모 프로세스의 ram 영역 값도그대로 복사 해 온다.
   - 하지만, 자식 프로세스가 새성될 당시 메모리가 바로 복사되는 것이 아니라, 메모리에 값을 작성하는 시점에 복사가 된다.
   - 즉, 부모나 자식 프로세스에서 값을 덮어쓰거나 새로 생성하지 않은 변수에 대해서는 같은 메모리를 바라보고 있다고 볼 수 있다.
-
+- 메모리는 reference count를 들고 있어 몇개의 프로세스에서 해당 영역을 참조하는지 체크한다.
 
 ### 프로세스 생명 주기 (Life Cycle)
 - 모든 프로세스는 부모 프로세스가 있고, 가장 최초로 실행된 프로세스를 init 프로세스라 하며, init 프로세스의 pid는 1이다. 
@@ -149,3 +161,36 @@ draft: false
    - exec 파일들은 기본적으로 path를 참조하지 않고 실행되어 명령어 파일의 절대경로를 인자로 넣어야 한다. 
    - p옵션이 붙은 함수를 사용하면 환경변수 path를 사용하여 명령어를 실행할 수 있다.
    - ex) `execlp("ls", "ls", "-l", null)`
+
+#### 쉘을 이용한 옵션처리
+- `execlp(command, command, null);` 형태로 실행하지 않고, `execl("/bin/sh", "sh", "-c", command, null);` 형태로 실행하면 'command' 명령을 쉘이 실행하게 되어 옵션을 알아서 처리해 준다.
+
+#### exec로 생성한 프로세스의 속성
+1. 상속되는 속성
+  - 파일 디스크립터
+  - 사용자 ID, 그룹 ID, 프로세스 그룹 ID, 세션 ID, 제어 터미널
+  - alarm 시그널 남은 설정시간
+  - 작업 디렉터리, root 디렉터리
+  - 파일 잠금 여부, 파일 생성 마스크
+  - 자원 제약, CPU 사용시간
+2. 상속되지 않는 속성
+  - signal의 처리는 SIG_IGN 처리되던 시그널 외에는 default로 복구된다. 
+  - 유효 사용자 ID (파일 속성에서 set_user_ID 비트가 설정된 경우)
+  - 유효 그룹 ID (set_group_id 비트가 설정된 경우)
+
+#### reference count
+- exec를 사용하여 프로세스를 호출하면, 그 아래 line들은 실행이 되지 않는다. 
+  - 프로세스는 코드 영역 메모리를 참조하고, 메모리는 reference count를 두어 몇개의 프로세스가 해당 메모리를 참조하는지 체크한다.
+  - 이때, exec를 사용하면 기존 프로세스는 code 영역을 내버려두고 exec에서 사용할 새로운 코드영역을 참조하게 된다. (+program counter 이동)
+  - 그렇게 되면 기존에 남아있던 코드 영역 메모리는 reference count가 0이되어 더이상 사용하지 않는 메모리로 취급되어 free된다.
+
+-> fork와 exec를 함께 사용하면 exec 아래의 코드도 실행할 수 있게 할 수 있다. 
+```
+...
+pid = fork()
+if (pid)
+  exec(...);
+wait(0);
+something_to_do(); // 부모 process에서 실행 가능
+...
+```
