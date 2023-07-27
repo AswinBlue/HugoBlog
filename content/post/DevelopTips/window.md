@@ -42,3 +42,8 @@ draft = false
   cd server
   call gradle wrapper
   ```
+
+## 리눅스에서 파일 가져오기
+- `scp` 명령을 사용해서 리눅스에서 파일을 가져올 수 있다.
+- `scp <계정>@<리눅스_IP주소>:리눅스에서_가져올_파일_경로 윈도우에_저장할_경로` 형태로 사용 가능하다.
+- ex) `scp kim@10.162.32.11:target_file C:\` : C 경로에 target_file을 받아온다. target_file에 절대경로를 사용하는게 좋다. 상대경로를 사용할 시 절대 경로는 /home/kim/target_file 가 된다.

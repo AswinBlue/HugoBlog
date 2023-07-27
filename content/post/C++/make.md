@@ -55,7 +55,7 @@ TARGET:DEPENDENCIES
   - TIP: 컴파일 도구를 변수로 지정해 놓으면 좋다. `CC=gcc` -> `$(CC) -c file.c`
   - TIP: 최종 파일 이름을 변수로 지정해 놓으면 좋다. `PROJECT_NAME=myProject` -> `gcc -o $(PROJECT_NAME) file1.o file2.o`
   - TIP: .o파일을 만드는 `-c` 옵션을 `CFLAGS` 로 변수로 사용하면 좋다.    
-  -> `CFLAGS = -I/include -c` 와 같이 include path 및 기타 설정이 가능하다.
+  -> `CFLAGS = -I./include -c` 와 같이 include path 및 기타 설정이 가능하다.
   - TIP: 링킹을 위한 `LFLAGS` 또한 같은 맥락에서 변수로 활용하면 좋다.
 - `${VARIABLE:ASIS=TOBE}` : VALUE 변수에서 ASIS라는 구문을 TOBE라는 구문으로 치환한다. (ex: `PROJECT_NAME:my=your`-> ${PROJECT_NAME} == yourProject)
 

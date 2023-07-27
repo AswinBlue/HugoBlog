@@ -104,7 +104,7 @@ draft: false
     my_function() { while ( waitpid(-1, 0, WNOHANG) > 0 ); }
     ```
 
-  - 하지만, SIGCHLD 시그널은, 자식 프로세스가 종료되었을 때 뿐 아니라, 정지되었을 때도 호출된다. signal 설정 옵션으로 자식 프로세스가 종료되었을 때 날아오는 SIGCHLD 는 처리하지 않도록 설정해야 완벽하다.
+  - 하지만, SIGCHLD 시그널은, 자식 프로세스가 종료 되었을 때 뿐 아니라, 정지되었을 때도 호출된다. signal 설정 옵션으로 자식 프로세스가 종료되었을 때 날아오는 SIGCHLD 는 처리하지 않도록 설정해야 완벽하다.
     - signal의 상위호환인 `sigaction` 함수를 사용하면 flag를 설정하여 처리 가능하다.
 
 ### Init Process

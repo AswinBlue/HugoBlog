@@ -32,6 +32,8 @@ _____________
 ------------------------------
 ```
 - application level에서는 library를 사용하며, 이 코드들은 library buffer를 사용한다. (open(), read(), write(), close() ...)
+  - 시스템에서 제공하는 최적의 buffer 단위로 disk에서 값을 읽어오고, library buffer에 담아두면 작은단위로 읽어올 때 효율적이다. 
+  - 예를들어, 한 줄씩 파일을 읽어야 한다면, 1byte씩 파일에서 '\n'을 감지할 때 까지 읽을 수 있지만, BUF_SIZ만큼 파일에서 읽어서 library buffer에 담아두고 library buffer를 1byte씩 읽으며 '\n'를 찾는 것이 실행 속도는 더 빠르다. (IO접근은 적을수록 효율적)
 - Kernel level에서는 System call을 사용하며 system buffer를 사용한다.
 - application level 함수를 사용하면, 보통 library buffer를 1차적으로 사용하고, 내부적으로 system call을 수행해 system buffer를 2차적으로 사용하게 된다.
   - printf는 c library 함수이며, '\n'을 만나야 화면상에 출력을 한다.
@@ -153,6 +155,10 @@ _____________
 
 
 ## 파일의 속성
+```
+struct stat buf;
+int s = stat("./file", &buf); // 성공시 0, 실패시 -1
+```
 - `stat(FILE_NAME, STAT_STRUCT)`: FILE_NAME 파일에서 stat 데이터(파일 정보)를 추출해 STAT_STRUCT 버퍼에 저장, 데이터는 `struct stat` 형태이다.
   - `sys/stat.h` 헤더파일에 정의되어 있다.
   - `.st_mode`: 2byte로 구성되며, 파일의 종류와 권한을 나타낸다.
@@ -179,7 +185,7 @@ _____________
   - `.st_nlink` 값은 파일에 걸려있는 hard link의 갯수를 나타낸다. (unsigned long int)
   - `.st_uid` 값은 파일을 소유한 user의 uid값을 나타낸다. 
     - `/etc/passwd` 경로에 username과 uid 매핑 테이블이 있다. 
-    - `getpwuid` 함수로 uid를 넘겨주면 `struct passwd` 구조체 포인터를 반환해 주는 함수가 있으므로, 이를 사용하면 된다. 
+    - `getpwuid` 함수로 uid를 넘겨주면 `struct passwd` 구조체 포인터를 반환해 주는 함수가 있으므로, 사용자 정보가 필요할 경우 이를 사용하면 된다. 
       - struct passwd 에는 /etc/passwd 파일에 적히는 데이터들을 그대로 구조체로 담아낸 형태이며, pw_name, pw_passwd, pw_uid, pw_gid 등 데이터를 참조 가능하다.
       - `pwd.h` 헤더에 정의되어 있다.
   - `.st_gid` 값은 파일이 속한 group의 gid 값을 나타낸다. 
@@ -234,7 +240,7 @@ _____________
 ## 디렉터리 구조
 ```
 DIR* directory_p = opendir(".");
-struct direct* directory_entry_p = readdir(directory_p);
+struct dirent* directory_entry_p = readdir(directory_p);
 ```
 - 디렉터리 정보는 `struct dirent` 형태의 구조체에 저장된다. 
   - struct dirent 구조체는 디렉터리 내부의 파일들의 정보를 담아내는 구조체이다.
@@ -256,6 +262,7 @@ struct direct* directory_entry_p = readdir(directory_p);
   - `OPTIONS` 는 옵션으로 처리할 캐릭터들을 char* 형태로 나열한다. (ex: "abcd")
   - 한번 호출 할 때 마다 argv를 하나씩 확인하며 OPTIONS에 해당하는 문자열이 들어있을 경우 옵션에 해당하는 캐릭터를 int형으로 반환한다.
   - 옵션이 더이상 없으면 -1 을 반환한다.
+  - getopt는 내부적으로 argv의 위치를 변경하여 옵션들을 제일 앞으로 이동시키고, 나머지를 뒤로 옮긴다. -1을 반환하며 옵션 처리가 끝남을 회신한 후에는 전역변수 `optind` 로 남은 파라미터들을 접근할 수 있다. (ex: argv[optind])
 
 ## 파일 링크
 - `cp` 명령은 directory entry와 i-node, 데이터를 모두 새로 복사하여 생성하는 deep copy 명령이다.

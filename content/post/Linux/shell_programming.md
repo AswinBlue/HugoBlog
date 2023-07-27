@@ -1,8 +1,8 @@
 ---
-title: "Shell"
+title: "Shell Programming"
 date: 2023-07-13T18:29:44+09:00
 lastmod: 2023-07-13T18:29:44+09:00
-tags: ["linux", "shell"]
+tags: ["linux", "shell_programming"]
 categories: ["dev"]
 imgs:  []
 cover:  ""  # image show on top
@@ -15,8 +15,8 @@ license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
 draft: false
 ---
 
-# Shell
-리눅스 쉘 명령어에 대해 기술한다.
+# Shell Programming
+리눅스 쉘 프로그래밍에 대해 기술한다.
 
 ## 기본
 `!/bin/bash` : 쉘 파일을 실행할 때 어떤 쉘로 실행될지 설정 하는 것
