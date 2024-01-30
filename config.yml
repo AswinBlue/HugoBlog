@@ -160,7 +160,7 @@ params:
         url: tags
 
   homeInfoParams:
-    Title: "Staying still makes you regress"
+    Title: "Staying still makes you regressed"
     Content: >
       Dev Blog made from Hugo
         - Tracks of my dev life
