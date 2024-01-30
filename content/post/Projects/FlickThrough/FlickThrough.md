@@ -17,9 +17,9 @@ draft: false
 
 # Flick Through
 
-github: https://github.com/AswinBlue/FlickThrough
-Link : aswinblue.github.io/FlickThrough/
-시작날짜: August 21, 2023
+github: https://github.com/AswinBlue/FlickThrough  
+Link : aswinblue.github.io/FlickThrough/  
+시작날짜: August 21, 2023  
 
 ## 목표
 
@@ -34,6 +34,7 @@ Link : aswinblue.github.io/FlickThrough/
 5. 스크린샷 혹은 클립보드의 내용도 사용할 수 있도록 함
 
 
+# 기능 구현
 
 ## 1. 구현 내용
 
@@ -352,3 +353,141 @@ Link : aswinblue.github.io/FlickThrough/
 - 다국어 설정 방법 1 (intl, l10n.yaml을 사용한 공식 방식) : [https://fronquarry.tistory.com/8](https://fronquarry.tistory.com/8)
 - 다국어 설정 방법 2 (intl과 command를 통한 방식) : [https://fronquarry.tistory.com/8](https://fronquarry.tistory.com/8)
 - 두 방식을 비교한 내용 : [https://jay-flow.medium.com/flutter-localizations-완전-정복-하기-8fa5f50a3fd2](https://jay-flow.medium.com/flutter-localizations-%EC%99%84%EC%A0%84-%EC%A0%95%EB%B3%B5-%ED%95%98%EA%B8%B0-8fa5f50a3fd2)
+
+# 배포
+
+## 1. 구현 내용
+
+### github에 web 페이지 배포
+
+1. root 경로에 `.github/workflows/web.yml` 파일을 만든다.
+
+```yaml
+name: github-page-work # 작업 이름
+
+on:
+  push:
+    branches: [master] # master 브랜치의 코드 사용해서 동작
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+      - uses: subosito/flutter-action@v1
+      - uses: bluefireteam/flutter-gh-pages@v7
+        with:
+          baseHref: /FlickThrough/
+```
+
+1. https://github.com/settings/tokens 에 접속하여 ‘generate new token’을 선택하여 신규  token을 생성한다. 
+    
+    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled.png)
+    
+- 배포만이 목적이라면 아래와 같이 권한을 설정 해 주면 충분하다.
+
+![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%201.png)
+
+- 토큰이 생성되면 페이지를 닫지 말라. 현재 페이지를 벗어나면 다시 토큰을 볼 수 없다.
+그 상태에서 바로 코드가 들어있는 github repository의 setting 으로 진입한다. ([https://github.com/AswinBlue/FlickThrough/settings](https://github.com/AswinBlue/FlickThrough/settings))
+- repository 설정에서 “Secrets and variables” 메뉴에 진입하고, ‘Secrets’ 탭을 선택한 후 ‘New Repository Secret’ 버튼을 눌러서 `GIT_TOKEN` 을 key로, 이전 단계에서 받은 token을 value로 설정하여 secret variable을 하나 생성한다. (생성한 secret variable도 다시 확인할 수 없으므로 주의한다. 또한 GITHUB_ 로 시작하는 key의 secret varaible은 생성할 수 없다)
+([https://github.com/AswinBlue/FlickThrough/settings/secrets/actions](https://github.com/AswinBlue/FlickThrough/settings/secrets/actions))
+    
+    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%202.png)
+    
+1. 내용을 작성하고 github에 푸쉬하면 github 의 action 탭에서 action의 실행 결과를 확인할 수 있다.  ([https://github.com/AswinBlue/FlickThrough/actions/new](https://github.com/AswinBlue/FlickThrough/actions/new))
+    
+    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%203.png)
+    
+2. action이 정상적으로 완료되었다면, setting/page 항목에서 브랜치 ‘gh-pages’로 설정 해 준다. (자동으로 되는 경우도 있음)
+([https://github.com/AswinBlue/FlickThrough/settings/pages](https://github.com/AswinBlue/FlickThrough/settings/pages))
+    
+    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%204.png)
+    
+
+### 2. 아이콘 변경
+
+[https://www.appicon.co/](https://www.appicon.co/) 에 이미지 파일을 넣으면 android 아이콘 형태로 이미지를 변환하여 추출 해 준다. 
+
+추출된 아이콘을 `\android\app\src\main\res` 경로에 복사 붙여넣으면 된다. 
+
+IOS는 `ios/Runner/Assets.xcassets` 폴더 안에 AppIcon.appiconset 폴더를 교체 해 준다. 
+
+### 3. Android 앱 배포
+
+1. 구글 플레이스토어 개발자 계정 생성
+개발자 계정이 없다면, [https://play.google.com/console](https://play.google.com/console) 에 접속하여 안내에 따라 계정을 생성한다. 생성에는 $25의 비용이 부과되므로 달러 결제가 가능한 카드를 준비한다.
+2. 안드로이드 앱 배포시 자신이 앱의 개발자가 맞다는 것을 증명하고 앱을 업데이트 하기 위해서는 앱에 설정된 key와 동일한 key를 알고 있어야 한다. 이를 key store 시스템이라 하며, 배포전 반드시 설정을 해야 한다. 
+    - jdk에서 제공하는 keytool 명령어를 사용해야 한다. jdk를 설치하면 `C:\Program Files\Java\jdk-21\bin` 경로에 keytool 실행파일이 있다.
+    - `keytool -genkey -v -keystore C:/Users/USER_NAME/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key`명령으로 key를 생성한다. key 생성시 비밀번호를 입력 해 주고, 묻는 질문에 필요하다면 대답해 준다.
+    - 생성된 key.jks 파일을 `android/app/` 경로로 이동시키고, [key.properties](http://key.properties) 파일을 생성한 후, 아래와 같이 내용을 채워 넣는다.
+        
+        ```dart
+        storePassword=<키생성시 입력한 암호>
+        keyPassword=<키생성시 입력한 암호>
+        keyAlias=key
+        storeFile=./key.jks
+        ```
+        
+    - .gitignore 파일로 key.jks와 [key.properties](http://key.properties) 파일이 유출되지 않게 잘 조정한다.
+    - app/build.gradle 파일에 keystore 을 사용하기 위한 내용을 추가한다.
+        
+        ```dart
+        def keystoreProperties = new Properties()
+        def keystorePropertiesFile = rootProject.file('app/key.properties')
+        if (keystorePropertiesFile.exists()) {
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        }
+        
+        ...
+        
+        android {
+        ...
+        	signingConfigs {
+        	  release {
+        	    keyAlias keystoreProperties['keyAlias']
+        		  keyPassword keystoreProperties['keyPassword']
+        	    storeFile file(keystoreProperties['storeFile'])
+              storePassword keystoreProperties['storePassword']
+            }
+          }
+        	
+          buildTypes {
+            release {
+              signingConfig signingConfigs.release
+            }
+          }
+        ```
+        
+    - gradle 파일 수정 후에는 gradle을 프로젝트에 sync 해 주어야 한다. 
+    gradle sync라는 항목이 ‘file’ 밑에 있는 경우도, ‘tool → android’ 밑에 있는 경우도 있는데 둘다 보이지 않는다면 build.gradle 파일을 우클릭 한 후 ‘Link gradle project’ 를 눌러준다.
+        
+        ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%205.png)
+        
+    - 마지막으로 build를 release 버전으로 수행해야 한다. 좌측 하단에 Build Variants 창을 찾아(혹은 build → Select build variant 선택) 설정을 release로 변경한다.
+        
+        ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%206.png)
+        
+    - 이후 콘솔창에 `flutter build appbundle` 명령어를 입력하여 app bundle을 빌드한다. 빌드한 결과는 /build/app/outputs/bundle/release 경로에 생성된다.
+    - 파일명은 app-release.aab 로 생성되어 있다. playstore console에 배포할때도 aab 파일을 업로드 한다.
+    - 업로드한 파일의 manifest에 적힌 버전과 동일한 버전은 중복 업로드를 할 수 없으므로, 이후 업로드 시에는 높은 버전을 업로드 해야 하며, 기존 버전을 삭제하고 싶다면 playstore console에서 ‘app bundle 탐색기’ 메뉴를 찾아 삭제가 가능하다.
+
+## 2. 문제와 해결
+
+1. `fatal: unable to access '[https://github.com/AswinBlue/FlickThrough/](https://github.com/AswinBlue/FlickThrough/)': The requested URL returned error: 403` 에러
+    - “erickzanardo/flutter-gh-pages@v3” 과 “bluefireteam/flutter-gh-pages@v7” 을 사용해도 모두 동일한 에러가 발생했다.
+    - 해당 url에 접근 권한이 없는 경우 발생한다.
+        - 1) gitbash를 이용하여 url을 계정 이름이 포함된 형태로 변경해 준다.
+        `git remote set-url origin https://AswinBlue@github.com/AswinBlue/FlickThrough.git`
+        - 2) checkout job 실행시 token 사용하도록 적용 해 주면 이후 명령들도 권한이 적용 되는듯 하다.
+            
+            ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%207.png)
