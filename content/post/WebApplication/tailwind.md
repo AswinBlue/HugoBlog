@@ -20,9 +20,10 @@ draft = false
 - [Tailwind Docs](https://tailwindcss.com/docs)
 
 ## Installation
-  - `npm install -D tailwindcss@latest` 명령을 사용하여 설치가 가능하다.
-  - `npx tailwindcss init -P` 명령을 사용하면 tailwind.config.js 파일이 생성되며, 현재 위치에서 tailwind를 적용할 수 있게 된다.
-    - tailwind.config.js 파일은 다음과 같이 구성된다.   
+1. tailwind 모듈 설치 
+   - `npm install -D tailwindcss@latest` 명령을 사용하여 설치가 가능하다.
+   - `npx tailwindcss init` 명령을 사용하면 현재 경로에 tailwind.config.js 파일이 생성되며, 현재 프로젝트에서 tailwind를 적용할 수 있게 된다.
+     - tailwind.config.js 파일은 다음과 같이 구성된다.   
 
     ```
     module.exports = {
@@ -80,33 +81,40 @@ draft = false
     };
     ```
 
-  - tailwind는 react와 같은 framework에서는 자동으로 적용이 가능하지만, 그 외의 경우에는 postcss 등과 같은 모듈의 도움이 필요하다.  
+   - tailwind는 react와 같은 framework에서는 자동으로 적용이 가능하지만, 그 외의 경우에는 postcss 등과 같은 모듈의 도움이 필요하다.  
+   - tailwind 모듈 설치와 tailwind.config.js 구성이 끝났다면, tailwind로 작성된 css를 코드에 추가해줘야 한다. index.css에 아래 구문을 추가한다. 
+      ```
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+      ```
 
-  1. postcss
-     - `npm install -D postcss postcss-cli` : postcss 모듈과, 명령어 입력을 위한 postcss-cli를 설치한다. 이후 cmd창에 postcss 명령어가 동작한다.  
-     - `postcss SOURCE_FILE -o OBJECT_FILE` : SOURCE_FILE 의 내용을 참조하여 OBJECT_FILE 경로에 파일 생성. SOURCE_FILE의 내용은 아래와 같다.   
-        ```
-        @tailwind base;
-        @tailwind components;
-        @tailwind utilities;
-        ```
+2. postcss
+   - react 사용시에는 postcss를 설치하지 않아도 되므로 스킵해도 된다. 
+   - `npm install -D postcss postcss-cli` : postcss 모듈과, 명령어 입력을 위한 postcss-cli를 설치한다. 이후 cmd창에 postcss 명령어가 동작한다.  
+   - `postcss SOURCE_FILE -o OBJECT_FILE` : SOURCE_FILE 의 내용을 참조하여 OBJECT_FILE 경로에 파일 생성. SOURCE_FILE의 내용은 아래와 같다.   
+      ```
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+      ```
      
-     - `--watch` 옵션을 붙이면 파일 변경시 다시 빌드하지 않아도 된다.
+   - `--watch` 옵션을 붙이면 파일 변경시 다시 빌드하지 않아도 된다.
     
-  1. script
-     - package.json 파일에 다음 스크립트를 작성한다. 이후 `npm run build:postcss` 명령으로 세팅을 할 수 있다. 
-        ```
-        "scripts": {
-          "build:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o target/classes/static/css/tailwind.css",
-          "watch:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o src/main/resources/static/css/tailwind.css -w"
-        }
-        ```
+3. script
+  - package.json 파일에 tailwind용 스크립트를 작성한다.
+    ```
+    "scripts": {
+      "build:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o target/classes/static/css/tailwind.css",
+      "watch:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o src/main/resources/static/css/tailwind.css -w"
+    }
+    ```
+  - 이후 `npm run build:postcss` 명령으로 쉽게 tailwind 빌드를 할 수 있다.  
+  - tailwind.config.js 를 변경하면 빌드를 새로 해줘야 하지만, `-w` 옵션으로 동작시키면 tailwind.config.js를 변경해도 실시간으로 변경점이 적용된다.
 
-      - tailwind를 적용할 파일들을 앞서 tailwind.config.js 파일에서 'content' 항목에 넣어 지정했었다. 이 파일들에 새로운 class를 사용하였다면 postcss 명령으로 새로 build를 해줘야 한다.
-      - build가 아닌 watch를 사용했다면 실시간으로 변경점이 적용된다.
+  - tailwind를 적용할 파일들을 앞서 tailwind.config.js 파일에서 'content' 항목에 넣어 지정했었다. 이 파일들에 새로운 class를 사용하였다면 postcss 명령으로 새로 build를 해줘야 한다.
 
-
-1. Config
+4. Config
    - Project root 경로에 tailwind.config.js 파일에서 tailwind에 사용되는 custom 설정을 할 수 있다.   
      1. font
          - theme.extend.fontFamily에 사용할 font 이름을 정의하고, 
