@@ -28,7 +28,16 @@ draft = false
  - int 외 다른 형태도 사용 가능  
 
 ### 출력
-print()
+
+- print() 와 sys.stdout.write() 로 화면에 출력할 수 있다. 
+
+#### Flush
+  - print() 함수는 효율을 위해 버퍼에 내용을 채워놓고 있다가 버퍼가 일정량 채워지면 화면에 버퍼의 내용을 출력한다. 
+  - print() 함수에는 bool 형태의 인자 `flush` 를 받을 수 있는데, flush를 True로 설정하면 버퍼가 찰 때 까지 대기하지 않고 바로 출력할 수 있다. 
+    - ex) `print("print this immediately", flush=True)`
+  - sys 모듈의 `sys.stdout.flush()` 함수를 사용하여 동일한 효과를 낼 수 있다.
+  - python을 실행할 때, `-u` 옵션을 넣어서 실행하면 내부적으로 표준 출력이 모두 버퍼링 없이 즉시 flushing 된다. 
+
 
 ### 함수
 함수 인자로 배열 형태를 표현할 때 *를 붙인다.
@@ -47,6 +56,10 @@ func1(1, 2, 3) # 출력: [1, 2, 3]
 오름차순 정렬: `list.sort()`  
 튜플 두번째 인자 기준 오름차순 정렬: `list.sort(key=lambda x:x[1])`  
 내림차순 정렬 : `list.sort(reverse=True)`
+
+### 문자열
+- 문자열 뒤에 `format()` 함수를 호출해서 문자열 안에 `{}` 를 변수로 치환할 수 있다. 
+  - ex) `"sample text {} {}".format("var1", "var2")` 은 `sample text var1 var2` 으로 출력된다.
 
 ## 라이브러리
 ### numpy

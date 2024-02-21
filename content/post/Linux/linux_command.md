@@ -69,9 +69,12 @@ tar: Error is not recoverable: exiting now
 
 
 ### 리다이렉션
-- `CMD1 > FILE_NAME` 표준 출력을 리다이렉션, 동작1의 결과를 FILE_NAME에 저장한다.
-- `CMD1 2> FILE_NAME` 표준 에러를 리다이렉션, 동작1에서 발생한 에러를 FILE_NAME에 저장한다.
-- `CMD1 >> FILE_NAME` 표준 출력을 리다이렉션, 동작1의 결과를 FILE_NAME에 저장하되, 기존 파일 뒤부터 이어서 쓴다.
+- `CMD1 > FILE_NAME`: 표준 출력을 리다이렉션, CMD1의 결과를 FILE_NAME에 저장한다.
+  - `CMD1 1> FILE_NAME` 명령과 동일하다. 즉, `1>` 은 `>`로 대체 가능하다.
+- `CMD1 2> FILE_NAME`: 표준 에러를 리다이렉션, CMD1에서 발생한 에러를 FILE_NAME에 저장한다.
+- `CMD1 >> FILE_NAME`: 표준 출력을 리다이렉션, CMD1의 결과를 FILE_NAME에 저장하되, 기존 파일 뒤부터 이어서 쓴다.
+- `CMD1 2> FILE_NAME_1 1> FILE_NAME_2`: CMD1의 표준에러와 표준출력을 FILE_NAME_1 과 FILE_NAME_2에 나누어 기록한다.
+- `CMD1 > /dev/null`: 출력할 내용을 버린다. `dev/null` 로 리다이렉트 된 내용은 모두 버려진다.
 
 ## 참조
 http://m.egloos.zum.com/slog2/v/3689816
