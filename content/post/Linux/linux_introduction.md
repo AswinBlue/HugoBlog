@@ -46,7 +46,18 @@ draft: false
 - 커널은 같지만, Redhat Ubuntu CentOs Fedora 등 다양한 배포 버전이 개발되었다. 
 
 ---
+## Linux hierarchy
+- 리눅스는 다음과 같은 구조로 구성되어 하드웨어를 제어한다. 
+> Hardware ->  
+> Linux Kernel ->  
+> System Call Interface ->  
+> System Utilities ->  
+> Linux Shell
 
+- 하드웨어에 가까울 수록 low level,  멀어질 수록 high level 로 동작이 캡슐화 된다.
+
+
+---
 ## File System
 - 리눅스의 파일 구조는 Tree 형태를 갖고 있다. 가장 최 상단의 경로는 `/` 이며, root directory라고 칭한다.
 - 모든 주변장치(터미널, 프린터, 디스크) 를 파일로 간주한다.
