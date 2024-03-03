@@ -116,6 +116,10 @@ draft = false
   - 배포시에는 'build'디렉터리 안의 내용을 사용하면 된다. 웹서버의 최상위 디렉터리를 'build'로 설정하면 된다.
  - `npm install serve` 명령어로 serve 툴을 설치한다. serve는 웹서버를 실행시키는 도구이다.
  - `serve -s build` 명령어로 'build' 디렉터리를 root 디렉터리로 웹서버를 실행한다.
+   - 만약 vsCode 사용 중 "이 시스템에서 스크립트를 실행할 수 없으므로 ..." 문구가 발생한다면, 콘솔에서 설정을 변경해야 한다. 
+   - 관리자코드로 vsCode를 실행시킨 후, 콘솔 창에 `Set-ExecutionPolicy RemoteSigned` 를 입력한다. 
+   - 이후 `get-ExecutionPolicy` 를 입력하여 결과값이 `RemoteSigned` 가 나오는지 확인한다. 
+   - 이후에는 정상적으로 `serve` 명령이 동작함을 확인 할 수 있다. 
  - 보통은 이렇게 일일이 작업을 수행하지 않고, `npm run deploy` 명령으로 package.json 파일에 기록된 설정대로 배포 작업을 자동화시킨다.
 
 ### github에 배포
