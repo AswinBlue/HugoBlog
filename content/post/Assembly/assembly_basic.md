@@ -24,16 +24,19 @@ draft: false
   - 숫자를 넣으면 상수이다. 
   - [] 로 둘러싸인 숫자는 메모리이다.
   - 메모리 피연산자 앞에는 메모리의 크기를 나타내는 크기 지정자(Size Directive)가 붙을 수 있다.
+    - WORD: 16bit
+    - DWORD: 32bit
+    - QWORD: 64bit
 
 
 ## 명령어
 1. mov
-   - 특정 값을 레지스터리나 메모리에 저장하는 명령
+   - "값"을 레지스터리나 메모리에 저장하는 명령
    - `mov dst, src` : src 값을 dst에 덮어씀(src는 상수값)
    - `mov dst, [mem + 4]` : mem + 4 주소에 저장된 값을 dst에 덮어씀
    - dst 값으로는 주소나 포인터가 올 수 있다.
 2. lea
-   - 특정 주소를 레지스터리나 메모리에 저장하는 명령
+   - "주소"를 레지스터리나 메모리에 저장하는 명령
    - `lea dst, src` : src값을 dst에 덮어씀 (src는 주소값)
    - `lea dst, [mem + 4]` : mem 값에 4를 더한 값을 dst에 덮어씀
 3. add 
@@ -93,21 +96,45 @@ draft: false
 - 시스템 콜은 유저모드에서 시스템에게 커널 모드에서 실행할 수 있는 동작들을 요청하는 동작이다. 
   - 유저가 시스템 콜을 호출하면 커널은 이를 실행하고, 결과를 유저에게 반환한다.
 ## 레지스터
+### 범용 레지스터
 1. rsp : 스택의 최상단의 주소
 2. rip : 현재 명령 실행 주소
 3. rdi : 함수 실행시 첫 번째 인자의 주소
 4. esi : 함수 실행시 두 번째 인자의 주소
-5. rbp : (Base Register Pointer)스택 복귀 주소
-6. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
+5. rsi : (source index) 데이터 이동시 원본을 가리키는 주소
+6. rdi : (destination index) 데이터 이동시 목적지를 가리키는 주소
+7. rbp : (Base Register Pointer)스택 복귀 주소
+8. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
    - 시스템 콜의 실질적인 번호를 가리킴
    - rbx : (Extended Base register)메모리 주소를 저장하는 용도로 사용
    - rcx : (Extended Counter Register)CPU loop counter
    - rdx : (Extended Data Register)
-7. eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
+9.  eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
    - 피연산자와 별개로 데이터가 저장된다.
-8. ax
-9. al
-10. ah
+   - rax 값에서 마지막 4byte 길이만 잘려서 저장된다.
+10. ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
+   - 큰 의미는 없지만 관습처럼 사용되며 eax에서 하위 2byte를 자른 값을 나타낸다.
+   - ax는 다시 ah와 al로 한 byte씩 나뉜다.
+     - ah : ax에서 상위 1byte
+     - al : ax에서 하위 1byte
+
+ byte_4   | byte_3 | byte_2 | byte_1
+---|---|---|---
+ eax_4|eax_3|eax_2|eax_1 
+ | | |ax_2|ax_1
+ | | |ah|al
+
+### 세그먼트 레지스터
+- cs, ss, ds, es, fs, gs
+
+### 명령어 포인터 레지스터
+- Instruction Pointer Register, IP
+
+### 플래그 레지스터
+- CF(Carry Flag) : 부호 없는 수의 연산 결과가 비트의 범위를 넘을 경우 1로 세팅
+- ZF(Zero Flag) : 연산의 결과가 0일 경우 1로 세팅
+- SF(Sign Flag) : 연산의 결과가 음수일 경우 1로 세팅
+- OF(Overflow Flag) : 부호 있는 수의 연산 결과가 비트 범위를 넘을 경우 1로 세팅
 
 ## 프로시저
 - 특정 주소의 명령어를 실행하도록 하는 코드이다.
