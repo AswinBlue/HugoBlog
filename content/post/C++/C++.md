@@ -111,5 +111,11 @@ printf("%d",MULT(2+2,3+3)) // 예상값 (4 * 6) * 2 = 26
 ### printf
 - `printf("%*d", width, value)` : value를 width글자 수만큼 앞에 공백을 두고 출력
 - `printf("%0*d", width, value)` : value를 width글자 수만큼 앞에 0을 두고 출력
+- printf의 버퍼가 출력되는 조건  
+  1) 프로그램이 종료될 때
+  2) 버퍼가 가득찬 경우
+  3) 강제로 버퍼를 비우도록 명령받은 경우(ex: fflush)
+  4) 버퍼에 개행문자가 들어온 경우
+
 ### sscanf
 - `sscanf(base_buffer, "%64[^\n]", target_buffer)` : base_buffer에서 '\n'이 아닌 문자열 64개를 읽어와 target_buffer에 담는다. (정규식 사용)
