@@ -32,7 +32,11 @@ draft: false
 ## 명령어
 1. mov
    - "값"을 레지스터리나 메모리에 저장하는 명령
-   - `mov dst, src` : src 값을 dst에 덮어씀(src는 상수값)
+   - `mov dst, src` : src 값을 dst에 덮어씀
+   - dst = 레지스터, src = 레지스터 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
+   - dst = 메모리, src = 레지스터 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
+   - dst = 레지스터, src = 메모리 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
+   - dst = 메모리, src = 메모리 : 불가능
    - `mov dst, [mem + 4]` : mem + 4 주소에 저장된 값을 dst에 덮어씀
    - dst 값으로는 주소나 포인터가 올 수 있다.
 2. lea
@@ -99,20 +103,20 @@ draft: false
 ### 범용 레지스터
 1. rsp : 스택의 최상단의 주소
 2. rip : 현재 명령 실행 주소
-3. rdi : 함수 실행시 첫 번째 인자의 주소
+3. rdi : 함수 실행시 첫 번째 인자의 주소 / 시스템 콜 실행시 첫 번째 인자의 주소 / (destination index) 데이터 이동시 목적지를 가리키는 주소
 4. esi : 함수 실행시 두 번째 인자의 주소
-5. rsi : (source index) 데이터 이동시 원본을 가리키는 주소
-6. rdi : (destination index) 데이터 이동시 목적지를 가리키는 주소
-7. rbp : (Base Register Pointer)스택 복귀 주소
-8. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
+5. rsi : 시스템 콜 실행시 두 번째 인자의 주소 / (source index) 데이터 이동시 원본을 가리키는 주소
+6. rbp : (Base Register Pointer)스택 복귀 주소
+7. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
    - 시스템 콜의 실질적인 번호를 가리킴
+   - 시스템 콜의 반환값도 rax에 저장됨
    - rbx : (Extended Base register)메모리 주소를 저장하는 용도로 사용
    - rcx : (Extended Counter Register)CPU loop counter
-   - rdx : (Extended Data Register)
-9.  eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
+   - rdx : 시스템 콜 실행 시 세 번째 인자의 주소 / (Extended Data Register)
+8. eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
    - 피연산자와 별개로 데이터가 저장된다.
    - rax 값에서 마지막 4byte 길이만 잘려서 저장된다.
-10. ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
+9. ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
    - 큰 의미는 없지만 관습처럼 사용되며 eax에서 하위 2byte를 자른 값을 나타낸다.
    - ax는 다시 ah와 al로 한 byte씩 나뉜다.
      - ah : ax에서 상위 1byte
@@ -123,6 +127,9 @@ draft: false
  eax_4|eax_3|eax_2|eax_1 
  | | |ax_2|ax_1
  | | |ah|al
+10. esp : 스택 최상단의 주소값 (Stack pointer register)
+   - PUSH , POP ,SUB , CALL 명령을 수행 할 때 마다 자동으로 변경된다.
+11. ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
 
 ### 세그먼트 레지스터
 - cs, ss, ds, es, fs, gs
