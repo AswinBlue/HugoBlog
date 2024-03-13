@@ -155,3 +155,24 @@ draft: false
 ## 스택프레임
 - 각 함수들은 실행되면서 지역변수와 임시 값들을 저장해야 하는데, 이 값들은 스택 영역에 저장된다. 
 - 하지만 특정 함수가 사용하고 있는 스택 영역을 다른 함수가 침범하여 사용하지 못하게 하기 위해 함수별로 스택 프레임을 두고 스택 영역을 공용으로 사용하지 못하게 관리한다.
+
+## .asm to bin
+- .asm 파일을 바이트 코드로 변경하려면 "nasm" 이라는 모듈을 사용하면 된다. 
+- `nasm -f elf YOUR_FILE.asm` 명령으로 .o 파일을 생성할 수 있다.
+  - 만약 구동중인 컴퓨터가 x86-64 구조라면 elf 대신 elf64를 입력한다.
+  - 컴퓨터 구조별 명령은  `nasm -fh` 로 확인이 가능하다. 
+  - 생성된 .o 파일은 `objdump -d YOUR_OBJ.o` 명령으로 내용 확인이 가능하다.
+  - 만약 assembly 파일 안에 main 함수를 정의하였다면 `gcc YOUR_OBJ.o -o YOUR_OUT.out` 명령어로 실행 가능한 ELF 파일을 생성할 수도 있다. 
+- `objcopy --dump-section .YOUR_SECTION=YOUR_BIN.bin YOUR_OBJ.o` 명령으로 .o 파일을 .bin 파일로 변환할 수 있다. 
+  - `section .text` 로 어셈블리 영역이 시작된다면 YOUR_SECTION=text 가된다.
+  - ex) test.asm 파일이 아래와 같은 경우, 
+      ```
+         section .text  ; 아래에 text 라는 section을 정의한다.
+         global main    ; main 함수를 전역으로 선언한다.
+         main:          ; main 함수의 내용을 구현한다.
+         push 0x00      ; 구현부
+         ...
+      ```
+
+   - `nasm -f elf64 test.asm` 을 수행한 후, `objcopy --dump-section .text=test.bin test.o` 을 수행하면 test.bin 파일을 얻어낼 수 있다.
+  - 생성한 바이너리 파일을 `xxd YOUR_BIN.bin` 명령으로 내용을 출력할 수 있다. 이는 `objdump -s YOUR_OBJ.o` 명령의 출력 형태와 동일하다

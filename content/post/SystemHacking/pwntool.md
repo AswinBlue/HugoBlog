@@ -63,5 +63,9 @@ $ python3 -m pip install --upgrade pwntools
      - exploit 대상의 아키텍처에 대한 정보를 설정할 수 있다. 
      - `context.arch = "amd64"` 형태로 설정
      - i386, arm, mips 등을 설정 할 수 있다.
-8. 
-9. 
+8. asm
+   - `asm(CODE)` 형태로 CODE에 어셈블리 라인을 string 형태로 기입시 바이너리 코드를 반환한다.
+   - ex) `asm('mov eax, SYS_execve')` => `b'\xb8\x0b\x00\x00\x00'`
+9. disasm
+   - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
+   - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
