@@ -14,9 +14,9 @@ single:  false  # display as a single page, hide navigation on bottom, like as a
 license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
 draft: false
 ---
-
-# CPU
-## Segment
+# Computer Science
+## CPU
+### Segment
 - 프로세스가 사용하는 메모리를 Segment라 칭하며, 리눅스에서는 5가지 종류로 이를 분류한다. 
   1. 코드 세그먼트 : 실행 가능한 코드가 위치한 영역으로, text segment라고도 부른다.
   2. 데이터 세그먼트 : 코드 실행에 필요한 데이터가 있는 영역으로, 전역변수 및 전역 상수들이 위치한다.
@@ -31,7 +31,7 @@ draft: false
   
 - 세그먼트는 위에서 언급된 순서대로 메모리에 배치되며, 스택 세그먼트만 특이하게 메모리 가장 마지막을 기준으로 할당된다.
 
-## ISA
+### ISA
 - Instruction Set Architecture 의 약자로, 명령어 집합 구조라 해석한다.
 - x86-64, ARM, MIPS, AVR 등이 대표적인 예시이다.
 
@@ -66,4 +66,18 @@ draft: false
 	  
 - CPU의 레지스터들은 32비트 크기를 가지며, eax, ebx, ecx, edx, esi, edi, esp, ebp 가 있다. 
 
+## 함수 호출 규약
+- 함수 호출시에는 호출자의 상태와 반환주소를 저장하고, 피호출자가 요구하는 인자, 피호출자의 반환값을 처리해야 한다. 
+- 이러한 함수 호출 및 반환 매커니즘약을 "함수 호출 규약(convention)" 이라한다.
+- 함수 호출 규약은 컴파일러에 의해 적용되며, 컴파일러가 target CPU의 종류에 따라 적합한 규약을 적용 해 준다.
+  - 예를 들어, 레지스터가 적은 아키텍처에서는 스택을 통해 함수 인자를 전달하고, 반대의 경우는 적은 인자는 레지스터를 통해, 많은 인자는 스택을 통해 전달하는 방식을 취한다.
+  - CPU가 같더라도 컴파일러에 따라 함수 호출 규약이 달라질 수 있다.
+    - ex) cdecl, stdcall, fastcall, thiscall
 
+### SYSV
+- SYSV 규약으로 만들어진 대표적인 예로는 리눅스가 있다.
+- SYSV ABI(Application Binary Interface) 함수 호출 규약에는 ELF 포맷, 링킹 방법 등이 정의되어 있다.
+
+#### SYSV 규약의 특징
+- 함수 호출시 인자를 순서대로 RDI, RSI(ESI), RDX(EDX), RCX(ECX), R8(R8D), R9(R9D) 에 저장하며 더 많은 인자를 받을 땐 스택을 사용한다.
+- 

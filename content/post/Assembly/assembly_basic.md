@@ -112,6 +112,8 @@ draft: false
 4. esi : 함수 실행시 두 번째 인자의 주소
 5. rsi : 시스템 콜 실행시 두 번째 인자의 주소 / (source index) 데이터 이동시 원본을 가리키는 주소
 6. rbp : (Base Register Pointer)스택 복귀 주소
+   - SFP(Stack Frame Pointer) 라고도 부르며, 함수 호출시 호출자(caller)의 SFP를 stack에 넣고, 실행된 함수가 끝날 때 이를 pop하여 함수가 호출된 코드 라인으로 복귀할 수 있다.
+   - 즉, 함수 호출 시마다 `push rbp` 코드를 보게 될 것이다.
 7. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
    - 시스템 콜의 실질적인 번호를 가리킴
    - 시스템 콜의 반환값도 rax에 저장됨
@@ -121,7 +123,7 @@ draft: false
 8. eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
    - 피연산자와 별개로 데이터가 저장된다.
    - rax 값에서 마지막 4byte 길이만 잘려서 저장된다.
-9. ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
+9.  ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
    - 큰 의미는 없지만 관습처럼 사용되며 eax에서 하위 2byte를 자른 값을 나타낸다.
    - ax는 다시 ah와 al로 한 byte씩 나뉜다.
      - ah : ax에서 상위 1byte
@@ -155,6 +157,15 @@ draft: false
 ## 스택프레임
 - 각 함수들은 실행되면서 지역변수와 임시 값들을 저장해야 하는데, 이 값들은 스택 영역에 저장된다. 
 - 하지만 특정 함수가 사용하고 있는 스택 영역을 다른 함수가 침범하여 사용하지 못하게 하기 위해 함수별로 스택 프레임을 두고 스택 영역을 공용으로 사용하지 못하게 관리한다.
+- rbp를 스택 프레임을 만드는 어셈블리는 아래와 같다. 
+  - 스택에 현재 함수의 stack base pointer를 추가한다.
+  - 이후 rbp를 rsp와 동일하게 세팅한다.
+  - rsp를 원하는 값만큼(VALUE) 뺀다. 그러면 rbp와 rsp의 차이만큼 새로운 함수의 스택프레임이 형성된다.
+```
+push rbp 
+mov rbp, rsp
+sub rsp, VALUE
+```
 
 ## .asm to bin
 - .asm 파일을 바이트 코드로 변경하려면 "nasm" 이라는 모듈을 사용하면 된다. 
