@@ -112,7 +112,7 @@ draft: false
 4. esi : 함수 실행시 두 번째 인자의 주소
 5. rsi : 시스템 콜 실행시 두 번째 인자의 주소 / (source index) 데이터 이동시 원본을 가리키는 주소
 6. rbp : (Base Register Pointer)스택 복귀 주소
-   - SFP(Stack Frame Pointer) 라고도 부르며, 함수 호출시 호출자(caller)의 SFP를 stack에 넣고, 실행된 함수가 끝날 때 이를 pop하여 함수가 호출된 코드 라인으로 복귀할 수 있다.
+   - rbp 주소에는 함수가 종료되고 함수를 호출한 함수(caller) 의 스택 프레임으로 rbp를 이동하기 위한 주소 SFP(Stack Frame Pointer) 가 저장된다. 함수 호출시 호출자(caller)의 SFP를 stack에 넣고, 실행된 함수가 끝날 때 이를 pop하여 함수가 호출된 코드 라인으로 복귀할 수 있다.
    - 즉, 함수 호출 시마다 `push rbp` 코드를 보게 될 것이다.
 7. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
    - 시스템 콜의 실질적인 번호를 가리킴
@@ -158,14 +158,31 @@ draft: false
 - 각 함수들은 실행되면서 지역변수와 임시 값들을 저장해야 하는데, 이 값들은 스택 영역에 저장된다. 
 - 하지만 특정 함수가 사용하고 있는 스택 영역을 다른 함수가 침범하여 사용하지 못하게 하기 위해 함수별로 스택 프레임을 두고 스택 영역을 공용으로 사용하지 못하게 관리한다.
 - rbp를 스택 프레임을 만드는 어셈블리는 아래와 같다. 
-  - 스택에 현재 함수의 stack base pointer를 추가한다.
-  - 이후 rbp를 rsp와 동일하게 세팅한다.
-  - rsp를 원하는 값만큼(VALUE) 뺀다. 그러면 rbp와 rsp의 차이만큼 새로운 함수의 스택프레임이 형성된다.
+  1) 스택에 현재 함수의 stack base pointer를 추가한다.
+  2) 이후 rbp를 rsp와 동일하게 세팅한다.
+  3) rsp를 원하는 값만큼(VALUE) 뺀다. 그러면 rbp와 rsp의 차이만큼 새로운 함수의 스택프레임이 형성된다. 지역변수가 들어갈 공간이 확보된다.
 ```
 push rbp 
 mov rbp, rsp
 sub rsp, VALUE
 ```
+
+- 구성된 스택 프레임은 아래와 같이 형성된다.
+ 
+```
+----------  <- rsp
+지역변수
+----------  <- rbp
+SFP
+----------  <- rbp + 0x08
+return address
+----------
+```
+
+- 함수가 종료되면 다음 절차가 수행된다.
+   1) 지역변수 공간을 해제
+   2) rbp에 저장된 SFP 정보를 가져와 rbp 이동
+   3) return address에 저장된 주소를 가져와 rip 이동
 
 ## .asm to bin
 - .asm 파일을 바이트 코드로 변경하려면 "nasm" 이라는 모듈을 사용하면 된다. 

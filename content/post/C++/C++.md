@@ -119,3 +119,7 @@ printf("%d",MULT(2+2,3+3)) // 예상값 (4 * 6) * 2 = 26
 
 ### sscanf
 - `sscanf(base_buffer, "%64[^\n]", target_buffer)` : base_buffer에서 '\n'이 아닌 문자열 64개를 읽어와 target_buffer에 담는다. (정규식 사용)
+
+### scanf
+- `scanf("%s", buf)` 는 입력의 길이를 제한하지 않고 띄어쓰기, 탭, 개행문자가 올 때 까지 입력을 받는다. 
+- `scanf("%[n]s", buf)` 를 사용하여 입력 갯수를 n개로 제한할 수 있다.

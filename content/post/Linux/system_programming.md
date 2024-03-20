@@ -288,4 +288,3 @@ struct dirent* directory_entry_p = readdir(directory_p);
 - symbolic link는 하나의 파일로 취급되며, 디렉터리를 연결시켜도 파일로서 자신의 정보를 가진다.
   - (stat 함수와 lstat 함수가 symbolic link에 대해 다르게 동작하는 이유는 stat은 link가 가리키는 대상을 나타내고, lstat은 link 파일 자체를 가리키는 것)
 - symbolic link는 다른 파일 시스템 간에도 연결시킬 수 있다.
-
