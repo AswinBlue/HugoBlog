@@ -29,7 +29,21 @@ draft = false
 
 ### 출력
 
-- print() 와 sys.stdout.write() 로 화면에 출력할 수 있다. 
+- `print()` 와 `sys.stdout.write()` 로 화면에 출력할 수 있다. 
+  - `sys.stdout.write` 안에는 string 형태만 적용할 수 있다.
+  - `print` 안에는 수식 등으로 string 및 byte를 표현 가능하다.
+- `sys.stdout.buffer.write()` 를 사용하면 문자열을 수식을 통해 조합하고 ascii 코드 형태로 출력 가능하다.
+  - print() 를 사용하면 prefix가 붙어서 원하는 형태를 표현하기 어렵다. 이럴 때 sys.stdout.buffer.write()를 사용한다.
+  - ex)
+      ```
+        sys.stdout.write(b'A'*0x10 + b'B'*0x20 + b'\xaa\
+        xbb\xcc\xdd\x00\x00\x00\x00')
+        # 결과: AAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB����
+        sys.stdout.write(b'A'*0x10 + b'B'*0x20 + b'\xaa\
+xbb\xcc\xdd\x00\x00\x00\x00')
+        # 결과: b'AAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\xaa\xbb\xcc\xdd\x00\x00\x00\x00'
+      ```
+
 
 #### Flush
   - print() 함수는 효율을 위해 버퍼에 내용을 채워놓고 있다가 버퍼가 일정량 채워지면 화면에 버퍼의 내용을 출력한다. 

@@ -26,6 +26,8 @@ draft = false
 > $ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart  
 > $ wsl --set-default-version 2
 
+- WSL 콘솔에서 `explorer.exe .` 를 입력하면 현재 경로를 윈도우의 파일 탐색기로 열 수 있다. 해당 경로에 파일을 옮기면 윈도우-리눅스 간 파일 이동이 가능하다.
+
 ## 환경변수
   - 환경변수 설정시 컴퓨터를 재부팅하지 않고 적용하는 방법
   - 콘솔에 `taskkill /f /im explorer.exe`, `explorer.exe` 명령을 순서대로 입력한다.
