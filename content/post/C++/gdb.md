@@ -60,6 +60,8 @@ draft = false
 - `enable [index]` : 해당 brekapoint 활성화
 - `disable [index]` : 해당 breakpoint 비활성화
 - `condition [index] [조건]` : 해당 breakpoint는 조건을 만족할 때에만 동작 (ex : `condition 2 var_a == 0`)
+- `catch` : 특정 조건이 되면 프로세스를 정지시킴
+  - `catch syscall [system call 이름]` : 시스템 콜이 동작하면 프로세스 정지
 
 ### 실행
 - `file [파일이름]` : 해당 파일 이름 디버깅 실행
@@ -85,7 +87,9 @@ draft = false
 - `info locals` : 지역변수들 확인
 - `info variables` : 전역변수 확인
 - `info addr [함수이름]` : 함수 주소 확인
+- `info register [레지스터 이름]` : 레지스터 값 확인
 - `p [변수]` : 변수 값 확인
+- `p $[레지스터 이름]` : 레지스터 값 확인
 - `p *[배열]@[숫자]` : 해당 숫자만큼 배열의 값 출력
 - `p [구조체]` : 구조체 주소 확인
 - `p *[구조체]` : 구조체 전체 값 확인
@@ -131,4 +135,4 @@ draft = false
 - `vmmap` : 가상 메모리 레이아웃을 보여줌
 
 ### 기타
-- q : 종료
+- `q` : 종료
