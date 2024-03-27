@@ -75,6 +75,10 @@ func1(1, 2, 3) # 출력: [1, 2, 3]
 - 문자열 뒤에 `format()` 함수를 호출해서 문자열 안에 `{}` 를 변수로 치환할 수 있다. 
   - ex) `"sample text {} {}".format("var1", "var2")` 은 `sample text var1 var2` 으로 출력된다.
 
+- `문자열.ljust(num, f)` : 문자열의 길이가 'num'이 될 때 까지 우측에 f 문자를 집어넣음
+  - ex) "HELLO".ljust(10,'#') => HELLO#####
+- `문자열.rjust(num, f)` : 문자열의 길이가 'num'이 될 때 까지 좌측에 f 문자를 집어넣음
+  - ex) "HELLO".rjust(10,'#') => #####HELLO
 ## 라이브러리
 ### numpy
 기본 구문

