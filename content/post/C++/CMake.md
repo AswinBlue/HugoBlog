@@ -34,6 +34,8 @@ draft = false
   - CmakeLists.txt 작성은 쉘 프로그래밍과 유사하다. cmake 문법을 사용하여 작성해 주면 된다. 미리 지정된 변수들도 있는데, 해당 변수들에 주의하며 작성한다.
 
 ## 문법
+
+### 빌드 설정
 - `ADD_EXECUTABLE` : 실행파일 생성
 ex) ``ADD_EXECUTABLE(main.exe main.cpp function.cpp)`` : main.cpp와 function.cpp를 사용해 main.exe를 생성한다. 헤더 파일은 자동으로 적용된다.
 
@@ -45,6 +47,25 @@ ex) ``ADD_EXECUTABLE(main.exe main.cpp function.cpp)`` : main.cpp와 function.cp
 - `add_dependencies` : subdirectory 이름을 사용하지 않고, add_library 혹은 add_executable로 생성한 이름을 첫번째 인자로 사용해야 한다.   
 ex) ``add_dependencies(<생성한 객체이름> <모듈1> <모듈2> ...)``   
 
+### 출력
+- `message(MODE MESSAGE)` : 로그레벨 `MODE` 로 MESSAGE를 출력한다. 
+  - MODE는 아래 값을 가질 수 있다.
+    - FATAL_ERROR
+    - SEND_ERROR
+    - WARNING
+    - AUTHOR_WARNING
+    - DEPRECATION
+    - STATUS
+    - VERBOSE
+    - DEBUG
+    - TRACE
+  - MESSAGE에 변수를 출력할 땐 `${VARIABLE}` 형태를 대입한다.
+    - ex) `message(STATUS ${directories})`
+    - 여러 문자열과 변수를 합하여서 사용도 가능하다.
+      - ex) `message(STATUS "your directory : ${directories}")`
 
+### Define
+- `add_definitions(-DFOO -DBAR ...)` 형태로 
+  - ex) `add_definitions(-DYOUR_DEFINITION=1 -DMY_DEFINITION="MY")` : `#define YOUR_DEFINITION 1`, `#define MY_DEFINITION "MY"` 두 라인을 수행한 것과 같은 효과를 가진다.
 ## 참조
 https://nowonbun.tistory.com/712
