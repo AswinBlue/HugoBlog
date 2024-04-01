@@ -80,4 +80,18 @@ draft: false
 
 #### SYSV 규약의 특징
 - 함수 호출시 인자를 순서대로 RDI, RSI(ESI), RDX(EDX), RCX(ECX), R8(R8D), R9(R9D) 에 저장하며 더 많은 인자를 받을 땐 스택을 사용한다.
-- 
+
+## 컴파일
+- high level language를 기계어로 변환하는 작업을 컴파일이라 하고, 컴파일은 네가지 변환기를 거친다. 
+  1. Preprocessor(전처리기) : c언어로 구현된 .c 파일을 전처리가 완료된 .i 파일로 변환
+  2. Compiler(컴파일러) : 전처리된 .i 파일을 어셈블리어로 변환   
+  3. Assembler(어셈블): 각 벤더들이 만든 어셈블리어를 목적파일로 변환(어셈블리 언어를 기계어로 변환)
+  4. Linker(링커): 목적파일에서 참조하는 다른 목적파일들을 linking 하여 최종 실행파일을 생성
+
+### PLT / GOT
+- user가 작성한 코드가 동적 라이브러리를 참조하는 경우 PLT(Procedure Linkage Table)와 GOT(Global Offset Table) 를 사용하여 라이브러리 내의 함수를 참조한다. 
+- ASLR(Address Space Layout Randomization) 을 적용한다면 로딩시 라이브러리 코드들은 랜덤한 메모리 위치를 배정받을 것이며 함수의 이름을 바탕으로 심볼을 검색해 PLT와 GOT에 알맞은 주소값을 찾아 넣게 된다. 
+  - 이 과정을 runtime resolve 라 한다.
+  - 동적 라이브러리의 함수를 최초로 호출할 땐 라이브러리를 검색해서 함수의 주소를 조회하지만, 한 번 사용한 다음에는 GOT에 주소를 기록 해 놓아서 다음에 사용할 땐 GOT만 조회하여 함수를 사용할 수 있도록 한다. 이 동작을 resolve 라 한다.
+  - `_dl_runtime_resolve_fxsave` 함수가 실행되면서 resolve 한 값을 GOT에 저장한다. 
+  - 함수를 호출하면 PLT 값을 참조해 GOT의 특정 영역을 확인하고, GOT에서 함수의 주소를 읽어와 실행시킨다. GOT에 주소가 없다면 PLT에 적힌 값을 사용하여 resolve 동작을 수행한다.
