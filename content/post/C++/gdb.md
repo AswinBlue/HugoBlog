@@ -135,6 +135,7 @@ draft = false
   - `pdisas` 의 축약으로, debugger에 따라 `disiassemble` 로 동작하는 경우도 있다.
 - `tele` : telescope의 축약으로 rsp 주변의 메모리를 덤프함과 동시에 메모리에 담긴 주소를 참조하여 그 안에 담긴 값도 함께 보여준다.
 - `vmmap` : 가상 메모리 레이아웃을 보여줌
+- `search TARGET` : TARGET 이 포함된 byte sequences, 문자열, 포인터, 혹은 정수가 저장된 주소를 반환한다.
 
 ### 기타
 - `q` : 종료

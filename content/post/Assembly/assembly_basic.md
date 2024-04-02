@@ -135,8 +135,12 @@ draft: false
  | | |ax_2|ax_1
  | | |ah|al
 10. esp : 스택 최상단의 주소값 (Stack pointer register)
-   - PUSH , POP ,SUB , CALL 명령을 수행 할 때 마다 자동으로 변경된다.
+   - x86에서 사용하는 값으로, x64에서는 rsp로 대체된다.
+   - PUSH, POP, SUB, CALL 명령을 수행 할 때 마다 자동으로 변경된다.
+   - PUSH, POP 의 기준이 되는 포인터이다.
 11. ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
+   - x86에서 사용하는 값으로, x64에서는 rbp로 대체된다.
+   - 새로운 함수가 호출 될 경우, EBP 값이 스택에 push되어, 이전 함수의 EBP값이 스택에 쌓이게 된다. 
 
 ### 세그먼트 레지스터
 - cs, ss, ds, es, fs, gs
@@ -162,32 +166,42 @@ draft: false
 ## 스택프레임
 - 각 함수들은 실행되면서 지역변수와 임시 값들을 저장해야 하는데, 이 값들은 스택 영역에 저장된다. 
 - 하지만 특정 함수가 사용하고 있는 스택 영역을 다른 함수가 침범하여 사용하지 못하게 하기 위해 함수별로 스택 프레임을 두고 스택 영역을 공용으로 사용하지 못하게 관리한다.
-- rbp를 스택 프레임을 만드는 어셈블리는 아래와 같다. 
-  1) 스택에 현재 함수의 stack base pointer를 추가한다.
-  2) 이후 rbp를 rsp와 동일하게 세팅한다.
-  3) rsp를 원하는 값만큼(VALUE) 뺀다. 그러면 rbp와 rsp의 차이만큼 새로운 함수의 스택프레임이 형성된다. 지역변수가 들어갈 공간이 확보된다.
-```
-push rbp 
-mov rbp, rsp
-sub rsp, VALUE
-```
-
+- 함수가 호출될 떄 마다 스택프레임이 형성되며, 스택프레임 형성을 어셈블리어로 표현하면 다음과 같다.
+  ```
+  push EIP  # 함수 완료 후 실행할 코드의 주소를 스택에 저장
+  push EBP  #  함수 완료 후 EBP 포인터를 복구시킬 값을 스택에 저장한다. (이를 SFP라 한다.)
+  mov EBP ESP # 스택의 top 주소를 EBP에 대입한다. (EBP를 갱신하여 새로운 스택 프레임의 base를 세팅한다.)
+  sub ESP, VALUE  # 지역변수가 설정될 영역만큼(VALUE) ESP 주소를 옮긴다. (EBP - ESP 만큼이 지역변수 영역)
+  ```
+  - x64라면 EIP 대신 rip, EBP 대신 rbp, ESP 대신 rsp를 사용한다.
 - 구성된 스택 프레임은 아래와 같이 형성된다.
- 
-```
-----------  <- rsp
-지역변수
-----------  <- rbp
-SFP
-----------  <- rbp + 0x08
-return address
-----------
-```
-
+   ```
+   ----------  <- ESP(rsp)
+   지역변수
+   ----------  <- EBP(rbp)
+   SFP
+   ----------  <- EBP(rbp) + 0x08 (x64라면 +0x10)
+   return address (EIP)
+   ----------
+   ```
+- 만약 Stack canary 기법이 적용되었다면 아래와 같이 canary가 추가된다.
+   ```
+   ----------  <- ESP(rsp)
+   지역변수
+   ----------  <- EBP(rbp) - 0x08 (x64라면 -0x10)
+   Canary (8byte length)
+   ----------  <- EBP(rbp)
+   SFP
+   ----------  <- EBP(rbp) + 0x08 (x64라면 +0x10)
+   return address (EIP)
+   ----------
+   ```
 - 함수가 종료되면 다음 절차가 수행된다.
-   1) 지역변수 공간을 해제
-   2) rbp에 저장된 SFP 정보를 가져와 rbp 이동
-   3) return address에 저장된 주소를 가져와 rip 이동
+  ```
+  mov ESP, EBP  # 지역변수 공간을 해제
+  pop EBP  # SFP에 정보를 가져와 ebp에 대입
+  RET  # pop EIP; jmp EIP 동작을 수행한다.
+  ```
 
 ## .asm to bin
 - .asm 파일을 바이트 코드로 변경하려면 "nasm" 이라는 모듈을 사용하면 된다. 
