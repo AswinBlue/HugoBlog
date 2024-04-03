@@ -180,7 +180,7 @@ draft: false
    지역변수
    ----------  <- EBP(rbp)
    SFP
-   ----------  <- EBP(rbp) + 0x08 (x64라면 +0x10)
+   ----------  <- EBP(rbp) + 0x04 (x64라면 +0x08)
    return address (EIP)
    ----------
    ```
@@ -188,11 +188,11 @@ draft: false
    ```
    ----------  <- ESP(rsp)
    지역변수
-   ----------  <- EBP(rbp) - 0x08 (x64라면 -0x10)
+   ----------  <- EBP(rbp) - 0x04 (x64라면 -0x08)
    Canary (8byte length)
    ----------  <- EBP(rbp)
    SFP
-   ----------  <- EBP(rbp) + 0x08 (x64라면 +0x10)
+   ----------  <- EBP(rbp) + 0x04 (x64라면 +0x08)
    return address (EIP)
    ----------
    ```
