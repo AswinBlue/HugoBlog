@@ -192,8 +192,10 @@ draft: false
    ```
    ----------  <- ESP(rsp)
    지역변수
+   ----------  <- EBP(rbp) - 0x08 (x64라면 -0x10)
+   dummy value 0x00 (4byte / x64라면 8byte)
    ----------  <- EBP(rbp) - 0x04 (x64라면 -0x08)
-   Canary (8byte length)
+   Canary (4byte / x64라면 8byte)
    ----------  <- EBP(rbp)
    SFP
    ----------  <- EBP(rbp) + 0x04 (x64라면 +0x08)
