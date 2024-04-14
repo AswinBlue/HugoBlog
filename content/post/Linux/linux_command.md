@@ -37,7 +37,10 @@ draft = false
 ## 리눅스 기본
 - `stty -a`: 시그널 단축키들의 값 확인
 - `strace FILE_NAME`: 실행파일이 실행되는 상세 과정을 라인별로 보여준다.
-
+- `getconf`  리눅스의 시스템 변수 값을 확인하는 명령어
+  - `getconf -a`: 모든 시스템 변수를 반환한다.
+  - `getconf LONG_BIT`: 시스템이 x64라면 64를, x86이라면 32를 반환한다.
+- `ldd FILE_NAME` : FILE_NAME 을 실행하는데 필요한 라이브러리 의존성을 확인한다. 
 ## 문자열 조작
 ### sed
 - 기본적인 기능은 ed에서 따 왔으며, 이 기능들은 모두 sed에 적용이 된다.
@@ -99,6 +102,7 @@ tar: Error is not recoverable: exiting now
   - ELF란 Executable and Linkable Format을 의미한다. (*.o 형태의 파일이다)
 - `objdump -S FILE_NAME`: object file을 어셈블리 형태로 주소별로 출력 해주는 명령이다. 
 - `objdump -h FILE_NAME`: object file의 section 헤더정보를 확인하는 명령어이다. section의 크기, VMA(Virtual Memory Address), LMA(Load Memory Address), file offset 등의 정보를 확인할 수 있다.
+- `objdump -d FILE_NAME`: object file 내용을 어셈블리어 형태로 출력한다.
 
 
 ### 리다이렉션
