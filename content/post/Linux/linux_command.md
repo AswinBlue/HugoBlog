@@ -100,6 +100,8 @@ tar: Error is not recoverable: exiting now
 - `file FILE_NAME`: 파일이 어떤 종류의 내용을 담고 있는지(C language, text ...)를 확인할 수 있다.
 - `readelf FILE_NAME`: ELF 파일의 meta data를 확인한다. 
   - ELF란 Executable and Linkable Format을 의미한다. (*.o 형태의 파일이다)
+  - `readelf -h` ELF 파일의 헤더 확인
+  - `readelf -s` ELF 파일 내부 symbol 정보들을 출력한다. 함수 주소, 이름 및 속성들을 확인할 수 있다.
 - `objdump -S FILE_NAME`: object file을 어셈블리 형태로 주소별로 출력 해주는 명령이다. 
 - `objdump -h FILE_NAME`: object file의 section 헤더정보를 확인하는 명령어이다. section의 크기, VMA(Virtual Memory Address), LMA(Load Memory Address), file offset 등의 정보를 확인할 수 있다.
 - `objdump -d FILE_NAME`: object file 내용을 어셈블리어 형태로 출력한다.
