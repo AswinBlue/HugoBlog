@@ -42,7 +42,7 @@ Link : aswinblue.github.io/FlickThrough/
 
 텍스트가 출력될 텍스트박스, 진행률 표시바, 시작/일시정지 버튼, 속도 조절 스크롤바, 파일 읽기 버튼을 구성
 
-![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled.png)
+![Untitled](./%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled.png)
 
 1. 파일 로드 기능
     1. 파일 로드 버튼을 클릭해서 읽을 텍스트 파일 로드
