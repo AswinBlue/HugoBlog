@@ -40,15 +40,16 @@ draft: false
 ### x86-64 아키텍처 레지스터
 - x86-64 아키텍처는 아래와 같이 레지스터를 용도에 따라 구분한다. 
   1. 범용 레지스터(General Register) : 8byte를 저장 가능
-    - 아래 용도로 주로 사용되지만 그외 용도로도 다양하게 사용 가능한 레지스터.
-    - rax (accumulator register) : 함수의 반환 값
-    - rbx (base register) : x64에서는 주된 용도 없음
-    - rcx (counter register) : 반복문의 반복 횟수, 각종 연산의 시행 횟수
-  	- rdx (data register) : x64에서는 주된 용도 없음
-    - rsi (source index) : 데이터를 옮길 때 원본을 가리키는 포인터
-    - rdi (destination index) : 데이터를 옮길 때 목적지를 가리키는 포인터
-  	- rsp (stack pointer) : 사용중인 스택의 위치를 가리키는 포인터
-  	- rbp (stack base pointer) : 스택의 바닥을 가리키는 포인터
+  	- r0 ~ r15까지 16개의 레지스터로 구성되며, 주로 r1 ~ r8 까지가 프로그램 구동시 기본으로 사용되며, 나머지는 정해진 용도 없이 reserved 된 레지스터이다. 
+    - r1 ~ r8 레지스터는 아래 용도로 주로 사용되고, 명칭도 붙는다. 
+      - r1) rax (accumulator register) : 함수의 반환 값
+      - r2) rcx (counter register) : 반복문의 반복 횟수, 각종 연산의 시행 횟수
+      - r3) rdx (data register) : x64에서는 주된 용도 없음
+      - r4) rbx (base register) : x64에서는 주된 용도 없음
+      - r5) rsp (stack pointer) : 사용중인 스택의 위치를 가리키는 포인터
+  	  - r6) rbp (stack base pointer) : 스택의 바닥을 가리키는 포인터
+      - r7) rsi (source index) : 데이터를 옮길 때 원본을 가리키는 포인터
+      - r8) rdi (destination index) : 데이터를 옮길 때 목적지를 가리키는 포인터
   2. 세그먼트 레지스터(Segment Register) : 16bit를 저장 가능
   	- 과거에는 사용 가능한 물리 메모리의 크기를 늘리기 위해 사용했으나, x64 아키텍처에서는 주소영역이 확장되면서 주로 메모리 보호를 위해 사용
     - cs, ss, ds, es, fs, gs 종류가 존재
@@ -90,12 +91,19 @@ draft: false
 
 ### PLT / GOT
 - user가 작성한 코드가 동적 라이브러리를 참조하는 경우 PLT(Procedure Linkage Table)와 GOT(Global Offset Table) 를 사용하여 라이브러리 내의 함수를 참조한다. 
-- ASLR(Address Space Layout Randomization) 을 적용한다면 로딩시 라이브러리 코드들은 랜덤한 메모리 위치를 배정받을 것이며 함수의 이름을 바탕으로 심볼을 검색해 PLT와 GOT에 알맞은 주소값을 찾아 넣게 된다. 
-  - 이 과정을 runtime resolve 라 한다.
-  - 동적 라이브러리의 함수를 최초로 호출할 땐 라이브러리를 검색해서 함수의 주소를 조회하지만, 한 번 사용한 다음에는 GOT에 주소를 기록 해 놓아서 다음에 사용할 땐 GOT만 조회하여 함수를 사용할 수 있도록 한다. 이 동작을 resolve 라 한다.
-  - `_dl_runtime_resolve_fxsave` 함수가 실행되면서 resolve 한 값을 GOT에 저장한다. 
-  - 함수를 호출하면 PLT 값을 참조해 GOT의 특정 영역을 확인하고, GOT에서 함수의 주소를 읽어와 실행시킨다. GOT에 주소가 없다면 PLT에 적힌 값을 사용하여 resolve 동작을 수행한다.
-- ELF는 GOT를 활용하여 라이브러리 호출 비용을 절약한다.
-- 프로그램을 실행하며 실시간으로 GOT를 채워가는 방식을 Lazy Building이라 하는데, 프로그램 실행 중 GOT에 쓰기 권한이 부여되어야 하기 때문에 해킹에 취약하다.
+- `라이브러리 함수 호출 -> PLT 참조 -> GOT 참조 -> 실제 함수 주소 반환` 의 순서로 코드가 동작하게 된다. 
+- 예를들어 printf 함수를 호출한다고 하면 아래와 같은 절차대로 PLT 와 GOT 테이블을 참조하며, printf 함수는 library의 0xBBBB 위치의 코드에 매핑되어 실행된다.
+  ```
+    Code        PLT              GOT              Library
+    ...         ...              ...              ...
+    printf  ->  printf:0xAAAA -> 0xAAAA:0xBBBB -> 0xBBBB
+    ...         ...              ...              ...
+  ```
+- ASLR(Address Space Layout Randomization) 을 적용한다면 로딩시 라이브러리 코드들은 랜덤한 메모리 위치를 배정받을 것이며 함수의 이름을 바탕으로 심볼을 검색해 PLT와 GOT 에 알맞은 주소값을 찾아 넣게 된다. 
+  - GOT 에 알맞은 값을 채우는 과정을 runtime resolve 라 한다.
+  - 동적 라이브러리의 함수를 최초로 호출할 땐 라이브러리를 검색해서 함수의 주소를 조회하지만, 한 번 사용한 다음에는 GOT 에 주소를 기록 해 놓아서 다음에 사용할 땐 GOT 만 조회하여 함수를 사용할 수 있도록 한다. 이 동작을 resolve 라 한다.
+  - `_dl_runtime_resolve_fxsave` 함수가 실행되면서 resolve 한 값을 GOT 에 저장한다. 
+  - 함수를 호출하면 PLT 값을 참조해 GOT 의 특정 영역을 확인하고, GOT 에서 함수의 주소를 읽어와 실행시킨다. GOT 에 주소가 없다면 PLT에 적힌 값을 사용하여 resolve 동작을 수행한다.
+- ELF는 GOT 를 활용하여 라이브러리 호출 비용을 절약한다.
+- 프로그램을 실행하며 실시간으로 GOT 를 채워가는 방식을 Lazy Building이라 하는데, 프로그램 실행 중 GOT 에 쓰기 권한이 부여되어야 하기 때문에 해킹에 취약하다.
   - 공격자가 ELF에서 프로세스의 흐름에 관여하는 `.init_array`, `.fini_array` 과 같은 데이터 세그먼트들을 다른 함수로 덮어쓰면 프로세스의 흐름이 변경될 수 있다.
-  - 

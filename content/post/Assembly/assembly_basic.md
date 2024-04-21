@@ -106,39 +106,45 @@ draft: false
   - 유저가 시스템 콜을 호출하면 커널은 이를 실행하고, 결과를 유저에게 반환한다.
 ## 레지스터
 ### 범용 레지스터
+- [x86-64 아키텍처 레지스터 참조](../../computerscience/computer_science/#x86-64-아키텍처-레지스터)
 1. rsp : 스택의 최상단의 주소
+   - x64구조에서 rsp 라 부르고, x86구조에서는 esp 라고 한다. 
 2. rip : 현재 명령 실행 주소
+   - x64구조에서 rdi 라 부르고, x86구조에서는 eip 라고 한다. 
 3. rdi : 함수 실행시 첫 번째 인자의 주소 / 시스템 콜 실행시 첫 번째 인자의 주소 / (destination index) 데이터 이동시 목적지를 가리키는 주소
-4. esi : 함수 실행시 두 번째 인자의 주소
-5. rsi : 시스템 콜 실행시 두 번째 인자의 주소 / (source index) 데이터 이동시 원본을 가리키는 주소
-6. rbp : (Base Register Pointer)스택 복귀 주소
+   - x64구조에서 rdi 라 부르고, x86구조에서는 edi 라고 한다. 
+4. rsi : 시스템 콜 실행시 두 번째 인자의 주소 / (source index) 데이터 이동시 원본을 가리키는 주소
+   - x64구조에서 rsi 라 부르고, x86구조에서는 esi 라고 한다. 
+5. rbp : (Base Register Pointer)스택 복귀 주소
+   - x64구조에서 rbp 라 부르고, x86구조에서는 ebp 라고 한다. 
    - rbp 주소에는 함수가 종료되고 함수를 호출한 함수(caller) 의 스택 프레임으로 rbp를 이동하기 위한 주소 SFP(Stack Frame Pointer) 가 저장된다. 함수 호출시 호출자(caller)의 SFP를 stack에 넣고, 실행된 함수가 끝날 때 이를 pop하여 함수가 호출된 코드 라인으로 복귀할 수 있다.
    - 즉, 함수 호출 시마다 `push rbp` 코드를 보게 될 것이다.
-7. rax : (Extended Accumulator Register)사칙연산에서 자동으로 피연산자로 사용되는 리턴 주소
+6. rax : (Extended Accumulator Register) 사칙연산에서 자동으로 피연산자의 값이 저장된다.
+   - 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장된다.
+   - 피연산자와 별개로 데이터가 저장된다.
+   - x64구조에서 rax 라 부르고, x86구조에서는 eax 라고 한다. 
    - 시스템 콜의 실질적인 번호를 가리킴
    - 시스템 콜의 반환값도 rax에 저장됨
-   - rbx : (Extended Base register)메모리 주소를 저장하는 용도로 사용
-   - rcx : (Extended Counter Register)CPU loop counter
-   - rdx : 시스템 콜 실행 시 세 번째 인자의 주소 / (Extended Data Register)
-8. eax : (Extended AX) 논리 연산(덧셈, 뺄셈 등)의 결과값이 저장되는 위치
-   - 피연산자와 별개로 데이터가 저장된다.
-   - rax 값에서 마지막 4byte 길이만 잘려서 저장된다.
-9.  ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
+   - rbx(ebx) : (Extended Base register)메모리 주소를 저장하는 용도로 사용
+   - rcx(ecx) : (Extended Counter Register)CPU loop counter
+   - rdx(edx) : 시스템 콜 실행 시 세 번째 인자의 주소 / (Extended Data Register)
+7.  ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
    - 큰 의미는 없지만 관습처럼 사용되며 eax에서 하위 2byte를 자른 값을 나타낸다.
    - ax는 다시 ah와 al로 한 byte씩 나뉜다.
      - ah : ax에서 상위 1byte
      - al : ax에서 하위 1byte
 
- byte_4   | byte_3 | byte_2 | byte_1
----|---|---|---
- eax_4|eax_3|eax_2|eax_1 
- | | |ax_2|ax_1
- | | |ah|al
-10. esp : 스택 최상단의 주소값 (Stack pointer register)
+ byte_8 | byte_7 | byte_6 | byte_5 | byte_4 | byte_3 | byte_2 | byte_1
+---|---|---|---|---|---|---|---
+rax_8|rax_7|rax_6|rax_5|rax_4|rax_3|rax_2|rax_1 
+-|-|-|-|eax_4|eax_3|eax_2|eax_1
+-|-|-|-|-|-|-|ax_2|ax_1
+-|-|-|-|-|-|-|ah|al
+1.  esp : 스택 최상단의 주소값 (Stack pointer register)
    - x86에서 사용하는 값으로, x64에서는 rsp로 대체된다.
    - PUSH, POP, SUB, CALL 명령을 수행 할 때 마다 자동으로 변경된다.
    - PUSH, POP 의 기준이 되는 포인터이다.
-11. ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
+2.  ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
    - x86에서 사용하는 값으로, x64에서는 rbp로 대체된다.
    - 새로운 함수가 호출 될 경우, EBP 값이 스택에 push되어, 이전 함수의 EBP값이 스택에 쌓이게 된다. 
 
