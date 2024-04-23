@@ -44,8 +44,8 @@ draft: false
     - r1 ~ r8 레지스터는 아래 용도로 주로 사용되고, 명칭도 붙는다. 
       - r1) rax (accumulator register) : 함수의 반환 값
       - r2) rcx (counter register) : 반복문의 반복 횟수, 각종 연산의 시행 횟수
-      - r3) rdx (data register) : x64에서는 주된 용도 없음
-      - r4) rbx (base register) : x64에서는 주된 용도 없음
+      - r3) rdx (data register) : 시스템 콜 실행 시 세 번째 인자의 주소
+      - r4) rbx (base register) : 메모리 주소를 저장하는 용도로 사용
       - r5) rsp (stack pointer) : 사용중인 스택의 위치를 가리키는 포인터
   	  - r6) rbp (stack base pointer) : 스택의 바닥을 가리키는 포인터
       - r7) rsi (source index) : 데이터를 옮길 때 원본을 가리키는 포인터

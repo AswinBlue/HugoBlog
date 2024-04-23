@@ -125,26 +125,26 @@ draft: false
    - x64구조에서 rax 라 부르고, x86구조에서는 eax 라고 한다. 
    - 시스템 콜의 실질적인 번호를 가리킴
    - 시스템 콜의 반환값도 rax에 저장됨
-   - rbx(ebx) : (Extended Base register)메모리 주소를 저장하는 용도로 사용
-   - rcx(ecx) : (Extended Counter Register)CPU loop counter
-   - rdx(edx) : 시스템 콜 실행 시 세 번째 인자의 주소 / (Extended Data Register)
-7.  ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
+7. rbx(ebx) : (Extended Base register)메모리 주소를 저장하는 용도로 사용
+8. rcx(ecx) : (Extended Counter Register)CPU loop counter
+9. rdx(edx) : 시스템 콜 실행 시 세 번째 인자의 주소 / (Extended Data Register)
+10. ax : eax가 사용되기 이전, CPU의 word가 16bit 일 때 사용되던 레지스터
    - 큰 의미는 없지만 관습처럼 사용되며 eax에서 하위 2byte를 자른 값을 나타낸다.
-   - ax는 다시 ah와 al로 한 byte씩 나뉜다.
+   - ax 는 다시 ah와 al로 한 byte씩 나뉜다.
      - ah : ax에서 상위 1byte
      - al : ax에서 하위 1byte
 
- byte_8 | byte_7 | byte_6 | byte_5 | byte_4 | byte_3 | byte_2 | byte_1
----|---|---|---|---|---|---|---
-rax_8|rax_7|rax_6|rax_5|rax_4|rax_3|rax_2|rax_1 
--|-|-|-|eax_4|eax_3|eax_2|eax_1
--|-|-|-|-|-|-|ax_2|ax_1
--|-|-|-|-|-|-|ah|al
-1.  esp : 스택 최상단의 주소값 (Stack pointer register)
+      byte_8 | byte_7 | byte_6 | byte_5 | byte_4 | byte_3 | byte_2 | byte_1
+      ---|---|---|---|---|---|---|---
+      rax_8|rax_7|rax_6|rax_5|rax_4|rax_3|rax_2|rax_1 
+      -|-|-|-|eax_4|eax_3|eax_2|eax_1
+      -|-|-|-|-|-|-|ax_2|ax_1
+      -|-|-|-|-|-|-|ah|al
+11. esp : 스택 최상단의 주소값 (Stack pointer register)
    - x86에서 사용하는 값으로, x64에서는 rsp로 대체된다.
    - PUSH, POP, SUB, CALL 명령을 수행 할 때 마다 자동으로 변경된다.
    - PUSH, POP 의 기준이 되는 포인터이다.
-2.  ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
+12. ebp : 스택 프레임 최하단의 주소값 (Base pointer register)
    - x86에서 사용하는 값으로, x64에서는 rbp로 대체된다.
    - 새로운 함수가 호출 될 경우, EBP 값이 스택에 push되어, 이전 함수의 EBP값이 스택에 쌓이게 된다. 
 
