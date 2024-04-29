@@ -27,6 +27,41 @@ $ python3 -m pip install --upgrade pip
 $ python3 -m pip install --upgrade pwntools
 ```
 - [공식 메뉴얼](https://docs.pwntools.com/en/latest/)
+- docker를 사용한 설치 방법
+   ```
+   FROM ubuntu:18.04
+
+   ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
+   ENV LC_CTYPE=C.UTF-8
+
+   RUN apt update
+   RUN apt install -y \
+      gcc \
+      git \
+      python3 \
+      python3-pip \
+      ruby \
+      sudo \
+      tmux \
+      vim \
+      wget
+
+   # install pwndbg
+   WORKDIR /root
+   RUN git clone https://github.com/pwndbg/pwndbg
+   WORKDIR /root/pwndbg
+   RUN git checkout 2023.03.19
+   RUN ./setup.sh
+
+   # install pwntools
+   RUN pip3 install --upgrade pip
+   RUN pip3 install pwntools
+
+   # install one_gadget command
+   RUN gem install one_gadget
+
+   WORKDIR /root
+   ```
 
 ## 사용법
 - `from pwn import *` 을 통해 모듈을 로딩한다.
@@ -184,4 +219,10 @@ $ python3 -m pip install --upgrade pwntools
       0x00000000000707e1 : stosd dword ptr [rdi], eax ; pop rdi ; add al, 0 ; jmp 0x7043d
       ```
 
-
+### One_gadget
+- exploit 에 필요한 `gadget` 들을 일일이 찾거나, `objdump`, `readelf` 등으로 매번 함수들을 찾지 않고 명령어 한 번으로 libc 라이브러리에서 execve("/bin/sh") 를 실행 시킬 수 있도록 하는 gadget 을 알려주는 툴이다.
+- 다음 명령어로 설치가 가능하다.
+   ```
+   sudo apt-get install ruby
+   gem install one_gadget
+   ```

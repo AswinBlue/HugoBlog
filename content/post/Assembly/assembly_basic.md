@@ -215,6 +215,10 @@ draft: false
   RET  # pop EIP; jmp EIP 동작을 수행한다.
   ```
 
+- 리눅스에서 C 언어로 프로그램을 짜면 보통 `libc` 라이브러리를 호출하게 되고, 이 경우 main 함수는 `__libc_start_main` 함수에서 호출된다. 
+  - main 함수의 스택 프레임을 벗어나 return 주소로 가게 되면 `__libc_start_main` 함수의 스택 프레임으로 이동할 수 있다.
+  - main 함수의 스텍 프레임의 return address 가 __libc_start_main + A 라면, "main 함수의 return address" - "libc 라이브러리에서 __libc_start_main 함수의 offset" - "A" = libc_base 가 된다. 이 사실은 exploit 에 사용될 수 있다.
+
 ## .asm to bin
 - .asm 파일을 바이트 코드로 변경하려면 "nasm" 이라는 모듈을 사용하면 된다. 
 - `nasm -f elf YOUR_FILE.asm` 명령으로 .o 파일을 생성할 수 있다.
