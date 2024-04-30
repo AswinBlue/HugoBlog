@@ -1,5 +1,5 @@
 ---
-title: "Computer_science"
+title: "Computer Science"
 date: 2023-01-19T21:59:14+09:00
 lastmod: 2023-01-19T21:59:14+09:00
 tags: ["CS",]

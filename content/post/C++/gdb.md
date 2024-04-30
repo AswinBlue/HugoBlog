@@ -91,6 +91,7 @@ draft = false
 - `info addr [함수이름]` : 함수 주소 확인
 - `info register [레지스터 이름]` : 레지스터 값 확인
 - `p [변수]` : 변수 값 확인
+- `p &[변수]` : 변수 주소값 확인
 - `p $[레지스터 이름]` : 레지스터 값 확인
 - `p *[배열]@[숫자]` : 해당 숫자만큼 배열의 값 출력
 - `p [구조체]` : 구조체 주소 확인
@@ -115,14 +116,18 @@ draft = false
     - `x/t` : 2진법으로 표시
     - `x/b` : 1 byte 단위로 표시(byte)
     - `x/h` : 2 byte 단위로 표시(half word)
-    - `x/w`: 4 byte 단위로 표시(word) 
+    - `x/w` : 4 byte 단위로 표시(word) 
     - `x/g` : 8 byte 단위로 표시(giant)
     - `x/i` : 역어셈블된 기계여 표시
     - `x/c` : ASCII 표의 바이트 표시
     - `x/s` : 문자 데이터의 전체 문자열을 표시.
     - ex1) `x/4wx` : 주소값부터 다음 네 개의 주소를 4byte씩 16진수로 표시
     - ex2) `x/10gx` : 주소값부터 다음 80byte를 8byte씩 16진수로 표시
-- `i r` : 레지스트 값 모두 확인 (info registers 와 동일)
+- `i` : info 의 단축어로, 각종 정보를 확인할 때 사용한다. 
+  - `i b` : break point 확인
+  - `i addr 변수명` : 변수의 주소 확인
+  - `i var 변수명` : 변수 관련 내용 출력
+  - `i r` : 레지스트 값 모두 확인 (info registers 와 동일)
 - `bt` : 프로그램 중단시 최종 스택 프레임을 출력 (backtrace와 동일)
 - `display [변수명]`  : 변수 값을 매번 화면에 디스플레이
 - `display/[출력형식] [변수명]` : 변수 값을 출력 형식으로 디스플레이
@@ -134,6 +139,7 @@ draft = false
 - `pd` : rip 주변의 기계어를 어셈블리로 번역하여 출력한다. 
   - `pdisas` 의 축약으로, debugger에 따라 `disiassemble` 로 동작하는 경우도 있다.
 - `tele` : telescope의 축약으로 rsp 주변의 메모리를 덤프함과 동시에 메모리에 담긴 주소를 참조하여 그 안에 담긴 값도 함께 보여준다.
+  - `tele 주소` : `주소` 기준으로 메모리 stack 출력
 - `vmmap` : 가상 메모리 레이아웃을 보여줌
 - `search TARGET` : TARGET 이 포함된 byte sequences, 문자열, 포인터, 혹은 정수가 저장된 주소를 반환한다.
 
