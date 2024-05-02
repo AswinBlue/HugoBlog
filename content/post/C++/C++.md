@@ -156,3 +156,6 @@ printf("%d",MULT(2+2,3+3)) // 예상값 (4 * 6) * 2 = 26
 ### scanf
 - `scanf("%s", buf)` 는 입력의 길이를 제한하지 않고 띄어쓰기, 탭, 개행문자가 올 때 까지 입력을 받는다. 
 - `scanf("%[n]s", buf)` 를 사용하여 입력 갯수를 n개로 제한할 수 있다.
+- `scanf("%[^\n]", buf)`: `\n` 문자가 올 때 까지 읽는다.
+- `scanf("%[^\n]%*c", buf)`: `\n` 문자가 올 때 까지 읽되, \n은 버린다.
+  - ex) "this is test code\n\0" -> "this is test code\0"
