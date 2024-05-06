@@ -109,3 +109,46 @@ draft: false
 - ELF는 GOT 를 활용하여 라이브러리 호출 비용을 절약한다.
 - 프로그램을 실행하며 실시간으로 GOT 를 채워가는 방식을 Lazy Building이라 하는데, 프로그램 실행 중 GOT 에 쓰기 권한이 부여되어야 하기 때문에 해킹에 취약하다.
   - 공격자가 ELF에서 프로세스의 흐름에 관여하는 `.init_array`, `.fini_array` 과 같은 데이터 세그먼트들을 다른 함수로 덮어쓰면 프로세스의 흐름이 변경될 수 있다.
+  
+### 메모리 관리
+#### ptmalloc (pthread malloc)
+- 메모리 활용성을 높이기 위해 메모리 할당 및 해제 방법을 정의한 전략으로 아래와 같은 기능이 있다.
+  1. 해제된 메모리 크기에 따라 알맞게 재활용
+  2. 해제된 메모리의 위치를 저장하여 빠르게 접근
+  3. 외부/내부 메모리 파편화 방지를 위해 16byte 단위로 메모리 할당
+     - 보편적으로 메모리 할당 요청은 정확히 같은 크기보다 비슷한 크기로 할당이 많이 된다. 이 경우 16바이트 안의 오차는 모두 같은 크기의 메모리로 할당되므로 외부 단편화를 줄일 수 있다.
+- 할당된 메모리는 `linked list` 형태로 서로 연결된다. 
+- 메모리 할당시 `chunk` 라는 단위로 할당하며, `chunk` 에는 헤더 정보가 있다.
+  - 할당중(사용중)인 chunk 의 헤더와 해제된(빈) chunk 의 헤더가 다르다. 할당중인 chunk 는 16byte 의 헤더를 갖고, 해제된 chunk 의 헤더는 32byte 의 헤더를 갖는다. 
+  - 헤더에는 아래 정보들이 기록되어 있다.
+    1. `prev_size` : (8byte) 인접한 chunk 중, 앞쪽에 위치한 chunk 의 크기
+    2. `size` : (8byte) 헤더를 포함한 현재 chunk 의 크기
+       - x64 환경에서 ptmalloc 은 메모리를 16byte 크기로 할당하기 때문에 size 헤더의 마지막 3byte는 flag 로 사용하며 각각 allocated arena(A), mmap’d(M), prev-in-use(P) 를 의미한다.
+    3. `fd` : (8byte) 해제된 chunk 에만 적용되며, 이전 chunk 의 주소를 가리키는 포인터이다.
+    4. `bk` : (8byte) 해제된 chunk 에만 적용되며, 다음 chunk 의 주소를 가리키는 포인터이다.
+
+- 메모리가 해제되면 chunk를 바로 삭제하지 않고 `bin` 이라는 객체에 저장한다. 
+  - `bin` 은 총 128개의 항목을 담을 수 있는 배열이며, 62개의 `smallbin`(bin[1:64]) 과 63개의 `largebin`(bin[64:127]) 을 포함하고 있다. (0과 127번 index는 reserved)
+  1. `smallbin`
+     - `smallbin` 에는 32 byte 이상 1024 byte 미만의 `size` 를 갖는 해제된 `chunk` 들이 `linked list` 형태로 저장된다. 
+     - `smallbin` 은 `circular doubly-linked list` 로 구성되어 `FIFO` 의 속성을 갖는다.
+     - index가 작으면 더 작은 크기의 chunk를 갖도록 구성되며, index가 1씩 커질 때 마다 chunk의 크기가 16byte 더 크다. (`smallbin[0]`는 32byte, `smallbin[1]`는 48byte, ...)
+     - 메모리상 인접한 주소의 두 chunk 가 같은 `smallbin` 에 들어가 있으면 자동으로 병합(`consolidation`) 된다.
+  2. `fastbin`
+     - 일반적으로 작은 크기의 메모리들이 더 빈번하게 발생하므로, 이를 더 효율적으로 관리해야 할 필료가 있다. ptmalloc 에서는 `smallbin` 중 특히 작은 크기의 메모리를 `fastbin` 으로 관리하며, 메모리 단편화 보다는 속도에 관점을 두고 처리한다.
+     - 32byte 이상 176byte 이하의 chunk 들이 보관되며, 크기에 따라 총 10개의 fastbin 이 존재한다.
+     - `fastbin` 은 `single linked list` 이며, `LIFO` 로 동작한다.
+     - `fastbin` 의 chunk 들은 `consolidation` 작업을 수행하지 않는다.
+  3. `largebin`
+     - 1024 byte 크기 이상의 chunk 들을 보관하며, 총 63개의 largebin 이 존재한다. 
+     - index가 작으면 더 작은 크기의 chunk를 갖도록 구성되며, index가 1씩 커질 때 마다 chunk의 크기는 log 에 비례하여 증가한다. (`largebin[0]`는 1024 ~ 1088 byte, `smallbin[32]`는 3072 ~ 3584 byte, ...)
+     - 메모리 재사용 요청이 들어오면 가장 비슷한 크기의 chunk 를 반환한다.
+     - `smallbin` 과 마찬가지로 `doubly-linked list` 로 구성되고 `consolidation` 을 수행한다.
+     - 하나의 `fastbin` linked list 상에서 chunk 들은 메모리 크기 순으로 정렬되어있다. 
+  4. `unsortedbin`
+     - `fastbin` 에 해당되지 않는 chunk 들이 해제 된 경우 임시로 들어가는 bin 으로, 단 한개만 존재한다.
+     - `largebin` 요청시, `unsortedbin` 을 먼저 탐색하고 `largebin` 을 확인한다.
+     - `smallbin` 요청시, `fastbin` -> `smallbin` -> `unsortedbin` 을 탐색한다.
+     - `unsortedbin` 에서 chunk 확인 요청이 들어오면, chunk 들을 순회하며 알맞은 크기의 chunk 를 찾고, 순회하는 동안 방문한 chunk 들은 알맞은 `bin` 에 분류한다.
+     - `unsortedbin` 을 사용하면 `bin` 분류에 소요되는 자원을 절약할 수 있다.
+  - 위 `bin` 들은 `arena` 라는 객체에 담겨 보관된다. 

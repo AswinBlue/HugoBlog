@@ -146,7 +146,7 @@ draft = false
   - ELF 가 적용된 코드의 code_base, ASLR 이 적용된 코드의 libc_base 를 확인할 수 있다.
 - `search TARGET` : TARGET 이 포함된 byte sequences, 문자열, 포인터, 혹은 정수가 저장된 주소를 반환한다.
 - `disass 함수이름` : 함수를 어셈블리어로 풀어 쓴 내용을 출력한다.
-
+- `heap` : 동적할당 및 할당 해제된 heap 영역의 chunk 들을 확인 할 수 있다.
 ### 기타
 - `q` : 종료
 - `got` : got 내용을 출력
