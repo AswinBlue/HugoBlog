@@ -118,3 +118,12 @@ tar: Error is not recoverable: exiting now
 - `CMD1 >> FILE_NAME`: 표준 출력을 리다이렉션, CMD1의 결과를 FILE_NAME에 저장하되, 기존 파일 뒤부터 이어서 쓴다.
 - `CMD1 2> FILE_NAME_1 1> FILE_NAME_2`: CMD1의 표준에러와 표준출력을 FILE_NAME_1 과 FILE_NAME_2에 나누어 기록한다.
 - `CMD1 > /dev/null`: 출력할 내용을 버린다. `dev/null` 로 리다이렉트 된 내용은 모두 버려진다.
+
+## Metacharacter
+- 리눅스 상에서 특정 역할을 수행하는 문자를 `Metacharacter`(메타문자) 라 한다.
+- `$`: 쉘 환경변수 (`echo $PATH`: PATH 라는 환경변수를 화면에 출력)
+- `&&`: 이전 명령 이후 다음 명령 수행(`mkdir A && cd A`: A 라는 디렉터리 생성 후 A 디렉터리로 이동)
+- `;`: 명령어 구분자 (`mkdir A; cd A`: A 라는 디렉터리 생성, A 디렉터리로 이동)
+- `|`: 명령어 파이프라이닝 (`find . -name hello | grep world`: 'hello' 라는 이름의 파일을 찾고, 출력된 항목들 중 'world' 가 포함된 라인만 다시 추출)
+- `*`: 와일드카드 (`find . -name hello*`: 'hello*' 정규식에 일치하는 파일 찾기)
+- 

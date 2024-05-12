@@ -24,7 +24,10 @@ draft: false
   - 숫자를 넣으면 상수이다. 
   - [] 로 둘러싸인 숫자는 메모리이다.
   - 메모리 피연산자 앞에는 메모리의 크기를 나타내는 크기 지정자(Size Directive)가 붙을 수 있다.
+    - BYTE: 8bit
+      - `BYTE PTR rax` : rax 레지스터의 데이터를 1바이트만큼 참조
     - WORD: 16bit
+      - `WORD PTR [0x8048000]` : 0x8048000의 데이터를 2바이트만큼 참조
     - DWORD: 32bit
     - QWORD: 64bit
 
@@ -33,6 +36,9 @@ draft: false
 1. mov
    - "값"을 레지스터리나 메모리에 저장하는 명령
    - `mov dst, src` : src 값을 dst에 덮어씀
+     - `mov rdi, rsi` : rsi의 값을 rdi에 대입
+     - `mov QWORD PTR[rdi], rsi` : rsi의 값을 rdi가 가리키는 주소에 대입
+     - `mov QWORD PTR[rdi + 8 * rcx], rsi` : rsi의 값을 (rdi + 8 * rcx)가 가리키는 주소에 대입
    - dst = 레지스터, src = 레지스터 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
    - dst = 메모리, src = 레지스터 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
    - dst = 레지스터, src = 메모리 : src가 가리키는 주소의 값을 dst가 가리키는 주소의 값에 덮어씀
@@ -42,6 +48,7 @@ draft: false
 2. lea
    - "주소"를 레지스터리나 메모리에 저장하는 명령
    - `lea dst, src` : src값을 dst에 덮어씀 (src는 주소값)
+     - `lea rsi, [rbx + 8 * rcx]` : (rbx + 8 * rcx) 를 rsi에 대입
    - `lea dst, [mem + 4]` : mem 값에 4를 더한 값을 dst에 덮어씀
 3. add 
    - `add dst, src` : dst 에 있는 값에 src 값을 더해 dst에 덮어씀

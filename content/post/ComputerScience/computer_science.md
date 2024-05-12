@@ -33,8 +33,8 @@ draft: false
 - 세그먼트는 위에서 언급된 순서대로 메모리에 배치되며, 스택 세그먼트만 특이하게 메모리 가장 마지막을 기준으로 할당된다.
 
 ### ISA
-- Instruction Set Architecture 의 약자로, 명령어 집합 구조라 해석한다.
-- x86-64, ARM, MIPS, AVR 등이 대표적인 예시이다.
+- `Instruction Set Architecture` 의 약자로, 명령어 집합 구조라 해석한다.
+- 하드웨어의 종류에 따라 다른 ISA 가 사용되며, x86-64, ARM, MIPS, AVR 등이 대표적인 예시이다.
 
 - 컴퓨터 구조는 '기능구조' 'ISA' '마이크로 아키텍처' '하드웨어 및 컴퓨팅 방법론' 과 같이 레벨에 따라 분류가 가능하다. 
 
@@ -76,6 +76,7 @@ draft: false
   - CPU가 같더라도 컴파일러에 따라 함수 호출 규약이 달라질 수 있다.
     - ex) cdecl, stdcall, fastcall, thiscall
   - 스택 혹은 레지스터에 인자를 넣을 때 마지막 인자부터 첫 번째 인자까지 순서대로 집어넣는다.
+  
 ### SYSV
 - SYSV 규약으로 만들어진 대표적인 예로는 리눅스가 있다.
 - SYSV ABI(Application Binary Interface) 함수 호출 규약에는 ELF 포맷, 링킹 방법 등이 정의되어 있다.
@@ -85,11 +86,25 @@ draft: false
 - 즉, `rdi, rsi, rdx, rcx, r8, r9, [rsp], [rsp+8], [rsp+0x10], [rsp+0x18], [rsp+0x20]` 순서로 레지스터 및 stack 의 메모리를 참조하게 된다.
 
 ## 컴파일
-- high level language를 기계어로 변환하는 작업을 컴파일이라 하고, 컴파일은 네가지 변환기를 거친다. 
+- high level language를 기계어로 변환하는 작업을 컴파일이라 하고, C언어로 작성된 코드는 컴파일시 네가지 변환기를 거친다. 
   1. Preprocessor(전처리기) : c언어로 구현된 .c 파일을 전처리가 완료된 .i 파일로 변환
+     - 주석 제거, 매크로 치환, 파일 병합 과정을 거친다.
   2. Compiler(컴파일러) : 전처리된 .i 파일을 어셈블리어로 변환   
+     - 조건을 만족한다면 컴파일러에 따라 코드를 최적화 하여 어셈블리어로 변환한다.
+     - `gcc` 컴파일러는 `-O -O0 -O1 -O2 -O3 -Os -Ofast -Og` 옵션으로 최적화 여부를 설정할 수 있다.
   3. Assembler(어셈블): 각 벤더들이 만든 어셈블리어를 목적파일로 변환(어셈블리 언어를 기계어로 변환)
+     - `ELF`(리눅스 실행파일) 형식의 파일을 생성한다.
+     - 어셈블리 코드가 기계어로 번역된다.
   4. Linker(링커): 목적파일에서 참조하는 다른 목적파일들을 linking 하여 최종 실행파일을 생성
+
+- 기계어를 어셈블 언어로 만드는 어셈블의 역과정을 `Disassemble` 이라 한다.
+- 어셈블리어를 고급 언어로 만드는 컴파일읠 역과정을 `Decompile` 이라 한다.
+- [컴파일 명령어 참조](../../c++/gcc/#명령어-옵션)
+
+
+### ELF
+- ELF란 `Executable and Linkable Format` 의 약자로, 실행 가능하고 링킹 타임에 다른 프로그램에서 링크 할 수 있는 형태의 파일이다. 
+- 라이브러리들이 주로 ELF 파일 형태이며, 리눅스에서는 `*.o` 형태를 가진다.
 
 ### PLT / GOT
 - user가 작성한 코드가 동적 라이브러리를 참조하는 경우 PLT(Procedure Linkage Table)와 GOT(Global Offset Table) 를 사용하여 라이브러리 내의 함수를 참조한다. 
@@ -117,8 +132,8 @@ draft: false
   2. 해제된 메모리의 위치를 저장하여 빠르게 접근
   3. 외부/내부 메모리 파편화 방지를 위해 16byte 단위로 메모리 할당
      - 보편적으로 메모리 할당 요청은 정확히 같은 크기보다 비슷한 크기로 할당이 많이 된다. 이 경우 16바이트 안의 오차는 모두 같은 크기의 메모리로 할당되므로 외부 단편화를 줄일 수 있다.
-- 할당된 메모리는 `linked list` 형태로 서로 연결된다. 
-- 메모리 할당시 `chunk` 라는 단위로 할당하며, `chunk` 에는 헤더 정보가 있다.
+
+- 메모리를 할당하면 `chunk` 라는 객체가 생성되며, `chunk` 에는 메모리를 관리하기 위한 헤더 정보가 있다.
   - 할당중(사용중)인 chunk 의 헤더와 해제된(빈) chunk 의 헤더가 다르다. 할당중인 chunk 는 16byte 의 헤더를 갖고, 해제된 chunk 의 헤더는 32byte 의 헤더를 갖는다. 
   - 헤더에는 아래 정보들이 기록되어 있다.
     1. `prev_size` : (8byte) 인접한 chunk 중, 앞쪽에 위치한 chunk 의 크기
@@ -126,9 +141,35 @@ draft: false
        - x64 환경에서 ptmalloc 은 메모리를 16byte 크기로 할당하기 때문에 size 헤더의 마지막 3byte는 flag 로 사용하며 각각 allocated arena(A), mmap’d(M), prev-in-use(P) 를 의미한다.
     3. `fd` : (8byte) 해제된 chunk 에만 적용되며, 이전 chunk 의 주소를 가리키는 포인터이다.
     4. `bk` : (8byte) 해제된 chunk 에만 적용되며, 다음 chunk 의 주소를 가리키는 포인터이다.
+ - chunk + 16 부분은, 할당된 메모리에서는 data 영역 주소를 가리키지만 해제된 메모리에서는 `fd` 와 `bk` 라는 값을 기록하게 된다.
+    - 할당된 메모리
 
-- 메모리가 해제되면 chunk를 바로 삭제하지 않고 `bin` 이라는 객체에 저장한다. 
+    0 ~ 7 byte | 8 ~ 15 byte |
+    ------|------
+    prev_size | size (8~12: size, 13: A, 14:M, 15:P) |
+    data | data...
+
+    - 해제된 메모리
+
+    0 ~ 7 byte | 8 ~ 15 byte |
+    ------|------
+    prev_size | size (8~12: size, 13: A, 14:M, 15:P) |
+    fd | bk |
+  
+- 할당되지 않은 메모리는 `top chunk` 라는 모집합에서 관리되며, alloc 요청이 들어오면 `top chunk` 의 메모리를 일부 분리하여 `chunk` 단위로 관리한다.
+- 할당된 메모리는 `linked list` 형태로 서로 연결된다. 
+  - `top chunk` 에 인접한 미할당 `chunk` 는 다시 `top chunk` 로 자동으로 병합된다.
+
+- 메모리가 해제되면 `chunk` 를 바로 삭제하지 않고 `bin` 이라는 객체에 저장한다. 
   - `bin` 은 총 128개의 항목을 담을 수 있는 배열이며, 62개의 `smallbin`(bin[1:64]) 과 63개의 `largebin`(bin[64:127]) 을 포함하고 있다. (0과 127번 index는 reserved)
+
+fastbin | smallbin | largebin | unsortedbin | tcache
+--------|----------|----------|-------------|--------
+32 ~ 176 | 32 ~ 1024 | >= 1024 | (< 32) or (> 176) | 32 ~ 1040
+
+ - 메모리 해제시 tcache 에 먼저 chunk 가 담기고, tcache가 full 이면 unsortedbin / fastbin 에 담긴다.
+ - 이후 unsortedbin 이 탐색될 때 chunk들이 크기에 따라 smallbin / largebin 에 할당된다.
+
   1. `smallbin`
      - `smallbin` 에는 32 byte 이상 1024 byte 미만의 `size` 를 갖는 해제된 `chunk` 들이 `linked list` 형태로 저장된다. 
      - `smallbin` 은 `circular doubly-linked list` 로 구성되어 `FIFO` 의 속성을 갖는다.
@@ -149,6 +190,18 @@ draft: false
      - `fastbin` 에 해당되지 않는 chunk 들이 해제 된 경우 임시로 들어가는 bin 으로, 단 한개만 존재한다.
      - `largebin` 요청시, `unsortedbin` 을 먼저 탐색하고 `largebin` 을 확인한다.
      - `smallbin` 요청시, `fastbin` -> `smallbin` -> `unsortedbin` 을 탐색한다.
+     - `unsortedbin` 는 `top chunk` 와 맞닿아 있으므로 `top chunk` 와 `unsortedbin` 사이에 할당된 메모리가 없다면 `unsortedbin` 과 `top chunk` 는 병합된다.
+       - ex1) [unsorted bin] [top chunk] : 자동 병합
+       - ex2) [unsorted bin] [allocated memory1] [top chunk] : 병합 불가
+     - `unsortedbin` 의 첫 chunk 는 libc 영역의 특정 구역과 연결된다. 즉, 첫 chunk 의 `fd` 와 `bk` 영역에는 libc 영역의 주소가 기록되고, 이는 exploit에 활용될 수 있다.
      - `unsortedbin` 에서 chunk 확인 요청이 들어오면, chunk 들을 순회하며 알맞은 크기의 chunk 를 찾고, 순회하는 동안 방문한 chunk 들은 알맞은 `bin` 에 분류한다.
      - `unsortedbin` 을 사용하면 `bin` 분류에 소요되는 자원을 절약할 수 있다.
+
   - 위 `bin` 들은 `arena` 라는 객체에 담겨 보관된다. 
+  5. `tcache`
+     - `thread local cache` 를 뜻하며, thread 마다 독립적으로 존재하는 cache 이다. 
+     - fastbin 과 동일한 LIFO 방식의 단일 linked list 이며, thread 당 64개가 존재한다.
+     - 하나의 tcache 에는 최대 7 개의 chunk 만 보관 가능하도록 제한되어 있다.
+     - thread 마다 tcache 가 존재하므로 race condition 처리를 하지 않아도 되기 때문에 병목현상을 줄일 수 있는 기법이다.
+     - glibc 2.26 버전에서 처음 추가되었고, 초기에는 보안이 간소화 되어있어 취약점이 많았다. 
+       - 이후 tcache_entry 항목을 추가하며 Doubly Free Bug 에 대한 방어책을 마련했다.

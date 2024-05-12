@@ -66,21 +66,27 @@ $ python3 -m pip install --upgrade pwntools
 ## 사용법
 - `from pwn import *` 을 통해 모듈을 로딩한다.
 1. process / remote
-   - `target = process(파일경로)` 로 로컬 파일을 exploit 하기위한 대상으로 설정한다. 
-   - 원격으로 접속한 목적지의 파일을 exploit 할 때는 remote를 사용한다.
-  - `target = remote('목적지 ip', 목적지 port)` 를 호출하면 해당 ip:port 에 연결된 소켓을 exploit target으로 설정한다.
+   - `target = process(파일경로)`
+     - 로컬 파일을 exploit 하기위한 대상으로 설정한다. 
+     - `env` 인자로 실행시 환경변수를 설정 할 수 있다.
+       - 다음은 libc 파일을 원하는 경로에서 링킹 하도록 설정하는 구문이다. :  `target = process('./a.out', env= {"LD_PRELOAD" : "./libc.so.6"})`
+  - `target = remote('목적지 ip', 목적지 port)` 
+    - ip:port 에 연결된 소켓을 exploit target으로 설정한다.
+    - 원격으로 접속한 목적지의 파일을 exploit 할 때 사용한다.
 2. send
-   - `process` 혹은 `remote` 로 설정한 target 에 입력을 전달하는 함수
-   - send의 파생으로 sendline, sendafter, sendlineafter 등이 있다. 
-     - `target.send(B)` : target에 B를 입력
-     - `target.sendlineafter(A, B)` : 출력으로 A가 감지되면 target에 B를 입력
+   - `target.send(b'data_to_send')`
+     - `process` 혹은 `remote` 로 설정한 target 에 표준입력을 주입하는 함수
+     - `b''` 형태의 byte literal 을 전달해야 한다. `p64` 혹은 `p32` 로 변환하여 전달 할 수도 있다.
+     - send의 파생으로 sendline, sendafter, sendlineafter 등이 있다. 
+       - `target.sendline(b'data')` : 'data' 전달 후 '\n' 추가 입력
+       - `target.sendlineafter(b'input:', b'data')` : 출력으로 'input:'가 감지되면 target에 'data'를 입력
 3. recv
-   - target으로 부터 들어오는 출력 데이터를 수신하는 함수
+   - target으로 부터 들어오는 출력 데이터를 수신하는 함수. return 값은 byte literal 이므로 `u64` 혹은 `u32` 로 변환 후 사용한다.
+   - `result = target.recv(len)`: len만큼 데이터를 수신, len보다 길이가 짧으면 오류 반환
    - 파생으로 recvn, recvline, recvuntil, recvall 이 있다.
-     - `result = target.recv(len)`: len만큼 데이터를 수신, len보다 길이가 짧으면 오류 반환
-     - `result = target.recvn(len)`: len만큼 데이터를 수신, 수신한 길이가 len보다 짧으면 무한 대기
+     - `result = target.recvn(5)`: 5byte 데이터를 수신, 수신한 길이가 len보다 짧으면 무한 대기
      - `result = target.recvline()`: 개행문자를 만날 때 까지 데이터 수신
-     - `result = target.recvuntil(A)`: A 문자를 만날 때 까지 데이터 수신
+     - `result = target.recvuntil('name: ')`: "name: " 문자를 만날 때 까지 데이터 수신 (인자로 b'name', 'name' 모두 되는듯)
      - `result = target.recvall()`: 프로세스가 종료될 때 까지 데이터 수신
 4. packing / unpacking
    - 데이터를 변환하는 함수
@@ -95,9 +101,10 @@ $ python3 -m pip install --upgrade pwntools
 6. ELF
    - ELF 파일 헤더를 참조할 때 사용 가능
    - `elf = ELF(파일명)` 형태로 참조하면 dictionary 형태의 데이터를 반환 받을 수 있다.
-   - `elf.symbols[함수명]` 으로 함수의 offset을 확인할 수 있다.
-   - `elf.plt[함수명]` 으로 plt 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
-   - `elf.got[함수명]` 으로 got 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
+   - `elf.symbols[함수명]`: 'elf' 가 라이브러리 파일일 때, 라이브러리 함수의 offset을 확인할 수 있다.
+     - `elf.symbols[변수명]`: 'elf' 가 실행프로그램일 때, 변수의 주소를 확인할 수 있다.
+   - `elf.plt[함수명]`: 'elf' 가 실행프로그램일 때, plt 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
+   - `elf.got[함수명]` 'elf' 가 실행프로그램일 때, got 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
    - `elf.search[문자열]` 으로 ELF 에 저장된 문자열의 주소를 확인한다. 
 7. context
    - context.log_level
@@ -224,5 +231,5 @@ $ python3 -m pip install --upgrade pwntools
 - 다음 명령어로 설치가 가능하다.
    ```
    sudo apt-get install ruby
-   gem install one_gadget
+   sudo gem install one_gadget
    ```
