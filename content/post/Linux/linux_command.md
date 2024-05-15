@@ -97,7 +97,18 @@ tar: Error is not recoverable: exiting now
 - `wc FILE_NAME` : 파일의 라인, 단어, 글자 수를 출력 (단어는 공백문자(줄바꿈, 공백, 탭) 으로 구분된 글자 집합)
 - `wc -c FILE_NAME`: 파일 크기를 byte단위로 출력
 - `xxd FILE_NAME`: binary파일의 hexdump 출력
-- `file FILE_NAME`: 파일이 어떤 종류의 내용을 담고 있는지(C language, text ...)를 확인할 수 있다.
+- `file FILE_NAME`: 파일이 어떤 종류의 유형의 파일이며(C language, text, executable, ...), 어떤 속성을 갖고 있는지를 확인할 수 있다. 대상 파일의 유형을
+  - ex) 
+    ```
+    $ file /bin/ls    
+    /bin/ls: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=9567f9a28e66f4d7ec4baf31cfbf68d0410f0ae6, stripped
+
+    $ file /etc/passwd
+    /etc/passwd: ASCII text
+
+    $  file /bin/python
+    /bin/python: symbolic link to `python3'
+    ```
 - `readelf FILE_NAME`: ELF 파일의 meta data를 확인한다. 
   - ELF란 Executable and Linkable Format을 의미한다. (*.o 형태의 파일이다)
   - `readelf -h` ELF 파일의 헤더 확인

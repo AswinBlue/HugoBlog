@@ -151,3 +151,4 @@ draft = false
 - `q` : 종료
 - `got` : got 내용을 출력
 - `plt` : plt 내용을 출력
+- `finish` : 함수를 종료시키고 함수 호출 부분으로 이동 (step 의 반대)

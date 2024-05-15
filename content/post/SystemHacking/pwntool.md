@@ -101,10 +101,10 @@ $ python3 -m pip install --upgrade pwntools
 6. ELF
    - ELF 파일 헤더를 참조할 때 사용 가능
    - `elf = ELF(파일명)` 형태로 참조하면 dictionary 형태의 데이터를 반환 받을 수 있다.
-   - `elf.symbols[함수명]`: 'elf' 가 라이브러리 파일일 때, 라이브러리 함수의 offset을 확인할 수 있다.
-     - `elf.symbols[변수명]`: 'elf' 가 실행프로그램일 때, 변수의 주소를 확인할 수 있다.
-   - `elf.plt[함수명]`: 'elf' 가 실행프로그램일 때, plt 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
-   - `elf.got[함수명]` 'elf' 가 실행프로그램일 때, got 테이블에서 함수가 매핑된 주소를 확인할 수 있다.
+   - `elf.symbols[함수명]`: 'elf' 가 라이브러리 파일일 때, 라이브러리 함수의 `offset` 을 확인할 수 있다.
+     - `elf.symbols[변수명]`: 'elf' 가 실행프로그램일 때, 변수의 `주소`를 확인할 수 있다.
+   - `elf.plt[함수명]`: 'elf' 가 실행프로그램일 때, plt 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
+   - `elf.got[함수명]` 'elf' 가 실행프로그램일 때, got 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
    - `elf.search[문자열]` 으로 ELF 에 저장된 문자열의 주소를 확인한다. 
 7. context
    - context.log_level

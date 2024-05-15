@@ -23,12 +23,101 @@ draft = false
 
 ## Startup 
 ### 설치
-[링크 참조](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- [링크 참조](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- docker api 리눅스 설치 : `sudo apt-get install docker`
 
 ### 실행
-1. DockerFile 이름의 파일을 생성하고 내용을 채워넣는다. 
-https://docs.docker.com/engine/reference/builder/
- 
+1. `DockerFile` 이름의 파일을 생성하고 내용을 채워넣는다. 
+   - [가이드](https://docs.docker.com/engine/reference/builder/)
+  
+   - python 서버 실행 예시
+      ```
+      # python:3.10의 이미지로 부터
+      FROM python:3.9
+      # 제작자 및 author 기입
+      LABEL maintainer="huisam@naver.com"
+
+      # 해당 디렉토리에 있는 모든 하위항목들을 '/app/server`로 복사한다
+      COPY . /app/server
+
+      # image의 directory로 이동하고
+      WORKDIR /app/server
+
+      # 필요한 의존성 file들 설치
+      RUN pip3 install -r requirements.txt
+
+      # 환경 설정 세팅
+      RUN python setup.py install
+
+      # container가 구동되면 실행
+      ENTRYPOINT ["python", "Server.py"]
+      ```
+
+   - 리눅스 실행 예시
+      ```
+      FROM ubuntu:18.04
+
+      ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
+      ENV LC_CTYPE=C.UTF-8
+
+      RUN apt update
+      RUN apt install -y \
+          gcc \
+          git \
+          python3 \
+          python3-pip \
+          ruby \
+          sudo \
+          tmux \
+          vim \
+          wget
+
+      # install pwndbg
+      WORKDIR /root
+      RUN git clone https://github.com/pwndbg/pwndbg
+      WORKDIR /root/pwndbg
+      RUN git checkout 2023.03.19
+      RUN ./setup.sh
+
+      # install pwntools
+      RUN pip3 install --upgrade pip
+      RUN pip3 install pwntools
+
+      # install one_gadget command
+      RUN gem install one_gadget
+
+      WORKDIR /root
+      ``` 
+2. 이미지 파일 다운
+   - 별도의 이미지가 필요하다면 생성 혹은 다운. 일반적인 iso 파일은 docker에서 자체 지원
+3. docker 명령어로 빌드 (필요시 이미지 다운로드)
+   - ex) `docker build . -t version:ubuntu1804` : 18.04 버전 우분투로 빌드
+4. `docker run -d -t -v .:/volume --privileged --name=my_container ubuntu1804`
+   - 'my_container' 라는 이름으로 컨테이너 생성하고 tty 설정한 채로 background 실행
+   - 현재 디렉터리를 /volume 경로의 폴더에 연결
+5. `docker exec -it -u root my_container bash`
+   - 생성된 'my_container' 에 root 계정으로 bash 실행하여 접근
+6. 잘 안되다면 [오류와 해결방법](./#오류와-해결방법) 참조
+
+### 오류와 해결방법
+1. is docker daemon running? 에러
+  - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
+  - `service docker start` 명령으로 daemon 실행
+    - 만약 명령은 수행되나 켜지지 않는다면 systemctl명령 수행
+      - `systemctl start docker` : docker를 daemon으로 실행
+      - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
+    - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
+[참조](https://velog.io/@pop8682/Docker-Cannot-connect-to-the-Docker-daemon-at-unixvarrundocker.sock.-Is-the-docker-daemon-running-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0)   
+
+2. init 프로세스(PID 1)이 /bin/bash로 실행되지 않을 때, docker 실행 방법
+  - `docker run -t -i ubuntu:16.04 /bin/bash`
+
+3. `The container name "CONTAINER" is already in use by container`
+  - 동일 한 이름의 컨테이너가 이미 존재해서 발생하는 에러
+  - `docker ps -l` 로 컨테이너를 확인한다. 
+  - `docker stop CONTAINER_NAME` 로 컨테이너 종료
+  - `docker rm CONTAINER_NAME` 로 컨테이너 삭제
+  - 다시 docker를 실행시키면 문제가 해결된다.
 
 ## DockerFile 명령어
  - `FROM`: base image를 지정하는 명령어
@@ -82,87 +171,16 @@ https://docs.docker.com/engine/reference/builder/
    - 다음 빌드 때 ONBUILD가 호출된 순서대로 명령이 동작한다. 
    - `docker inspect` 명령어로 확인 가능
 
-### 예시
-
-- python 서버 실행
-```
-# python:3.10의 이미지로 부터
-FROM python:3.9
-# 제작자 및 author 기입
-LABEL maintainer="huisam@naver.com"
-
-# 해당 디렉토리에 있는 모든 하위항목들을 '/app/server`로 복사한다
-COPY . /app/server
-
-# image의 directory로 이동하고
-WORKDIR /app/server
-
-# 필요한 의존성 file들 설치
-RUN pip3 install -r requirements.txt
-
-# 환경 설정 세팅
-RUN python setup.py install
-
-# container가 구동되면 실행
-ENTRYPOINT ["python", "Server.py"]
-```
-
-- 리눅스 실행
-```
-FROM ubuntu:18.04
-
-ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
-ENV LC_CTYPE=C.UTF-8
-
-RUN apt update
-RUN apt install -y \
-    gcc \
-    git \
-    python3 \
-    python3-pip \
-    ruby \
-    sudo \
-    tmux \
-    vim \
-    wget
-
-## examples
-## change directory
-#WORKDIR /root
-# run commands
-#RUN git clone https://github.com/~~~~
-```
-
-### 오류 와 해결방법
-1. is docker daemon running? 에러
-  - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
-  - `service docker start` 명령으로 daemon 실행
-    - 만약 명령은 수행되나 켜지지 않는다면 systemctl명령 수행
-      - `systemctl start docker` : docker를 daemon으로 실행
-      - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
-    - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
-[참조](https://velog.io/@pop8682/Docker-Cannot-connect-to-the-Docker-daemon-at-unixvarrundocker.sock.-Is-the-docker-daemon-running-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0)   
-
-2. init 프로세스(PID 1)이 /bin/bash로 실행되지 않을 때, docker 실행 방법
-  - `docker run -t -i ubuntu:16.04 /bin/bash`
-
-3. `The container name "CONTAINER" is already in use by container`
-  - 동일 한 이름의 컨테이너가 이미 존재해서 발생하는 에러
-  - `docker ps -l` 로 컨테이너를 확인한다. 
-  - `docker stop CONTAINER` 로 컨테이너 종료
-  - `docker rm CONTAINER` 로 컨테이너 삭제
-  - 다시 docker를 실행시키면 문제가 해결된다.
-
-
 ## Docker 라이브러리 명령어
 - 이미지 : 특정 환경을 만들기 위해 세팅된 정보.
 - 컨테이너 : 실행가능한 상태의 프로세스. 이미지를 컨테이너에 담아 실행시킬 수 있다.
 
 ### 생성 및 설정
-- 버전 확인: ` docker -v `
-- 이미지 다운: ` docker pull <이미지명>[:태그] `
-- 이미지 생성 : 현재 경로에서 Dockerfile을 찾아 그 안의: ` docker build -t <이미지명> `
-- 설치된 도커 이미지 확인: ` docker images `
+- 버전 확인: `docker -v `
+- 이미지 다운: `docker pull <이미지명>[:태그]`
+- 이미지 생성 : `docker build . -t <이미지명> [태그]`
+  - 현재 경로에서 Dockerfile을 찾아 그 안의 명세에 따라 빌드가 된다.
+- 설치된 도커 이미지 확인: `docker images `
 
 ### 실행
 - 컨테이너 생성, 실행하지 않고 정지: ` docker create [옵션] <이미지명>[:태그] `
@@ -181,6 +199,7 @@ RUN apt install -y \
 
 ### 관리
 - 실행중인 컨테이너 확인: `docker ps`
+- 생성된 컨테이너 확인: `docker container list`
 - 컨테이너 종료: ` docker stop <컨테이너 id 또는 이름> `
 - 일시중지: ` docker container pause <컨테이너명> `
 - 일시중지 해제: ` docker container unpause <컨테이너명> `
