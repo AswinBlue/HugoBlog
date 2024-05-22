@@ -1,5 +1,5 @@
 ---
-title: "Projects"
+title: "🔷Projects"
 date: 2024-01-30T21:11:39+09:00
 lastmod: 2024-01-30T21:11:39+09:00
 tags: []
