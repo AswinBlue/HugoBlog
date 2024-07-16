@@ -153,6 +153,7 @@ $ python3 -m pip install --upgrade pwntools
 
 ### shellcraft
 - pwntool과 함께 설치되는 파이썬 모듈로 쉘 코드의 함수들을 반환한다.
+- [시스템 콜 테이블 참조](https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)
   - shellcraft.sh() : 쉘 실행 코드
   - shellcraft.open() : 쉘 코드 open(인자 필요)
   - shellcraft.read() : 쉘 코드 read(인자 필요)

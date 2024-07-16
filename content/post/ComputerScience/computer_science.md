@@ -41,16 +41,16 @@ draft: false
 ### x86-64 아키텍처 레지스터
 - x86-64 아키텍처는 아래와 같이 레지스터를 용도에 따라 구분한다. 
   1. 범용 레지스터(General Register) : 8byte를 저장 가능
-  	- r0 ~ r15까지 16개의 레지스터로 구성되며, 주로 r1 ~ r8 까지가 프로그램 구동시 기본으로 사용되며, 나머지는 정해진 용도 없이 reserved 된 레지스터이다. 
-    - r1 ~ r8 레지스터는 아래 용도로 주로 사용되고, 명칭도 붙는다. 
-      - r1) rax (accumulator register) : 함수의 반환 값
-      - r2) rcx (counter register) : 반복문의 반복 횟수, 각종 연산의 시행 횟수
-      - r3) rdx (data register) : 시스템 콜 실행 시 세 번째 인자의 주소
-      - r4) rbx (base register) : 메모리 주소를 저장하는 용도로 사용
-      - r5) rsp (stack pointer) : 사용중인 스택의 위치를 가리키는 포인터
-  	  - r6) rbp (stack base pointer) : 스택의 바닥을 가리키는 포인터
-      - r7) rsi (source index) : 데이터를 옮길 때 원본을 가리키는 포인터
-      - r8) rdi (destination index) : 데이터를 옮길 때 목적지를 가리키는 포인터
+  	- r0 ~ r15까지 16개의 레지스터로 구성되며, 주로 r0 ~ r7 까지가 프로그램 구동시 기본으로 사용되며, 나머지는 정해진 용도 없이 reserved 된 레지스터이다. 
+    - r0 ~ r7 레지스터는 아래 용도로 주로 사용되고, 명칭도 붙는다. 
+      - r0) rax (accumulator register) : 함수의 반환 값
+      - r1) rcx (counter register) : 반복문의 반복 횟수, 각종 연산의 시행 횟수
+      - r2) rdx (data register) : 시스템 콜 실행 시 세 번째 인자의 주소
+      - r3) rbx (base register) : 메모리 주소를 저장하는 용도로 사용
+      - r4) rsp (stack pointer) : 사용중인 스택의 위치를 가리키는 포인터
+  	  - r5) rbp (stack base pointer) : 스택의 바닥을 가리키는 포인터
+      - r6) rsi (source index) : 데이터를 옮길 때 원본을 가리키는 포인터
+      - r7) rdi (destination index) : 데이터를 옮길 때 목적지를 가리키는 포인터
   2. 세그먼트 레지스터(Segment Register) : 16bit를 저장 가능
   	- 과거에는 사용 가능한 물리 메모리의 크기를 늘리기 위해 사용했으나, x64 아키텍처에서는 주소영역이 확장되면서 주로 메모리 보호를 위해 사용
     - cs, ss, ds, es, fs, gs 종류가 존재

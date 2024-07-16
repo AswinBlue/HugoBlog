@@ -28,7 +28,7 @@ draft = false
 
 ### 실행
 1. `DockerFile` 이름의 파일을 생성하고 내용을 채워넣는다. 
-   - [가이드](https://docs.docker.com/engine/reference/builder/)
+   - [공식 가이드](https://docs.docker.com/engine/reference/builder/)
   
    - python 서버 실행 예시
       ```
@@ -88,36 +88,40 @@ draft = false
 
       WORKDIR /root
       ``` 
-2. 이미지 파일 다운
-   - 별도의 이미지가 필요하다면 생성 혹은 다운. 일반적인 iso 파일은 docker에서 자체 지원
-3. docker 명령어로 빌드 (필요시 이미지 다운로드)
+   - 별도의 이미지가 필요하다면 생성 혹은 다운로드 하고, DockerFile 에서 경로를 설정한다.
+   - 일반적인 iso 파일은 docker에서 자체 지원한다.
+2. `docker build <DOCKER_FILE_PATH>` 명령어로 빌드 수행.
    - ex) `docker build . -t version:ubuntu1804` : 18.04 버전 우분투로 빌드
-4. `docker run -d -t -v .:/volume --privileged --name=my_container ubuntu1804`
-   - 'my_container' 라는 이름으로 컨테이너 생성하고 tty 설정한 채로 background 실행
-   - 현재 디렉터리를 /volume 경로의 폴더에 연결
-5. `docker exec -it -u root my_container bash`
+     - -t 옵션 대신 `DockerFile` 에 `FROM ubuntu:22.04@sha256:67211c14fa74f070d27cc59d69a7fa9aeff8e28ea118ef3babc295a0428a6d21` 형태로 우분투 버전을 명시 할 수도 있다.
+3. `docker run -d -t -v .:/volume --privileged --name=my_container ubuntu1804`
+   - `--name=my_container`: 'my_container' 라는 이름으로 컨테이너 생성
+   - `-t`: tty 설정
+   - `-d`: background 실행
+   - `-v .:/volume`: 현재 디렉터리를 /volume 경로의 폴더에 연결
+   - `ubuntu1804`: ubuntu1804 이미지를 사용하여 실행
+4. `docker exec -it -u root my_container bash`
    - 생성된 'my_container' 에 root 계정으로 bash 실행하여 접근
-6. 잘 안되다면 [오류와 해결방법](./#오류와-해결방법) 참조
+5. 오류가 발생한다면  [오류와 해결방법](./#오류와-해결방법) 참조
 
 ### 오류와 해결방법
 1. is docker daemon running? 에러
-  - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
-  - `service docker start` 명령으로 daemon 실행
-    - 만약 명령은 수행되나 켜지지 않는다면 systemctl명령 수행
-      - `systemctl start docker` : docker를 daemon으로 실행
-      - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
-    - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
+   - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
+   - `service docker start` 명령으로 daemon 실행
+     - 만약 명령은 수행되나 켜지지 않는다면 systemctl명령 수행
+       - `systemctl start docker` : docker를 daemon으로 실행
+       - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
+     - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
 [참조](https://velog.io/@pop8682/Docker-Cannot-connect-to-the-Docker-daemon-at-unixvarrundocker.sock.-Is-the-docker-daemon-running-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0)   
 
 2. init 프로세스(PID 1)이 /bin/bash로 실행되지 않을 때, docker 실행 방법
-  - `docker run -t -i ubuntu:16.04 /bin/bash`
+   - `docker run -t -i ubuntu:16.04 /bin/bash`
 
 3. `The container name "CONTAINER" is already in use by container`
-  - 동일 한 이름의 컨테이너가 이미 존재해서 발생하는 에러
-  - `docker ps -l` 로 컨테이너를 확인한다. 
-  - `docker stop CONTAINER_NAME` 로 컨테이너 종료
-  - `docker rm CONTAINER_NAME` 로 컨테이너 삭제
-  - 다시 docker를 실행시키면 문제가 해결된다.
+   - 동일 한 이름의 컨테이너가 이미 존재해서 발생하는 에러
+   - `docker ps -l` 로 컨테이너를 확인한다. 
+   - `docker stop CONTAINER_NAME` 로 컨테이너 종료
+   - `docker rm CONTAINER_NAME` 로 컨테이너 삭제
+   - 다시 docker를 실행시키면 문제가 해결된다.
 
 ## DockerFile 명령어
  - `FROM`: base image를 지정하는 명령어
