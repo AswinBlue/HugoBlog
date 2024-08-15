@@ -181,7 +181,7 @@ draft: false
   - ds : data segment
   - es : extra segment
   - fs, gs : 앞선 세 개의 segment를 만들고 여유분 두개를 추가한 것. cs/ds/es는 CPU가 명확한 사용 용도를 가지는 반면 fs/gs는 정해진 용도가 없어 OS가 임의로 사용 가능
-    - 리눅스에서는 fs를 Thread Local Storage(TLS) 의 포인터로 사용한다. 
+    - 리눅스에서는 fs segment register를 Thread Local Storage(TLS) 의 포인터로 사용한다. 
 
 ### 명령어 포인터 레지스터
 - Instruction Pointer Register, IP

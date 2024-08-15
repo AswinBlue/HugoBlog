@@ -218,7 +218,7 @@ main()
 - C 라이브러리에서는 strtok_r 이라는 재진입 가능한 함수를 제공한다. 
 
 ### TLS / TSD
-- thread마다 개별적으로 사용할 수 있는 전역변수 영역을 TLS라 한다. 
+- TLS는 thread 의 전역 변수를 저장하기 위한 공간으로, 로더(Loader)에 의해서 할당된다.
 - 리눅스에서는 TSD라 부른다. 
 - `int pthread_setspecific(pthread_key_t key, const void *value)` : 'key' 에 해당하는 영역에 'value'를 연결한다. value로는 동적할당한 메모리가 온다. 
 - `void* pthread_getspecific(pthread_key_t key)` : 기존에 set으로 할당한 key에 해당하는 메모리를 가져온다. 

@@ -33,14 +33,24 @@ draft = false
 
 ## 기타 명령어
 
-### coredumb 파일
+### 실행 전 설정사항
+1. coredumb 파일
+   - 프로그램이 비정상적으로 종료될 때 메모리의 현재 상황을 블랙박스처럼 남기는 coredump 파일이 생성된다.다만, coredump 파일 생성에는 사전에 설정이 필요하다. 
+      1. `ulimit -c unlimited` 로 coredump 파일의 크기를 무제한으로 설정한다.
+         - 리눅스 프롬프트에서 `ulimit -a` 명령을 입력 해 보면 각종 파일들의 크기 설정을 볼 수 있다.  `core file size` 가 보통 기본 0으로 설정되어 있다. 
+      2. coredump 생성 경로를 확인한다. 경로로 설정된 디렉터리가 존재하지 않을 경우 생성되지 않을 수 있다.
+         - 리눅스에는 보통 `/proc/sys/kernel/core_pattern` 파일에 corefile 생성 포멧(경로)가 세팅되어 있다. 해당 파일을 확인하여 core 파일 생성 경로를 획득한다. (리눅스 버전에 따라 `/var/lib/apport/coredump/`, `/mnt/wslg/dumps/core` 등의 디렉터리에 core 파일이 생성된다.)
+   - 이후에는 프로그램 실행 중 비정상적으로 종료가 되면 `core` 라는 이름의 파일이 생성된다. 
+   - gdb에서 core파일을 사용하여 디버깅을 할 수 있다. 디버깅 심벌이 있는 실행파일과, core파일이 있다면, `gdb 실행파일 CORE파일` 라고 입력 해 주면 gdb는 프로그램이 죽은 시점 까지 동작을 수행하고 break 한다. 
+     - 이때 gdb의 `bt` 명령으로 stack을 확인할 수도 있다.
+   - gdb 의 [TUI 모드](https://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_19.html)를 다운받아 사용하면 코드의 어떤 라인에서 core dump 가 발생헀는지 확인 가능하다.
 
-- 프로그램이 비정상적으로 종료될 때 메모리의 현재 상황을 블랙박스처럼 남기는 coredump 파일이 생성된다.다만, coredump 파일 생성에는 사전에 설정이 필요하다. 
-- 리눅스 프롬프트에서 `ulimit -a` 명령을 입력 해 보면 각종 파일들의 크기 설정을 볼 수 있다. 이때 `core file size` 가 보통 0으로 설정되어 있다. 
-- 간혹 리눅스에서 core 파일이 생성되지 않는 경우가 있는데, `ulimit -c unlimited` 로 coredump 파일의 크기를 무제한으로 설정하면 해결 된다.
-- 이후에는 프로그램 실행 중 비정상적으로 종료가 되면 `core` 라는 이름의 파일이 생성된다. 
-- gdb에서 core파일을 사용하여 디버깅을 할 수 있다. 디버깅 심벌이 있는 실행파일과, core파일이 있다면, `gdb 실행파일 core` 라고 입력 해 주면 gdb는 프로그램이 죽은 시점 까지 동작을 수행하고 break 한다. 
-  - 이때 `bt` 명령으로 stack을 확인할 수도 있다.
+2. 환경 변수 설정
+   - `set env` 명령으로 환경변수 설정 가능
+     - `set env LD_PRELOAD {PATH}` 명령으로 LD_PRELOAD 환경변수를 설정하여 라이브러리 참조 경로를 설정 할 수 있다.
+
+3. 실행중인 프로세스 디버깅
+   - `gdb attach -p {PROCESS_ID}` : 쉘에서 `ps` 명령어 입력시 나오는 PROCESS_ID 를 사용하여 현재 실행중인 프로세스를 디버깅 할 수 있다.
 
 ## 디버깅 중 명령어
 
@@ -81,6 +91,7 @@ draft = false
 - `set {타입}<주소>=<값>` : 특정 타입의 값을 해당 주소에 집어넣음 (ex: `set {int} 0x123456 = 10` : 0x123456 주소에 10이라는 int값 주입)
 - `entry` : 프로그램의 첫 실행지점을 break point 로 잡고 디버깅을 실행시킨다. `start` 명령과 동일한 효과
 - `finish` : 현재 실행중인 함수를 종료시키고 함수 호출지점 다음으로 이동 (`fin` 으로 사용 가능)
+- `set solib-search-path <LIBRARY_PATH>` : shared library 파일을 찾을 경로를 추가로 설정
 
 ### 확인
 - `l` : main을 기점으로 소스 출력 (list와 동일)
@@ -152,3 +163,8 @@ draft = false
 - `got` : got 내용을 출력
 - `plt` : plt 내용을 출력
 - `finish` : 함수를 종료시키고 함수 호출 부분으로 이동 (step 의 반대)
+#### TUI mode
+- 특정 코드를 gdb와 연동시켜 디버깅 중 어셈블리 코드의 RIP 레지스터가 가리키는 라인을 코드에서 볼 수 있게 하는 기능이다. 
+- gdb 를 실행시킨 후 `dir` 명령으로 코드가 있는 곳의 위치를 설정한다.
+- 이후 `tui enable` 명령으로 tui 모드를 세팅하고, 실시간으로 코드를 확인 할 수 있다.
+- `tui diable` 명령으로 tui 창을 제거할 수 있다.

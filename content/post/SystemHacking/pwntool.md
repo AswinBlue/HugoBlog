@@ -63,24 +63,31 @@ $ python3 -m pip install --upgrade pwntools
    WORKDIR /root
    ```
 
+### 에러 발생시 해결
+- `partially initialized module 'pwndbg' has no attribute 'lib'` 에러 발생시에는 쉘 명령어에 `export LANG=C.UTF-8` 를 입력한다.
+
 ## 사용법
 - `from pwn import *` 을 통해 모듈을 로딩한다.
+
+### 실행
 1. process / remote
    - `target = process(파일경로)`
      - 로컬 파일을 exploit 하기위한 대상으로 설정한다. 
-     - `env` 인자로 실행시 환경변수를 설정 할 수 있다.
+     - `env` 인자를 추가하여 프로그램 동작시 적용될 환경변수를 설정할 수 있다.
        - 다음은 libc 파일을 원하는 경로에서 링킹 하도록 설정하는 구문이다. :  `target = process('./a.out', env= {"LD_PRELOAD" : "./libc.so.6"})`
   - `target = remote('목적지 ip', 목적지 port)` 
     - ip:port 에 연결된 소켓을 exploit target으로 설정한다.
     - 원격으로 접속한 목적지의 파일을 exploit 할 때 사용한다.
-2. send
+  
+### 데이터 송수신
+1. send
    - `target.send(b'data_to_send')`
      - `process` 혹은 `remote` 로 설정한 target 에 표준입력을 주입하는 함수
      - `b''` 형태의 byte literal 을 전달해야 한다. `p64` 혹은 `p32` 로 변환하여 전달 할 수도 있다.
      - send의 파생으로 sendline, sendafter, sendlineafter 등이 있다. 
        - `target.sendline(b'data')` : 'data' 전달 후 '\n' 추가 입력
        - `target.sendlineafter(b'input:', b'data')` : 출력으로 'input:'가 감지되면 target에 'data'를 입력
-3. recv
+2. recv
    - target으로 부터 들어오는 출력 데이터를 수신하는 함수. return 값은 byte literal 이므로 `u64` 혹은 `u32` 로 변환 후 사용한다.
    - `result = target.recv(len)`: len만큼 데이터를 수신, len보다 길이가 짧으면 오류 반환
    - 파생으로 recvn, recvline, recvuntil, recvall 이 있다.
@@ -88,17 +95,26 @@ $ python3 -m pip install --upgrade pwntools
      - `result = target.recvline()`: 개행문자를 만날 때 까지 데이터 수신
      - `result = target.recvuntil('name: ')`: "name: " 문자를 만날 때 까지 데이터 수신 (인자로 b'name', 'name' 모두 되는듯)
      - `result = target.recvall()`: 프로세스가 종료될 때 까지 데이터 수신
-4. packing / unpacking
+
+3. packing / unpacking
    - 데이터를 변환하는 함수
    - `p32(VALUE)` : 32bit little endian으로 변환
    - `p64(VALUE)` : 64bit little endian으로 변환
    - `u32(VALUE)` : 32bit big endian으로 변환
    - `u64(VALUE)` : 64bit big endian으로 변환
 
-5. interactive
+4. interactive
    - exploint 중 표준 입력/출력으로 프로세스에 직접 입력을 주입하고 출력을 확인하고 싶은 경우
    - `target.interactive()` 를 설정하면 'target' 에 직접 관여할 수 있다.
-6. ELF
+5. asm
+   - `asm(CODE)` 형태로 CODE에 어셈블리 라인을 string 형태로 기입시 바이너리 코드를 반환한다.
+   - ex) `asm('mov eax, SYS_execve')` => `b'\xb8\x0b\x00\x00\x00'`
+6. disasm
+   - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
+   - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
+
+### 실행파일 분석
+1. ELF
    - ELF 파일 헤더를 참조할 때 사용 가능
    - `elf = ELF(파일명)` 형태로 참조하면 dictionary 형태의 데이터를 반환 받을 수 있다.
    - `elf.symbols[함수명]`: 'elf' 가 라이브러리 파일일 때, 라이브러리 함수의 `offset` 을 확인할 수 있다.
@@ -106,19 +122,20 @@ $ python3 -m pip install --upgrade pwntools
    - `elf.plt[함수명]`: 'elf' 가 실행프로그램일 때, plt 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
    - `elf.got[함수명]` 'elf' 가 실행프로그램일 때, got 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
    - `elf.search[문자열]` 으로 ELF 에 저장된 문자열의 주소를 확인한다. 
-7. context
+2. context
    - context.log_level
      - `context.log_level` 을 설정하여 디버깅을 위한 로그 레벨을 설정 할 수 있다.
    - context.arch
      - exploit 대상의 아키텍처에 대한 정보를 설정할 수 있다. 
      - `context.arch = "amd64"` 형태로 설정
      - `i386`, `arm`, `mips` 등을 설정 할 수 있다.
-8. asm
-   - `asm(CODE)` 형태로 CODE에 어셈블리 라인을 string 형태로 기입시 바이너리 코드를 반환한다.
-   - ex) `asm('mov eax, SYS_execve')` => `b'\xb8\x0b\x00\x00\x00'`
-9. disasm
-   - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
-   - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
+
+### 디버깅
+1.  pause
+   - `pause()` 함수를 호출하여 진행상황을 일시 정지 할 수 있다. gdb 로 디버깅을 하기 위해 주로 사용한다.
+     - gdb 명령어 중 `gdb attach -p {PROCESS_ID}` 를 참조하여 디버깅이 가능하다.
+2. gdb.attach()
+   - `target = process(파일경로)` 로 프로그램을 실행시켰다면 `gdb.attach(target)` 명령으로 gdb를 연동시킬 수 있다.
 
 
 ### 예시
