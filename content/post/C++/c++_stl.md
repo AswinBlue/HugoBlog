@@ -110,6 +110,10 @@ draft = false
   - `Heap.empty()` : size가 1 이상이면 false, 아니면 true
 
 
+### Tueple
+- `std::tueple<TYPE1, TYPE2>` : 두 자료형을 쌍으로 묶어서 tueple 자료형으로 구성
+- `std::get<0>(tp)` : 튜플 타입 'tp' 에서 첫번쨰 요소(TYPE1) 가져옴
+- `std::get<1>(tp)` : 튜플 타입 'tp' 에서 두번쨰 요소(TYPE2) 가져옴
 
 ## 정렬
 

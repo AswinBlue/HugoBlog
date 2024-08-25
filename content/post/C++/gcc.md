@@ -67,6 +67,13 @@ gcc는 컴파일러를 포함한 패키지일 뿐, 내부적인 컴파일러는 
   - SEARCH_DIR("=/usr/x86_64-linux-gnu/lib64")
   - SEARCH_DIR("=/usr/x86_64-linux-gnu/lib")
 
+### 동적 라이브러리 참조
+- 동적 링크를 적용한 경우, 프로그램 실행 전 linux 환경변수를 세팅하여 라이브러리 참조 위치를 설정 할 수 있다.
+- `export LD_PRELOAD=$(realpath {라이브러리_파일})` : "라이브러리_파일" 경로의 라이브러리를 가장 먼저 참조
+  - `export LD_PRELOAD=$(realpath {파일1}:{파일2}:{파일3})` : 여러 파일들을 `LD_PRELOAD` 에 추가
+- `export LD_LIBRARY_PATH=$(realpath {디렉터리_경로}})` : 특정 디렉터리에서 라이브러리를 찾아 실행하도록 설정
+  - `export LD_LIBRARY_PATH=$(realpath {디렉터리1}:{디렉터리2}})` : 여러 디렉터리를 `LD_LIBRARY_PATH` 에 추가
+
 ## 명령어 옵션
 - `-o`: 생성될 파일의 이름을 설정. ('SRC.c' 를 넣으면 결과물은 'SRC.o', 'SRC.s' 형태로 나오지만, 실팽파일은 a.out 형태가 된다. 전통적인 unix의 방식)
 - `-c`: 목적파일 "*.o" 파일 생성

@@ -81,9 +81,11 @@ draft = false
 
 
 ## 압축
-압축과 해제는 `tar` 명령어로 수행 가능하다. 
- - `tar -xvf <FILE_NAME>` : 압축 해제
- - `tar -cvf <FILE_NAME>` : 압축
+- `tar -xvf <FILE_NAME>` : tar 파일 압축 해제
+- `tar -cvf <RESULT_FILE> <SOURCE_FILE>` : tar 파일 압축
+- `tar -zxvf <FILE_NAME>` : tar.gz 파일 압축 해제
+- `tar -zcvf <RESULT_FILE> <SOURCE_FILE>` : tar.gz 파일 압축
+- `$ dpkg -x <SOURCE_PATH> <DESTINATION_PATH>` : .deb 파일 압축 해제
 
 
 ### 에러와 해결

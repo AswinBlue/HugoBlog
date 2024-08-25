@@ -251,3 +251,14 @@ $ python3 -m pip install --upgrade pwntools
    sudo apt-get install ruby
    sudo gem install one_gadget
    ```
+
+### Patchelf
+- 바이너리가 동적 라이브러리를 참조하는 경로를 변경할 수 있는 툴이다.
+- `apt-get install patchelf` 명령어로 설치가 가능하다.
+  - [Github 코드](https://github.com/NixOS/patchelf)
+- `patchelf --set-interpreter 라이브러리 실행파일` : '실행파일' 실행시 '라이브러리' 파일을 동적링크로 적용하도록 세팅한다.
+  - `gdb 실행파일` 명령으로 gdb를 실행한 후, `vmmap` 명령으로 메모리 레이아웃을 확인했을 때, 위에서 지정한 '라이브러리' 파일이 표시되면 정상 적용 된 것
+- `patchelf --replace-needed {원본_라이브러리} {대체_라이브러리} {실행파일}` 명령으로 이미 주입된 라이브러리 의존성을 변경 가능하다.
+
+- 만약 patchelf 를 적용한 이후 실행 파일 실행 시 permission denied 오류가 발생한다면, 라이브러리에 실행 권한이 적용되어있는지 확인 해 본다.
+  - `chmod a+x {라이브러리_파일}` 명령으로 실행 권한 추가가 필요하다.

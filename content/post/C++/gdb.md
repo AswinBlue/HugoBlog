@@ -94,6 +94,7 @@ draft = false
 - `set solib-search-path <LIBRARY_PATH>` : shared library 파일을 찾을 경로를 추가로 설정
 
 ### 확인
+- `entry` : pwngdb 에서 stack, register, disasm 화면을 출력
 - `l` : main을 기점으로 소스 출력 (list와 동일)
 - `l [라인]` : 해당 라인을 기점으로 소스 출력
 - `l [함수]` : 해당 함수를 기점으로 소스 출력
