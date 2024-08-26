@@ -93,7 +93,8 @@ draft = false
    - 별도의 이미지가 필요하다면 생성 혹은 다운로드 하고, DockerFile 에서 경로를 설정한다.
    - 일반적인 iso 파일은 docker에서 자체 지원한다.
 2. `docker build <DOCKER_FILE_PATH> -t my_image` 명령어로 빌드 수행.
-   - ex) `docker build . -t version:ubuntu1804 .` : ubuntu1804 버전 태그를 가진 docker 이미지 빌드
+   - ex) `docker build . -t version:ubuntu1804 .` : ubuntu1804 버전(version) 태그를 가진 docker 이미지 빌드
+   - ex) `docker build . -t my_image .` : my_image 이름(name)을 가진 docker 이미지 빌드
    - `-t` : 빌드 한 이미지에 태그를 추가 (컨테이너 실행 혹은 이미지 관리에 태그를 이용)
      
 3. `docker run -d -t -v ~:/volume --privileged --name=my_container my_image`
