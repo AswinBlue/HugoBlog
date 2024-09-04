@@ -220,7 +220,7 @@ draft: false
    ----------  <- EBP(rbp)
    SFP
    ----------  <- EBP(rbp) + 0x04 (x64라면 +0x08)
-   return address (EIP)
+   return address -> 함수 종료시 EIP(rip) 에 해당 위치의 값 대입
    ----------
    ```
 - 만약 Stack canary 기법이 적용되었다면 아래와 같이 canary가 추가된다.
@@ -232,7 +232,7 @@ draft: false
    ----------  <- EBP(rbp)
    SFP
    ----------  <- EBP(rbp) + 0x04 (x64라면 +0x08)
-   return address (EIP)
+   return address -> 함수 종료시 EIP(rip) 에 해당 위치의 값 대입
    ----------
    ```
 - 함수가 종료되면 다음 절차가 수행된다.
