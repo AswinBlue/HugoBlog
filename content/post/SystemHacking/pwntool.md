@@ -131,7 +131,7 @@ $ python3 -m pip install --upgrade pwntools
      - `i386`, `arm`, `mips` 등을 설정 할 수 있다.
 
 ### 디버깅
-1.  pause
+1. pause
    - `pause()` 함수를 호출하여 진행상황을 일시 정지 할 수 있다. gdb 로 디버깅을 하기 위해 주로 사용한다.
      - gdb 명령어 중 `gdb attach -p {PROCESS_ID}` 를 참조하여 디버깅이 가능하다.
 2. gdb.attach()

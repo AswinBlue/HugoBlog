@@ -115,7 +115,7 @@ draft = false
 - `docker image rm IMAGE_NAME` : 이미지 이름이나 ID로 이미지를 삭제
 #### 컨테이너
 - 실행시킨 docker 들은 (`docker run` 명령 수행)는 컨테이너 형태로 남아있다.
-- `docker ps -l` : 컨테이너 목록 확인
+- `docker ps -a` : 컨테이너 목록 확인
 - `docker stop CONTAINER_NAME` : CONTAINER_NAME 컨테이너 중지
 - `docker rm CONTAINER_NAME` : CONTAINER_NAME 컨테이너 삭제
 - `docker container start CONTAINER_NAME` : CONTAINER_NAME 컨테이너 실행
