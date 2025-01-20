@@ -1,9 +1,9 @@
 +++
-title = "Python"
+title = "Python 기초"
 date = 2021-09-01T18:49:18+09:00
 lastmod = 2021-09-01T18:49:18+09:00
 tags = ['python',]
-categories = ['dev',]
+categories = ['dev', 'basic']
 imgs = []
 cover = ""  # image show on top
 readingTime = true  # show reading time after article date

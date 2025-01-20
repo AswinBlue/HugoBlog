@@ -295,6 +295,15 @@ jobs:
 - Section이 되기위한 조건으로는 1) content 폴더의 직속 디렉터리 이거나, 2) 안에 _index.md 파일을 지녀야 한다.
 - _index.md 파일을 지닌 디렉터리는 중간 가지 역할을 하고, index.md 파일을 지닌 디렉터리는 leaf node 역할을 하며, index.md 파일과 동일한 디렉터리에 들어있는 파일들은 각각의 페이지가 생성되지 않는다. 
 
+### 이미지
+- 이미지는 /static 폴더에 넣으면 컴파일 시 /public 폴더로 이동된다.
+- 즉, /static/image/sample.png 파일은 컴파일시 /public/image/sample.png 로 이동되며, `![이미지 설명](/image/sample.png)` 구문으로 markdown에서 이미지를 참조할 수 있다.
+- 단, 이미지 경로에 특수문자나 띄어쓰기가 없어야 함에 주의한다.
+
+### config
+- config.yml, config.toml 등 설정 파일을 통해 hugo 동작시 옵션들을 세팅할 수 있다. 
+- baseURL: 최상위 root 경로를 설정하는 값이다.
+  - `hugo server --baseURL "/"` 로 테스트 할 때 baseURL만 따로 세팅할 수도 있다.
 
 ## 오류 해결
 ### 배포 페이지 CSS 동작 오류

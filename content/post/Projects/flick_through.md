@@ -42,7 +42,7 @@ Link : aswinblue.github.io/FlickThrough/
 
 텍스트가 출력될 텍스트박스, 진행률 표시바, 시작/일시정지 버튼, 속도 조절 스크롤바, 파일 읽기 버튼을 구성
 
-![Untitled](./%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled.png)
+![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled.png)
 
 1. 파일 로드 기능
     1. 파일 로드 버튼을 클릭해서 읽을 텍스트 파일 로드
@@ -51,7 +51,7 @@ Link : aswinblue.github.io/FlickThrough/
     1. 재생 버튼을 눌러 재생/일시정지 상태 변경
     2. List형태로 저장된 단어들을 일정 시간 delay를 두고 화면에 순서대로 출력
     
-    ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%201.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%201.png)
     
 3. 진행률조절
     1. 진행률 표시바를 클릭 혹은 드래그 하여 진행 위치를 조절
@@ -60,12 +60,12 @@ Link : aswinblue.github.io/FlickThrough/
 5. 클립보드 사용
     1. 클립 보드를 사용할 수 있도록 Text Box 추가, dialog안의 text box에 내용을 채워넣으면 해당 내용으로 flick through 실행
         
-        ![Paste from clip board 버튼을 추가](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%202.png)
+        ![Paste from clip board 버튼을 추가](/IMAGE_FLICKTHROUGH_APP/Untitled%202.png)
         
         Paste from clip board 버튼을 추가
         
     
-    ![버튼을 누르면 dialog 창이 발생하고, 여기서 confirm 을 누르면 해당 텍스트로 슬라이드 플레이 가능](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%203.png)
+    ![버튼을 누르면 dialog 창이 발생하고, 여기서 confirm 을 누르면 해당 텍스트로 슬라이드 플레이 가능](/IMAGE_FLICKTHROUGH_APP/Untitled%203.png)
     
     버튼을 누르면 dialog 창이 발생하고, 여기서 confirm 을 누르면 해당 텍스트로 슬라이드 플레이 가능
     
@@ -169,12 +169,12 @@ Link : aswinblue.github.io/FlickThrough/
     
      - await를 사용하여 UI와 병렬로 동작하도록 구현
     
-    ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%204.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%204.png)
     
 2. `LinearProgressIndicator` 형태는 터치를 지원하지 않음
  → `GestureDetector` 로 캡슐화 하여 터치를 직접 설정할 수 있음
     
-    ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%205.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%205.png)
     
 3. GestureDetector로 스크롤시, 화면 밖을 벗어나는 영역까지 드래그를 해도 위치가 인식이 된다.
 이 때문에 진행률이 음수가 되거나, 100%를 초과하는 경우가 발생하여 logic상으로 border를 처리해 주어야 한다.
@@ -182,9 +182,9 @@ Link : aswinblue.github.io/FlickThrough/
     
     → web에서 동작하는지, app에서 동작하는지 런타임에 확인할 수 있는 구분자를 사용하여 각각 다른 방법으로 동작하게 분기처리 한다.
     
-    ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%206.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%206.png)
     
-    ![loadTextFile은 `_MyHomePageState` class의 멤버 함수이다.](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%207.png)
+    ![loadTextFile은 `_MyHomePageState` class의 멤버 함수이다.](/IMAGE_FLICKTHROUGH_APP/Untitled%207.png)
     
     loadTextFile은 `_MyHomePageState` class의 멤버 함수이다.
     
@@ -193,15 +193,15 @@ Link : aswinblue.github.io/FlickThrough/
 
   1) platform에 따라 web.dart와 app.dart로 파일을 분리한다. 
     
-    ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%208.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%208.png)
     
      2) abstract class를 형성하고, 각 platform dependent 한 로직들은 abstract class 를 상속받아서 web.dart와 app.dart에 작성한다. 
     
-    ![abstract 함수를 선언하고, 조건부 import를 통해 컴파일타임 분기](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%209.png)
+    ![abstract 함수를 선언하고, 조건부 import를 통해 컴파일타임 분기](/IMAGE_FLICKTHROUGH_APP/Untitled%209.png)
     
     abstract 함수를 선언하고, 조건부 import를 통해 컴파일타임 분기
     
-    ![상속받아 만든 함수 (for app)](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2010.png)
+    ![상속받아 만든 함수 (for app)](/IMAGE_FLICKTHROUGH_APP/Untitled%2010.png)
     
     상속받아 만든 함수 (for app)
     
@@ -219,37 +219,37 @@ Link : aswinblue.github.io/FlickThrough/
     1. conditional import를 사용해야하는 것은 맞음. 
     2. factory pattern을 사용하여, getFileLoader() 호출시 특정 객체가 호출되도록 함. (함수는 전역으로 선언해야 함)
     
-    ![conditional import/export를 통해 필요한 파일만 플랫폼에 맞게 컴파일타임에 선택 ](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2011.png)
+    ![conditional import/export를 통해 필요한 파일만 플랫폼에 맞게 컴파일타임에 선택 ](/IMAGE_FLICKTHROUGH_APP/Untitled%2011.png)
     
     conditional import/export를 통해 필요한 파일만 플랫폼에 맞게 컴파일타임에 선택 
     
     1. 파일을 나누어 각 플랫폼별로 class를 따로 정의, interface를 상속받도록 하고, 각 파일에서 getFileLoader 을 선언한다. (conditional import를 사용하기 때문에 getFileLoader은 중복 선언되지 않고 컴파일타임에 하나만 선택된다. 
     2. base class를 상속하고, 플랫폼별로 동작이 달라지는 function을 override(재정의) 해서 각 플랫폼마다 다르게 동작하도록 하면 된다. 
         
-        ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2012.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2012.png)
         
-        ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2013.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2013.png)
         
     3. main에서 getFlieLoader() 로 객체를 호출하면 플랫폼에 맞는 알맞은 객체가 생성된다.
         
-        ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2014.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2014.png)
         
     
     실패1. main에서 호출한 AbstractFileLoader는 loadFile이 미구현된 상태. 미구현 에러 발생
     
-    ![cross_platform.dart 파일, base class를 선언](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2015.png)
+    ![cross_platform.dart 파일, base class를 선언](/IMAGE_FLICKTHROUGH_APP/Untitled%2015.png)
     
     cross_platform.dart 파일, base class를 선언
     
-    ![app.dart 파일, base class를 상속받고 loadFile 함수 재정의](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2016.png)
+    ![app.dart 파일, base class를 상속받고 loadFile 함수 재정의](/IMAGE_FLICKTHROUGH_APP/Untitled%2016.png)
     
     app.dart 파일, base class를 상속받고 loadFile 함수 재정의
     
-    ![main.dart에서 base class 생성](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2017.png)
+    ![main.dart에서 base class 생성](/IMAGE_FLICKTHROUGH_APP/Untitled%2017.png)
     
     main.dart에서 base class 생성
     
-    ![base class에서 구현된 function 호출](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2018.png)
+    ![base class에서 구현된 function 호출](/IMAGE_FLICKTHROUGH_APP/Untitled%2018.png)
     
     base class에서 구현된 function 호출
     
@@ -259,11 +259,11 @@ Link : aswinblue.github.io/FlickThrough/
 
  - **android/app/src/main/AndroidManifest.xml** 파일에 `<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />` 구문이 선언되어있는지 확인. 해당 태그는 manifest 직속, application 선언전에 호출되어야 한다. 
 
-![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2019.png)
+![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2019.png)
 
  - flutter에 권한 관리 모듈을 추가해야 한다. pubsec.yaml 파일에 permission_handler dependency를 추가한다. 
 
-![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2020.png)
+![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2020.png)
 
  - 이후 permission 이 필요한 동작을 호출하는 함수가 있는 파일에 permission_handler 모듈을 추가한다. 
 `import 'package:permission_handler/permission_handler.dart';`
@@ -271,21 +271,21 @@ Link : aswinblue.github.io/FlickThrough/
 
 권한이 없다면 자동으로 팝업을 띄워 권한을 요청하도록 되어있다.
 
-![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2021.png)
+![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2021.png)
 
 이후 await 를 통해 결과를 받아서 결과에 따른 처리를 수행하도록 한다. 
 
-![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2022.png)
+![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2022.png)
 
 1. 다개국어 지원시 AppLocations.of(context) 에서 null을 반환하여 랜더링 실패
     - `Text(AppLocalizations.*of*(context)!.pasteFromClipBoard),)` 형태를 widget에 넣을 때, 해당 값이 null로 치환되면 랜더링 오류가 발생한다.
     - 설정을 제대로 했는지 확인한다. 내 경우에는 아래 라인을 넣지 않아서 오류가 발생했다.
         
-        ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2023.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2023.png)
         
     - 설정도 제대로 했다면, l10n.yaml에서 언어를 감지하지 못했을 때 동작할 default language를 설정 해 준다.
         
-        ![Untitled](%5BBoosted%20Reader%5D%F0%9F%94%A8%20App%20%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%2011b84e8a72a24cb099094412c4ddd72b/Untitled%2024.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_APP/Untitled%2024.png)
         
     - 이 또한 먹히지 않는다면 MaterialApp 생성시 localeListResolutionCallback 항목을 아래와 같이 파라미터로 추가해 준다. 언어를 감지하지 못했을 시 default language 팩을 en 으로 설정하는 내용이다.
         
@@ -391,27 +391,27 @@ jobs:
 
 1. https://github.com/settings/tokens 에 접속하여 ‘generate new token’을 선택하여 신규  token을 생성한다. 
     
-    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled.png)
     
 - 배포만이 목적이라면 아래와 같이 권한을 설정 해 주면 충분하다.
 
-![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%201.png)
+![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%201.png)
 
 - 토큰이 생성되면 페이지를 닫지 말라. 현재 페이지를 벗어나면 다시 토큰을 볼 수 없다.
 그 상태에서 바로 코드가 들어있는 github repository의 setting 으로 진입한다. ([https://github.com/AswinBlue/FlickThrough/settings](https://github.com/AswinBlue/FlickThrough/settings))
 - repository 설정에서 “Secrets and variables” 메뉴에 진입하고, ‘Secrets’ 탭을 선택한 후 ‘New Repository Secret’ 버튼을 눌러서 `GIT_TOKEN` 을 key로, 이전 단계에서 받은 token을 value로 설정하여 secret variable을 하나 생성한다. (생성한 secret variable도 다시 확인할 수 없으므로 주의한다. 또한 GITHUB_ 로 시작하는 key의 secret varaible은 생성할 수 없다)
 ([https://github.com/AswinBlue/FlickThrough/settings/secrets/actions](https://github.com/AswinBlue/FlickThrough/settings/secrets/actions))
     
-    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%202.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%202.png)
     
 1. 내용을 작성하고 github에 푸쉬하면 github 의 action 탭에서 action의 실행 결과를 확인할 수 있다.  ([https://github.com/AswinBlue/FlickThrough/actions/new](https://github.com/AswinBlue/FlickThrough/actions/new))
     
-    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%203.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%203.png)
     
 2. action이 정상적으로 완료되었다면, setting/page 항목에서 브랜치 ‘gh-pages’로 설정 해 준다. (자동으로 되는 경우도 있음)
 ([https://github.com/AswinBlue/FlickThrough/settings/pages](https://github.com/AswinBlue/FlickThrough/settings/pages))
     
-    ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%204.png)
+    ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%204.png)
     
 
 ### 2. 아이콘 변경
@@ -471,11 +471,11 @@ IOS는 `ios/Runner/Assets.xcassets` 폴더 안에 AppIcon.appiconset 폴더를 �
     - gradle 파일 수정 후에는 gradle을 프로젝트에 sync 해 주어야 한다. 
     gradle sync라는 항목이 ‘file’ 밑에 있는 경우도, ‘tool → android’ 밑에 있는 경우도 있는데 둘다 보이지 않는다면 build.gradle 파일을 우클릭 한 후 ‘Link gradle project’ 를 눌러준다.
         
-        ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%205.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%205.png)
         
     - 마지막으로 build를 release 버전으로 수행해야 한다. 좌측 하단에 Build Variants 창을 찾아(혹은 build → Select build variant 선택) 설정을 release로 변경한다.
         
-        ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%206.png)
+        ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%206.png)
         
     - 이후 콘솔창에 `flutter build appbundle` 명령어를 입력하여 app bundle을 빌드한다. 빌드한 결과는 /build/app/outputs/bundle/release 경로에 생성된다.
     - 파일명은 app-release.aab 로 생성되어 있다. playstore console에 배포할때도 aab 파일을 업로드 한다.
@@ -490,4 +490,4 @@ IOS는 `ios/Runner/Assets.xcassets` 폴더 안에 AppIcon.appiconset 폴더를 �
         `git remote set-url origin https://AswinBlue@github.com/AswinBlue/FlickThrough.git`
         - 2) checkout job 실행시 token 사용하도록 적용 해 주면 이후 명령들도 권한이 적용 되는듯 하다.
             
-            ![Untitled](%5BBoosted%20Reader%5D%20%F0%9F%94%A8%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20a32ac3fe24cf4b8fb50fd6345d1460ac/Untitled%207.png)
+            ![Untitled](/IMAGE_FLICKTHROUGH_DEPLOY/Untitled%207.png)
