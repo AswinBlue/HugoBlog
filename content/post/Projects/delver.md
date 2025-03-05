@@ -38,11 +38,11 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
 - 여러 사이트에 호환되도록 구조를 설정
 
     
-    ![사이트별 속성을 json 형태로 기록](IMAGE_DELVER_WEB_SCRAPPER/Untitled.png)
+    ![사이트별 속성을 json 형태로 기록](/IMAGE_DELVER_WEB_SCRAPPER/Untitled.png)
     
     사이트별 속성을 json 형태로 기록
     
-    ![json 형태를 읽어 코드 변경 없이 사이트 추가할 수 있는 구조로 작성](IMAGE_DELVER_WEB_SCRAPPER/Untitled1.png)
+    ![json 형태를 읽어 코드 변경 없이 사이트 추가할 수 있는 구조로 작성](/IMAGE_DELVER_WEB_SCRAPPER/Untitled1.png)
     
     json 형태를 읽어 코드 변경 없이 사이트 추가할 수 있는 구조로 작성
     
@@ -53,11 +53,11 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
  - find() 혹은 find_all() 에 string 인자를 넣어서 검색을 하면 반환 값으로html tag 배열이 아니라, string 배열이 온다. 
  - 검색 결과에서 추가적으로 find를 해야할 경우 문자열을 따로 추출하여 검색을 하도록 한다.
     
-    ![item 안에 특정 문자열(keywords)이 있는지 확인하는 구문](IMAGE_DELVER_WEB_SCRAPPER/Untitled2.png)
+    ![item 안에 특정 문자열(keywords)이 있는지 확인하는 구문](/IMAGE_DELVER_WEB_SCRAPPER/Untitled2.png)
     
     item 안에 특정 문자열(keywords)이 있는지 확인하는 구문
     
-    ![위와같이 find_all() 구문에 ‘string’ 파라미터를 넣으면 detected 는 string의 배열을 갖게 된다.](IMAGE_DELVER_WEB_SCRAPPER/Untitled3.png)
+    ![위와같이 find_all() 구문에 ‘string’ 파라미터를 넣으면 detected 는 string의 배열을 갖게 된다.](/IMAGE_DELVER_WEB_SCRAPPER/Untitled3.png)
     
     위와같이 find_all() 구문에 ‘string’ 파라미터를 넣으면 detected 는 string의 배열을 갖게 된다.
 
@@ -79,13 +79,13 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
 1. python 코드가 배포될 때, 동작에 필요한 모듈들이 설치 되도록 dependency 설정
     - `pip freeze` 명령으로 설치된 모듈들을 확인한 후, 이를 requirements.txt 에 기입한다.
         
-        ![Untitled](IMAGE_DELVER_DEPLOY/Untitled.png)
+        ![Untitled](/IMAGE_DELVER_DEPLOY/Untitled.png)
         
     - 이후 `pip install -r requirements.txt` 명령어를 사용해 주면 설정된 의존성 파일들이 모두 설치된다.
 
 1. DockerFile을 설정하여 AWS에 docker 형태로 배포될 수 있도록 작성
     
-    ![Untitled](IMAGE_DELVER_DEPLOY/Untitled%201.png)
+    ![Untitled](/IMAGE_DELVER_DEPLOY/Untitled%201.png)
     
 
 ### AWS 연동
@@ -94,14 +94,14 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
     - IAM에서 AWS API 호출 시 인증에 사용 될 access key 를 발급 받는다.
     - IAM → 사용자 → 보안 자격증명 → 액세스키 → 액세스 키 만들기 경로로 생성이 가능하다.
         
-        ![Untitled](IMAGE_DELVER_DEPLOY/Untitled%202.png)
+        ![Untitled](/IMAGE_DELVER_DEPLOY/Untitled%202.png)
         
 2. ECR 생성
     - [Amazon ECR](https://us-east-2.console.aws.amazon.com/ecr/get-started?region=us-east-2) → **리포지토리** 에 접속하여 ‘리포지토리 생성’ 버튼을 클릭한다.
     - 프라이빗 설정으로, 이름을 지정한다.
     - 태그는 리포지토리 마지막에 붙는 버전을 나타내는 postfix이다. 태그 변경 옵션은, 같은 이름의 태그를 덮어쓸 수 있는지 설정하는 항목이다.
         
-        ![리포지터리 생성 화면](IMAGE_DELVER_DEPLOY/Untitled%203.png)
+        ![리포지터리 생성 화면](/IMAGE_DELVER_DEPLOY/Untitled%203.png)
         
         리포지터리 생성 화면
         
@@ -109,20 +109,20 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
     - [Lambda](https://us-east-2.console.aws.amazon.com/lambda/home?region=us-east-2#/) 에 접속하여 ‘함수생성’ 버튼을 클릭해 함수를 생성한다.
     - 생성된 ECR 을 실행하는 람다 함수를 생성한다.
         
-        ![‘컨테이너 이미지’ 를 동작시키도록 설정하여 생성하면 된다.](IMAGE_DELVER_DEPLOY/Untitled%204.png)
+        ![‘컨테이너 이미지’ 를 동작시키도록 설정하여 생성하면 된다.](/IMAGE_DELVER_DEPLOY/Untitled%204.png)
         
         ‘컨테이너 이미지’ 를 동작시키도록 설정하여 생성하면 된다.
         
 4. Lambda 함수가 매일 실행되도록 AWS Cloud Watch (EventBridge) 세팅
     - 설정 참조: [https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html)
     
-    ![시각 표시 규칙](IMAGE_DELVER_DEPLOY/Untitled%205.png)
+    ![시각 표시 규칙](/IMAGE_DELVER_DEPLOY/Untitled%205.png)
     
     시각 표시 규칙
     
     - 한국 시간 기준 매일 12시에 동작하도록 설정. 띄워 쓰기 기준으로, `cron(분 시 일 월 요일 해)` 를 뜻한다.
         
-        ![EventBridge 설정 내용](IMAGE_DELVER_DEPLOY/Untitled%206.png)
+        ![EventBridge 설정 내용](/IMAGE_DELVER_DEPLOY/Untitled%206.png)
         
         EventBridge 설정 내용
         
@@ -131,11 +131,11 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
     2. lambda 함수는 실패한 경우 재시도를 수행하는데, 재시도 횟수를 설정할 수 있다.
     ( Lambda 함수 재시도 참조 : [https://repost.aws/knowledge-center/lambda-function-retry-timeout-sdk](https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/invocation-retries.html))
         
-        ![Untitled](IMAGE_DELVER_DEPLOY/Untitled%207.png)
+        ![Untitled](/IMAGE_DELVER_DEPLOY/Untitled%207.png)
         
     3. lambda 함수가 비동기로 실행되는 경우, 실행 완료까지 timeout을 설정할 수 있다. 너무 짧게 잡으면 실행이 완료되지 않아 정상 동작을 해도 실패로 처리될 수 있다.
         
-        ![Untitled](IMAGE_DELVER_DEPLOY/Untitled%208.png)
+        ![Untitled](/IMAGE_DELVER_DEPLOY/Untitled%208.png)
         
 
 ### Github action 연동
@@ -144,14 +144,14 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
     - API KEY 혹은 AWS 계정 정보와 같이 외부에 공개되면 안되는 정보들은 github 의 action secret 기능을 통해 코드와 분리된 채로 배포 시 추가될 수 있도록 한다. 
     (참조: [https://ji5485.github.io/post/2021-06-26/create-env-with-github-actions-secrets/](https://ji5485.github.io/post/2021-06-26/create-env-with-github-actions-secrets/))
         
-        ![다른 사용자에게 공개되지 않는 비밀 변수를 생성할 수 있다. ](IMAGE_DELVER_DEPLOY/Untitled%209.png)
+        ![다른 사용자에게 공개되지 않는 비밀 변수를 생성할 수 있다. ](/IMAGE_DELVER_DEPLOY/Untitled%209.png)
         
         다른 사용자에게 공개되지 않는 비밀 변수를 생성할 수 있다. 
         
 2. Github Action 에서 새로운 작업을 정의한다. 
     - github 레퍼지터리에 들어가면 Action 이라는 탭이 있다.
         
-        ![image.png](IMAGE_DELVER_DEPLOY/image.png)
+        ![image.png](/IMAGE_DELVER_DEPLOY/image.png)
         
     - New Workflows 버튼을 누르면 새로운 Action 을 생성할 수 있는데, 그 중에서 미리 만들어진 template 을 골라 사용 할 수도 있지만, 우리는 직접 코드를 짜서 action을 만들 것이기 때문에 아무 템플릿이나 선택한다.
         
@@ -161,7 +161,7 @@ python 기반 웹 scrapping 및 결과를 slack 에 전송하는 slack bot
         > - Docker를 활용하여 ECR 생성 참조([https://www.youtube.com/watch?v=6O-7zb-igUs](https://www.youtube.com/watch?v=6O-7zb-igUs))
     - 이후, 아래와 같은 yml 파일을 작성 할 수 있는 창이 뜨는데, 파일의 이름과 내용을 알맞게 집어넣는다.
         
-        ![image.png](IMAGE_DELVER_DEPLOY/image%201.png)
+        ![image.png](/IMAGE_DELVER_DEPLOY/image%201.png)
         
     - 필자가 작성한 yml 파일의 이름은 `uploadECR.yml` 이고, 내용은 아래 링크에서 확인 가능하다. 파일의 내용은, push한 코드를 앞서 생성한 aws lambda 모듈에 연동시키는 것이다.
         - [https://github.com/AswinBlue/SlackBot/blob/master/.github/workflows/uploadECR.yml](https://github.com/AswinBlue/SlackBot/blob/master/.github/workflows/uploadECR.yml)

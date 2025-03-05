@@ -327,3 +327,13 @@ jobs:
  - github actions/checkout@v3 에서 submodule의 특정 commit으로 checkout 이 안되는 현상이다. 
 2. `render of "page" failed: "C:\HugoBlog\themes\hugo-PaperMod\layouts\_default\baseof.html:5:8": execute of template failed: template: _default/single.html:5:8: executing "_default/single.html" at <partial "head.html" .>: error calling partial: execute of template failed: template: partials/templates/opengraph.html:5:14: executing "partials/templates/opengraph.html" at <.Params.cover.image>: can't evaluate field image in type string`  
  - 빌드 했을 때 위와같은 오류가 발생 한다면, golang과 hugo 버전 차이에 따라 페이지가 파싱이 제대로 되지 않는 경우이다. hugo 문법에 따라 페이지를 수정하거나 golang, hugo 버전을 최신으로 업데이트 해 본다. 
+  
+### image url 오류
+- config.yml 파일에서 baseURL 을 설정하면 /static 디렉터리에 들어간 이미지들을 post 디렉터리의 markdown 으로 작성한 이미지 link가 정상적으로 세팅되지 않는다. 
+  - 실제 코드 예시 :  `![IMAGE1](/POST1/image1.png)`
+  - static 디렉터리 안의 이미지 예시 : /static/POST1/image1.png
+  - baseUrl 예시 : `http://mypage.com`
+  - 빌드시 실제 image 파일 경로 : http://mypage.com/POST1/image1.png
+  - 빌드후 page에서 세팅된 image url : /POST1/image1.png
+- 이를 해결하려면 config.yml 에 `canonifyurls: true` 세팅을 하나 더 추가 해 준다. 
+- 그러면 빌드시 page 에서 세팅된 image url 앞에 baseURL이 추가되어 경로 미스매칭이 해결된다.
