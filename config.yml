@@ -3,6 +3,7 @@ title: AswinBlue
 paginate: 5
 theme: hugo-PaperMod
 
+canonifyurls : true
 enableGitInfo: true
 enableInlineShortcodes: true
 enableRobotsTXT: true
