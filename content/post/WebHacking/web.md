@@ -25,12 +25,50 @@ draft: false
 - 웹에 갖춰진 정보 자산을 의미하며, 사용자에게 제공되어 화면을 구성하는데 사용된다.
 - 고유한 식별자인 Uniform Resource Identifier (URI)를 가진다.
 - 대표적인 웹 리소스의 종류
-  - Hyper Text Markup Language (HTML) : 태그와 속성을 통한 구조화된 문서 작성에 사용
-  - Cascading Style Sheets (CSS) : 웹 문서의 외형을 조절하는데 사용
-  - JavaScript (JS) : 이용자의 브라우저에서 실행되는 코드로 front end 의 동작을 결정
+  - Hyper Text Markup Language (HTML) : 태그와 속성을 통한 구조화된 문서 작성에 사용. [설명 참조](../WebApplication/html)
+  - Cascading Style Sheets (CSS) : 웹 문서의 외형을 조절하는데 사용. [설명 참조](../WebApplication/css)
+  - JavaScript (JS) : 이용자의 브라우저에서 실행되는 코드로 front end 의 동작을 결정. [설명 참조](../WebApplication/javaScript)
   - text
   - image
   - video
   - font
 
+## Web browser
+- Client 의 위치에서 Server 와 HTTP 통신을 수행해주고 그 결과를 가시화 해 주는 도구로, 사용자가 HTTP 통신을 직접 알지 못해도 Web을 사용할 수 있게 해 준다.
+- 동작 순서
+   1. URL 분석
+   2. DNS 요청
+   3. HTTP Request
+   4. get HTTP Respond
+   5. 리소스 다운로드 및 웹 랜더링
+
+### Dev Tool 
+- Web browser 에서 사용할 수 있는 개발자 도구
+- `Ctrl + U` : 소스코드 보기 단축키
+- `console.log` : 콘솔창에 로그 출력
+- `document.cookie` : 콘솔창에서 쿠키 출력
+
+## URL(Uniform Resource Locator)
+- 웹에 있는 리소스의 위치를 표현하는 문자열
+- URL 의 구성 요소
+  - Scheme: 웹 서버와 어떤 프로토콜로 통신할지 나타냅니다.
+  - Host: Authority의 일부로, 접속할 웹 서버의 주소에 대한 정보를 가지고 있습니다.
+  - Port: Authority의 일부로, 접속할 웹 서버의 포트에 대한 정보를 가지고 있습니다.
+  - Path: 접근할 웹 서버의 리소스 경로로 '/'로 구분됩니다.
+  - Query: 웹 서버에 전달하는 파라미터이며 URL에서 '?' 뒤에 위치합니다.
+  - Fragment: 메인 리소스에 존재하는 서브 리소스를 접근할 때 이를 식별하기 위한 정보를 담고 있습니다. '#' 문자 뒤에 위치합니다.
+
+## Domain name
+- 숫자의 조합으로 이루어진 IP 주소를 사람이 읽기 쉬운 형태의 문자열로 대체한 형태
+- Domain name 을 사용하기 위해서는 DNS가 필요하다.
+- DNS(Domain Name Server) 에 Domain name 을 질의하면 DNS 는 매핑되는 IP 를 반환한다. 
+> 콘솔의 nslookup  명령으로 domain name 정보를 확인할 수 있다.  
+> ex) `nslookup google.com`
+
+## Web rendering
+- 서버로부터 받은 리소스 파일을 시각화하는 과정을 의미한다.
+- 브라우저는 Web rendering 을 위한 엔진을 사용한다.
+  - Webkit
+  - Blink
+  - Gecko
 
