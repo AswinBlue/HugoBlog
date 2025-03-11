@@ -55,3 +55,38 @@ draft: false
     document.cookie = "name=test;"
     document.cookie = "age=30; Expires=Fri, 30 Sep 2022 14:54:50 GMT;"
     ```
+
+## SOP (Same Origin Policy)
+- 악의적인 웹 페이지에서 javascript 를 통해 Client 가 다른 웹 페이지로 패킷을 보내게 한다면, Client 의 Session 과 Cookie 를 사용해 웹 페이지에 패킷을 보낼 수 있게 된다.
+- Web Client 에서는 동일한 출처(origin) 로 판별된 사이트를 대상으로만 읽어들일 수 있는 제약을 만들었고, 이를 SOP 라 한다.
+- 데이터 읽기는 막지만, 쓰기는 허용된다.
+
+### 동일 출처 (same origin)
+- 웹 사이트의 URL은 프로토콜, 포트, 호스트 세 가지로 구성된다.
+- 예를들어 `https://google.com:443` URL은 아래와 같이 분석된다.
+  - 프로토콜(scheme) : `https`
+  - 호스트 : `google.com`
+  - 포트 : `443`
+- `https://google.com/menu:443` : same origin. path가 다른 것은 허용
+- `http://google.com:443` : cross origin. 프로토콜(scheme)이 다름
+- `https://naver.com:443` : cross origin. 호스트가 다름
+- `https://google.com:123` : cross origin. 포트가 다름
+
+### CORS (Cross-Origin Resource Sharing)
+- SOP 제약사항에도 예외는 있다. 이미지나 자바스크립트, CSS 등의 리소스를 불러오는 \<img>, \<style>, \<script> 등의 태그는 SOP의 영향을 받지 않습니다.
+- 또한, 필요에 의해 cross origin 간에도 데이터를 교환해야 할 상황이 있는데, 이 경우 CORS와 관련된 HTTP 헤더를 추가하여 데이터를 요청할 수 있다. 
+  ```
+  xhr = new XMLHttpRequest();
+  xhr.withCredentials = true;
+  ```
+  - 이 경우, 수신측에 메시지 요청을 질의하는 용도로 `OPTIONS` 메소드 데이터가 전달된다. 
+  - 이러한 패킷을 `CORS preflight` 라고 한다. 
+  - 요청 패킷의 헤더에 `Access-Control-Request` 구문이 들어있고, 회신 패킷의 헤더에는 `Access-Control-Allow` 구문이 들어가 있다.
+  - Server 의 회신에 적힌 CORS 정책을 보고, Client는 데이터를 요청할지 판단한다.
+
+### JSONP (JSON with Padding)
+- javascript 는 SOP 의 예외 취급을 받는 속성을 이용하여 \<script> 태그 형태로 cross origin 의 데이터를 받아오는 기법이다.
+- Server 에 데이터를 요청할 때 callback 함수의 이름을 넘겨주면, 대상 서버는 전달된 callback 함수로 데이터를 감싸 응답합니다
+  - ex) request: `<script src='http://theori.io/whoami?callback=myCallback'></script>`
+  - ex) response: `myCallback({'id':'dreamhack'});`
+- JSONP는 CROS 가 생성되기 전에 쓰이던 방법으로, 최근에는 사장되는 추세이다.
