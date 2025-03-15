@@ -47,6 +47,7 @@ draft: false
 - `Ctrl + U` : 소스코드 보기 단축키
 - `console.log` : 콘솔창에 로그 출력
 - `document.cookie` : 콘솔창에서 쿠키 출력
+- `location.href` : 전체 URL 을 반환하거나, URL을 업데이트
 
 ## URL(Uniform Resource Locator)
 - 웹에 있는 리소스의 위치를 표현하는 문자열
