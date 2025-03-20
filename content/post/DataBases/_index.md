@@ -1,5 +1,5 @@
 ---
-title: "DataBase"
+title: "DataBases"
 date: 2023-07-16T09:22:17+09:00
 lastmod: 2023-07-16T09:22:17+09:00
 tags: []
