@@ -62,12 +62,27 @@ draft: false
   )
   ```
   - 검색 연산자
+    - [MongoDB 공식 문서 참조](https://www.mongodb.com/ko-kr/docs/manual/reference/operator/query/)
     > `$eq`: 지정된 값과 같은 값 반환  
+    >   ex) `db.users.find({ "age": { "$eq": 25 } })`
     > `$in`: 배열 안의 값들과 일치하는 값 반환  
     > `$ne`: 지정된 값과 같지 않은 값 반환  
+    >   ex) `db.users.find({ "status": { "$ne": "inactive" } })`   
     > `$nin`: 배열 안의 값들과 일치하지 않는 값 반환  
     > `$and`: 논리적 AND  
+    > ex) 
+    > ```
+    >  db.users.find({
+    >    "$and": [
+    >      { "age": { "$gte": 18 } },
+    >      { "age": { "$lte": 30 } }
+    >    ]
+    >  })
+    > ```
+    > \+ and는 생략할 수도 있다.   
+    > ex) `db.users.find({ "age": { "$gte": 18 }, "age": { "$lte": 30 } })`   
     > `$not`: 쿼리 식의 효과를 반전  
+    > ex) `db.users.find({ "age": { "$not": { "$gte": 18 } } })`   
     > `$nor`: 논리적 NOR  
     > `$or`: 논리적 OR  
     > `$exists`: 지정된 필드가 있는 값 반환  
