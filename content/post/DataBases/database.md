@@ -29,8 +29,8 @@ draft: false
 
 ## SQL (Structured Query Language)
 - RDBMS의 데이터를 정의하고 질의, 수정 등을 하기 위해 고안된 언어로, 다음 세가지 종류의 언어를 포함한다.
-  - DDL (Data Definition Language) : 데이터를 정의하기 위한 언어
-  - DML (Data Manipulation Language) : 데이터를 조작하기 위한 언어
+  - DDL (Data Definition Language) : 데이터를 정의하기 위한 언어로 데이터베이스의 생성/수정/삭제 등의 행위를 수행
+  - DML (Data Manipulation Language) : 데이터를 조작하기 위한 언어로 실제 데이터베이스 내에 존재하는 데이터에 대해 조회/저장/수정/삭제 등의 행위를 수행
   - DCL(Data Control Language) : 접근 권한을 설정하기 위한 언어
 
 ## NoSQL 
