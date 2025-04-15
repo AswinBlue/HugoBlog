@@ -27,43 +27,43 @@ draft = false
 - mysql에서 주석은 '#'을 사용한다.
 
 ### 실행 및 로그인
-1. ``mysql``
+1. `mysql`
   - mysql 실행, 기본으로 설정된 user로 로그인됨
-2. ``mysql -u 아이디 -p``
+2. `mysql -u 아이디 -p`
   - `-u`: 특정 아이디로 로그인
   - `-p`: 로그인시 비밀번호 입력하도록
 
 ### 데이터베이스 관리
 1. DB 생성
    - UTF8 로 문자열 저장하기
-   ``CREATE DATABASE 데이터베이스_이름 default CHARACTER SET UTF8``
+   `CREATE DATABASE 데이터베이스_이름 default CHARACTER SET UTF8`
 1. DB 목록확인
-  ``show databases``
+  `show databases`
 1. DB 선택
-  ``use DB_NAME``  
+  `use DB_NAME`  
 1. 종료
-  ``EXIT``
+  `EXIT`
 1. 로그인 & 데이터베이스 선택
- ``$ mysql -p DB_NAME -u USER_NAME``
+ `$ mysql -p DB_NAME -u USER_NAME`
     - 사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행
     - USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인 시도
-    - -u DB_NAME 옵션은 로그인 후 ``$use DB_NAME`` 과 같은 효과
+    - -u DB_NAME 옵션은 로그인 후 `$use DB_NAME` 과 같은 효과
 
 
 ### 테이블 생성 및 관리
 1. TABLE_NAME 테이블의 스키마 확인
-``desc TABLE_NAME``
+`desc TABLE_NAME`
 
 1. CREATE : 테이블 생성
-```
-  CREATE  TABLE 테이블이름 (
-    id  INT  NOT  NULL AUTO_INCREMENT,
-    항목1 VARCHAR(255) NOT  NULL DEFAULT 'FOO',
-    항목2 DATE  NOT  NULL,
-    항목3 DECIMAL(10 , 2 ) NULL,
-    PRIMARY KEY (id)
-  ) ENGINE-;
-```
+   ```
+   CREATE  TABLE 테이블이름 (
+      id  INT  NOT  NULL AUTO_INCREMENT,
+      항목1 VARCHAR(255) NOT  NULL DEFAULT 'FOO',
+      항목2 DATE  NOT  NULL,
+      항목3 DECIMAL(10 , 2 ) NULL,
+      PRIMARY KEY (id)
+    ) ENGINE-;
+   ```
   - `NOT NULL`: 필수항목
   - `AUTO_INCREMENT`: 수동으로 설정 가능하지만, 따로 설정하지 않으면 테이블 내 해당 컬럼에서 가장 큰 값에 1을 증가하여 자동으로 설정됨.
   - `VARCHAR(#)`: 캐릭터형 #bit
@@ -78,11 +78,11 @@ draft = false
     [참조](https://chiccoder.tistory.com/24)
 
 1. DESC: 테이블 구조 확인
-``DESC 테이블``
-``DESCRIBE 테이블``
+`DESC 테이블`
+`DESCRIBE 테이블`
 
 1. SELECT : 테이블 검색
-``SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]``
+`SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]`
     - 필드를 ','로 다중 선택
     - `WHERE` 문으로 특정 조건에 해당하는 레코드만 추출
       - `LIKE` : 뒤에 와일드 카드 사용
@@ -93,54 +93,89 @@ draft = false
     - `ORDER BY` 문으로 검색 결과를 필드에 맞게 정렬
 
 1. DELETE : 데이터 삭제
-``DELETE FROM 테이블 [WHERE 조건]``
+`DELETE FROM 테이블 [WHERE 조건]`
   - 조건을 생략하면 테이블의 모든 데이터 삭제
 
 1. ALTER: 테이블 변경
 [참조](https://nexthops.tistory.com/2)
 - 컬럼 추가
-`` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형``
+` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형`
 - 컬럼 타입 변경
-`` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형``
+` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형`
 - 컬럼 이름 변경
-`` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형``
+` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형`
 - 컬럼 삭제
-`` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름``
+` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름`
 - Primary Key 설정
-`` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)``
+` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)`
 - Primary key 삭제
-`` ALTER TABLE 테이블이름 DROP PRIMARY KEY``
+` ALTER TABLE 테이블이름 DROP PRIMARY KEY`
 - 테이블명 변경
-`` ALTER TABLE 테이블이름 RENAME 새테이블이름``
+` ALTER TABLE 테이블이름 RENAME 새테이블이름`
 - DB구조 변경
-`` ALTER TABLE 테이블 engine=InnoDB;``
+` ALTER TABLE 테이블 engine=InnoDB;`
 
-1. DROP : 테이블 삭제
-`` DROP DATABASE 데이터베이스``
-`` DROP TABLE 테이블``
+1. UNION : 검색 결과 병합
+   - `SELECT * FROM UserTable UNION SELECT "DreamHack", "DreamHack PW;`
+   - 두 select 구문의 column 의 갯수와 타입이 일치해야 한다. 그렇지 않으면 오류가 발생한다.
+2. DROP : 테이블 삭제
+` DROP DATABASE 데이터베이스`
+` DROP TABLE 테이블`
 
 1. INSERT : 행 추가
 - 원하는 필드만 설정, 설정 안한부분은 default값이 들어감
-`` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )``
+` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )`
 - 모든 필드를 설정할땐 컬럼 이름을 생략 가능
-`` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )``
+` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )`
 
 1. JOIN : 테이블 융합
     - 내부Join
-       - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건``
-       - ``SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건``
+       - `SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건`
+       - `SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건`
 
     - 외부Join
         - LEFT Join
-           - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
+           - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
            - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
         - RIGHT Join
-           - ``SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건``
+           - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
            - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
 
+1. Sub Query
+   - select 구문 결과 뒤에 `()` 를 사용해서 추가 쿼리를 집어넣는 형태를 의미한다.
+   - ex) `SELECt 1,2,3, (SELECT 4);` 
+   - from 절에서 사용하는 sub query는 특히 `Inline View` 라 칭하며, Multi Row, Multi Column 결과를 반환할 수 있다.
+     ```
+      mysql> SELECT * FROM (SELECT *, 1234 FROM users) as u;
+        /*
+        +----------+------+
+        | username | 1234 |
+        +----------+------+
+        | admin    | 1234 |
+        | guest    | 1234 |
+        +----------+------+
+        2 rows in set (0.00 sec)
+        */
+
+     ``` 
+   - where 절에서 sub query를 사용하면 다중 행이 반환된다.
+    ```
+    mysql> SELECT * FROM users WHERE username IN (SELECT "admin" UNION SELECT "guest");
+    /*
+    +----------+----------+
+    | username | password |
+    +----------+----------+
+    | admin    | admin    |
+    | guest    | guest    |
+    +----------+----------+
+    2 rows in set (0.00 sec)
+    */
+
+    ```
+   
 ### 유저 관리
  1. GRANT : 데이터베이스에 권한 부여
-    - `` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; ``
+    - ` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; `
        - `ALL PRIVILEGES` : 모든 권한
        - `my_db.*` : my_db의 모든 테이블
        - `new_user` : 사용권한을 받을 유저(없을시 자동생성),
@@ -150,16 +185,16 @@ draft = false
 
 ### 기타 명령어
    1. 현재 사용자 정보 확인
-   ``select user()``
+   `select user()`
    1. 현재 DB 정보 확인
-   ``select databases()``
+   `select databases()`
    1. CSV파일 DB에 적용
-   ``LOAD DATA LOCAL INFILE '``**FILE_NAME**``' INTO TABLE ``**TABLE_NAME**`` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';``
+   `LOAD DATA LOCAL INFILE '`**FILE_NAME**`' INTO TABLE `**TABLE_NAME**` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';`
      - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다.
    필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다.
 
    1. 경고문 확인
-   `` SHOW WARNINGS\G ``
+   ` SHOW WARNINGS\G `
 
 -----
 
