@@ -24,7 +24,9 @@ draft = false
 문법 참조 : [http://tcpschool.com/mysql/mysql_basic_syntax](http://tcpschool.com/mysql/mysql_basic_syntax)
 
 - 명령어에서 대소문자는 상관없다.
-- mysql에서 주석은 '#'을 사용한다.
+- mysql에서 주석은 `#`을 사용한다.
+- 한줄 주속은 `--` 을 사용한다.
+  - `--` 뒤에 공백 없이 바로 문자나 문자가 아닌 문자가 올 경우, SQL 엔진에 따라 주석으로 인식되지 않을 수도 있어서, 일반적으로 `-- `(띄어쓰기 포함) 또는 `-- -` 같이 공백이나 의미 없는 문자를 추가해서 주석임을 명확히 해준다. 이건 DBMS에 따라 차이가 있지만, 일부 엔진(MySQL 등)은 `--` 뒤에 공백이 있어야 주석으로 인식한다. 
 
 ### 실행 및 로그인
 1. `mysql`
@@ -50,11 +52,11 @@ draft = false
     - -u DB_NAME 옵션은 로그인 후 `$use DB_NAME` 과 같은 효과
 
 
-### 테이블 생성 및 관리
+### 테이블 생성 및 관리 (DDL)
 1. TABLE_NAME 테이블의 스키마 확인
 `desc TABLE_NAME`
 
-1. CREATE : 테이블 생성
+2. CREATE : 테이블 생성
    ```
    CREATE  TABLE 테이블이름 (
       id  INT  NOT  NULL AUTO_INCREMENT,
@@ -77,9 +79,11 @@ draft = false
       - 트랜잭션을 지원함
     [참조](https://chiccoder.tistory.com/24)
 
-1. DESC: 테이블 구조 확인
+3. DESC: 테이블 구조 확인
 `DESC 테이블`
 `DESCRIBE 테이블`
+
+# 데이터 조작 및 검색 (DML)
 
 1. SELECT : 테이블 검색
 `SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]`
@@ -92,56 +96,56 @@ draft = false
       - `<>` : !=와 같은 의미
     - `ORDER BY` 문으로 검색 결과를 필드에 맞게 정렬
 
-1. DELETE : 데이터 삭제
+2. DELETE : 데이터 삭제
 `DELETE FROM 테이블 [WHERE 조건]`
   - 조건을 생략하면 테이블의 모든 데이터 삭제
 
-1. ALTER: 테이블 변경
-[참조](https://nexthops.tistory.com/2)
-- 컬럼 추가
-` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형`
-- 컬럼 타입 변경
-` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형`
-- 컬럼 이름 변경
-` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형`
-- 컬럼 삭제
-` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름`
-- Primary Key 설정
-` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)`
-- Primary key 삭제
-` ALTER TABLE 테이블이름 DROP PRIMARY KEY`
-- 테이블명 변경
-` ALTER TABLE 테이블이름 RENAME 새테이블이름`
-- DB구조 변경
-` ALTER TABLE 테이블 engine=InnoDB;`
+3. ALTER: 테이블 변경
+   - [참조](https://nexthops.tistory.com/2)
+   - 컬럼 추가
+     - ` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형`
+   - 컬럼 타입 변경
+     - ` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형`
+   - 컬럼 이름 변경
+     - ` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형`
+   - 컬럼 삭제
+     - ` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름`
+   - Primary Key 설정
+     - ` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)`
+   - Primary key 삭제
+     - ` ALTER TABLE 테이블이름 DROP PRIMARY KEY`
+   - 테이블명 변경
+     - ` ALTER TABLE 테이블이름 RENAME 새테이블이름`
+   - DB구조 변경
+     - ` ALTER TABLE 테이블 engine=InnoDB;`
 
-1. UNION : 검색 결과 병합
+4. UNION : 검색 결과 병합
    - `SELECT * FROM UserTable UNION SELECT "DreamHack", "DreamHack PW;`
    - 두 select 구문의 column 의 갯수와 타입이 일치해야 한다. 그렇지 않으면 오류가 발생한다.
-2. DROP : 테이블 삭제
-` DROP DATABASE 데이터베이스`
-` DROP TABLE 테이블`
+5. DROP : 테이블 삭제
+   - ` DROP DATABASE 데이터베이스`
+   - ` DROP TABLE 테이블`
 
-1. INSERT : 행 추가
-- 원하는 필드만 설정, 설정 안한부분은 default값이 들어감
-` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )`
-- 모든 필드를 설정할땐 컬럼 이름을 생략 가능
-` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )`
+6. INSERT : 행 추가
+   - 원하는 필드만 설정, 설정 안한부분은 default값이 들어감
+     - ` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )`
+   - 모든 필드를 설정할땐 컬럼 이름을 생략 가능
+     - ` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )`
 
-1. JOIN : 테이블 융합
-    - 내부Join
-       - `SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건`
-       - `SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건`
+7. JOIN : 테이블 융합
+   - 내부Join
+     - `SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건`
+     - `SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건`
 
-    - 외부Join
-        - LEFT Join
-           - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
-           - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
-        - RIGHT Join
-           - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
-           - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
+   - 외부Join
+     - LEFT Join
+       - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
+       - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
+     - RIGHT Join
+       - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
+       - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
 
-1. Sub Query
+8. Sub Query
    - select 구문 결과 뒤에 `()` 를 사용해서 추가 쿼리를 집어넣는 형태를 의미한다.
    - ex) `SELECt 1,2,3, (SELECT 4);` 
    - from 절에서 사용하는 sub query는 특히 `Inline View` 라 칭하며, Multi Row, Multi Column 결과를 반환할 수 있다.
@@ -172,8 +176,20 @@ draft = false
     */
 
     ```
+  - insert 구문에서도 sub query를 활용할 수 있다.
+    ```
+    INSERT 
+    INTO board (title, boardcontent)
+    VALUES ('title 1', (select upw from users where uid='admin'));
+    // 기존 db에서 uid='admin' 에 해당하는 upw 값을 그대로 가져와 삽입
+    ```
    
-### 유저 관리
+9. UPDATE
+   - 기존에 저장된 값을 변경하는 명령
+   - `UPDATE` 테이블 이름 `SET` 컬럼 이름 = 값 `WHERE` 레코드 선택 조건;
+     - ex) `UPDATE board SET boardcontent = "update content 2" WHERE title = 'title 1';`
+
+### 접근권한 관리 (DCL)
  1. GRANT : 데이터베이스에 권한 부여
     - ` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; `
        - `ALL PRIVILEGES` : 모든 권한
