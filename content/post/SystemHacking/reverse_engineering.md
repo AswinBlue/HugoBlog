@@ -91,6 +91,7 @@ draft: false
 
  
 ## 함수 분석
+- 윈도우 API 공식 함수는 이름을 붙여주고, 직접 만든 함수는 "SUB_1234" 와 같이 이름을 임의로 짓는다.
 - `_stdio_common_vfprintf()` : printf 함수 출력시 호출되는 함수이다. 
 - `_stdio_common_vfscanf()` : scanf 함수  출력시 호출되는 함수이다.
 - `__ROL1__(TARGET, NUM)` : TARGET (숫자)을 좌측으로 NUM 번 shift 시키고, 8bit 비트 위로 밀려난 좌측 인자들을 오른쪽 빈자리에 다시 집어넣는 함수
