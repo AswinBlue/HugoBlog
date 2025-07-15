@@ -1,0 +1,203 @@
+{{- define "main" }}
+
+<header class="page-header">
+    <h1>{{- (printf "%s&nbsp;" .Title ) | htmlUnescape -}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </h1>
+    {{- if .Description }}
+    <div class="post-description">
+        {{ .Description }}
+    </div>
+    {{- end }}
+</header>
+
+<!-- 변경된 부분: ID를 고유한 이름으로 변경 -->
+<div id="custom-searchbox">
+    <input id="custom-searchInput" autofocus placeholder="{{ .Params.placeholder | default (printf "검색어 입력...") }}"
+        aria-label="search" type="search" autocomplete="off">
+    <ul id="custom-searchResults" aria-label="search results">
+        <!-- 검색 전 초기 목록이 여기에 표시됩니다 (Hugo 템플릿에 의해) -->
+        {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+        {{ range $pages }}
+        <li class="post-entry">
+            <header class="entry-header">
+                {{ .Title }}&nbsp;»
+            </header>
+            <a href="{{ .Permalink }}" aria-label="{{ .Title }}"></a>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<!-- Fuse.js 라이브러리 로드 -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+
+<!-- 검색 결과 스타일 -->
+<style>
+    /* 스타일은 ID를 참조하지 않으므로 변경할 필요가 없습니다. */
+    #custom-searchResults { list-style: none; padding: 0; }
+    #custom-searchResults li { margin-top: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color, #eee); }
+    #custom-searchResults li:last-child { border-bottom: none; }
+    #custom-searchResults .entry-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.25rem; }
+    #custom-searchResults a { text-decoration: none; color: inherit; }
+    #custom-searchResults p { margin: 0; color: var(--secondary, #6c757d); line-height: 1.7; }
+    .result-tags { margin-top: 0.75rem; }
+    .tag { display: inline-block; background-color: var(--tertiary, #e9ecef); color: var(--primary-text, #495057); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-right: 0.3rem; margin-bottom: 0.3rem; }
+    #no-results { text-align: center; color: #777; padding: 2rem 0; }
+    mark { background-color: #ffec99; padding: 0.1em 0.2em; border-radius: 3px; color: #333; }
+</style>
+
+
+<!-- 검색 기능 JavaScript -->
+<script>
+    (function() {
+        // 변경된 부분: 새로운 ID를 참조하도록 수정
+        const searchInput = document.getElementById('custom-searchInput');
+        const resultsContainer = document.getElementById('custom-searchResults');
+        const initialResultsHTML = resultsContainer.innerHTML; // 페이지 로딩 시의 초기 목록을 저장
+        let fuse;
+
+        const baseURL = '{{ .Site.BaseURL | safeJS }}';
+        const fetchURL = `${baseURL.replace(/\/$/, '')}/index.json`;
+        
+        console.log(`Fetching search data from: ${fetchURL}`);
+
+        // 1. 검색 데이터(index.json) 가져오기
+        fetch(fetchURL)
+            .then(response => {
+                if (!response.ok) {
+                    console.error(`'${fetchURL}'에서 index.json을 찾을 수 없습니다. config.yml의 baseURL과 outputs 설정을 확인하고, hugo server를 재시작했는지 확인해주세요.`);
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                initializeFuse(data);
+                console.log("Fuse.js가 성공적으로 초기화되었습니다.");
+                if (searchInput.value) {
+                    performSearch(searchInput.value);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching or initializing search data:', error);
+            });
+
+        // 2. Fuse.js 초기화
+        function initializeFuse(data) {
+            const options = {
+                threshold: 0.3,
+                includeScore: true,
+                includeMatches: true,
+                minMatchCharLength: 2,
+                keys: [
+                    { name: 'title', weight: 0.6 },
+                    { name: 'tags', weight: 0.25 },
+                    { name: 'keywords', weight: 0.1 },
+                    { name: 'headings', weight: 0.05 }
+                ]
+            };
+            fuse = new Fuse(data, options);
+        }
+        
+        function createSentenceSnippet(fullText, query) {
+            if (!fullText || !query) return null;
+            const sentences = fullText.match(/[^.!?]+[.!?\s]*/g) || [];
+            if (sentences.length === 0) return null;
+            const lowerCaseQuery = query.toLowerCase();
+            let matchedSentenceIndex = -1;
+            for (let i = 0; i < sentences.length; i++) {
+                if (sentences[i].toLowerCase().includes(lowerCaseQuery)) {
+                    matchedSentenceIndex = i;
+                    break;
+                }
+            }
+            if (matchedSentenceIndex === -1) return null;
+            const startIndex = Math.max(0, matchedSentenceIndex - 1);
+            const endIndex = Math.min(sentences.length - 1, matchedSentenceIndex + 1);
+            let snippet = sentences.slice(startIndex, endIndex + 1).join(" ").trim();
+            const regex = new RegExp(query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+            const highlightedSnippet = snippet.replace(regex, '<mark>$&</mark>');
+            const prefix = startIndex > 0 ? '... ' : '';
+            const suffix = endIndex < sentences.length - 1 ? ' ...' : '';
+            return `<p>${prefix}${highlightedSnippet}${suffix}</p>`;
+        }
+
+        // 3. 검색 입력 이벤트 리스너
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value;
+            if (query.length < 1) {
+                resultsContainer.innerHTML = initialResultsHTML; // 검색어가 없으면 초기 목록으로 복원
+                return;
+            }
+            performSearch(query);
+        });
+
+        // 4. 검색 실행
+        function performSearch(query) {
+            if (!fuse) { return; }
+            const results = fuse.search(query);
+            displayResults(results, query);
+        }
+
+        // 5. 결과 표시
+        function displayResults(results, query) {
+            resultsContainer.innerHTML = ''; // 현재 목록을 지움
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<li id="no-results">검색 결과가 없습니다.</li>';
+                return;
+            }
+            const displayedLinks = new Set();
+            console.clear();
+            console.log(`\n--- 검색어 "${query}"에 대한 결과 ---`);
+            results.forEach(({ item, matches, score }) => {
+                if (displayedLinks.has(item.permalink)) { return; }
+                
+                const matchedInfo = matches.map(match => {
+                    const matchedValue = Array.isArray(match.value) 
+                        ? `[${match.value[match.indices[0][0]]}]`
+                        : match.value.substring(match.indices[0][0], match.indices[0][1] + 1);
+                    return `{ 필드: '${match.key}', 일치값: '${matchedValue}' }`;
+                }).join(', ');
+                console.log(`[표시됨] 제목: "${item.title}" (Score: ${score.toFixed(4)})\n` + `  - 링크: ${item.permalink}\n` + `  - 상세: ${matchedInfo}`);
+                
+                displayedLinks.add(item.permalink);
+                
+                const resultElement = document.createElement('li');
+                resultElement.className = 'post-entry'; // 기존 스타일과 동일한 클래스 적용
+
+                let highlightedTitle = item.title;
+                let contentHTML = ''; // 기본적으로 내용은 비워둠
+
+                const titleMatch = matches.find(m => m.key === 'title');
+                if (titleMatch) {
+                    highlightedTitle = titleMatch.value.replace(new RegExp(query, 'gi'), '<mark>$&</mark>');
+                }
+
+                const sentenceSnippet = createSentenceSnippet(item.content, query);
+                if (sentenceSnippet) {
+                    contentHTML = sentenceSnippet; // 문맥 스니펫이 있을 경우에만 내용을 추가
+                }
+
+                let tagsHTML = '';
+                if (item.tags && item.tags.length > 0) {
+                    tagsHTML = '<div class="result-tags">' + item.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') + '</div>';
+                }
+
+                // 기존 post-entry 구조와 유사하게 HTML을 생성
+                resultElement.innerHTML = `
+                    <header class="entry-header">${highlightedTitle}&nbsp;»</header>
+                    ${contentHTML}
+                    <a href="${item.permalink}" aria-label="${item.title}"></a>
+                    ${tagsHTML}
+                `;
+                resultsContainer.appendChild(resultElement);
+            });
+        }
+    })();
+</script>
+
+{{- end }}{{/* end main */}}

@@ -1,0 +1,39 @@
+{{/* 1. 'index'라는 이름의 빈 리스트(배열)를 생성합니다. */}}
+{{- $.Scratch.Add "index" slice -}}
+
+{{/* 2. 사이트의 모든 일반 페이지(블로그 글)를 하나씩 순회하는 루프를 시작합니다. */}}
+{{- range .Site.RegularPages -}}
+
+    {{/* 3. (기존 로직) 마크다운에서 h1, h2, h3 제목들을 찾아 $headings 변수에 저장합니다. */}}
+    {{- $headings := findRE "(?m)^#{1,3}\\s+(.*)" .RawContent -}}
+    {{- $cleaned_headings := slice -}}
+    {{- range $headings -}}
+        {{- $cleaned_headings = $cleaned_headings | append (replaceRE "^#{1,3}\\s+" "" .) -}}
+    {{- end -}}
+
+    {{/* --- 새로 추가된 키워드 추출 로직 시작 --- */}}
+    {{/* 4. 글의 순수 텍스트 본문(.Plain)을 모두 소문자로 변환합니다. */}}
+    {{- $lowerContent := .Plain | lower -}}
+
+    {{/* 5. 정규표현식을 사용해 한글, 영문, 숫자 연속 문자를 모두 찾아 단어 리스트($words)로 만듭니다. */}}
+    {{- $words := findRE `[a-z0-9\p{Hangul}]+` $lowerContent -}}
+
+    {{/* 6. Hugo의 `uniq` 함수를 사용해 단어 리스트에서 중복을 제거하여 최종 키워드 목록($keywords)을 만듭니다. */}}
+    {{- $keywords := $words | uniq -}}
+    {{/* --- 키워드 추출 로직 종료 --- */}}
+
+    {{/* 7. 현재 글의 모든 검색 데이터를 하나의 객체(dict)로 묶어 'index' 리스트에 추가합니다. */}}
+    {{- $.Scratch.Add "index" (dict 
+        "title" .Title
+        "tags" .Params.tags
+        "categories" .Params.categories
+        "summary" .Summary
+        "headings" $cleaned_headings
+        "keywords" $keywords              
+        "content" .Plain                  
+        "permalink" .Permalink)
+    -}}
+{{- end -}} {{/* 2번 메인 루프 종료 */}}
+
+{{/* 8. 모든 글의 정보가 담긴 'index' 리스트를 최종적으로 JSON 형식의 텍스트로 변환하여 출력합니다. */}}
+{{- $.Scratch.Get "index" | jsonify -}}
