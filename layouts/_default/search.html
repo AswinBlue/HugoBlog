@@ -24,10 +24,11 @@
         {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
         {{ range $pages }}
         <li class="post-entry">
-            <header class="entry-header">
-                {{ .Title }}&nbsp;»
-            </header>
-            <a href="{{ .Permalink }}" aria-label="{{ .Title }}"></a>
+            <a href="{{ .Permalink }}" aria-label="{{ .Title }}">
+                <header class="entry-header">
+                    {{ .Title }}&nbsp;»
+                </header>
+            </a>
         </li>
         {{ end }}
     </ul>
@@ -189,9 +190,10 @@
 
                 // 기존 post-entry 구조와 유사하게 HTML을 생성
                 resultElement.innerHTML = `
-                    <header class="entry-header">${highlightedTitle}&nbsp;»</header>
-                    ${contentHTML}
-                    <a href="${item.permalink}" aria-label="${item.title}"></a>
+                    <a href="${item.permalink}" aria-label="${item.title}">
+                        <header class="entry-header">${highlightedTitle}&nbsp;»</header>
+                        ${contentHTML}
+                    </a>
                     ${tagsHTML}
                 `;
                 resultsContainer.appendChild(resultElement);
