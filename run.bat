@@ -1,2 +1,1 @@
-hugo --config config.yml
-hugo server 
+hugo server --config config.yml -b http://localhost:1313/Blog/ -p 1313 --renderToMemory

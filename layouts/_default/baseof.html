@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}">
+
+<head>
+    {{- partial "head.html" . }}
+</head>
+
+<body class="
+{{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) -}}
+{{- print "list" -}}
+{{- end -}}
+{{- if eq site.Params.defaultTheme `dark` -}}
+{{- print " dark" }}
+{{- end -}}
+" id="top">
+    {{- partialCached "header.html" . .Page -}}
+
+    <div class="blog-layout-container">
+        <aside class="sidebar-column" id="blogSidebar">
+            {{ partial "sidebar.html" . }}
+        </aside>
+
+        <main class="main content-column">
+            {{- block "main" . }}{{ end }}
+        </main>
+
+        <aside class="right-column">
+            {{- partial "adfit.html" . -}}
+        </aside>
+    </div>
+
+    <!-- Mobile sidebar overlay backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    {{ partialCached "footer.html" . .Layout .Kind (.Param "hideFooter") (.Param "ShowCodeCopyButtons") -}}
+
+    <script>
+      (function() {
+        const toggleBtn = document.getElementById('mobileSidebarToggle');
+        const sidebar = document.getElementById('blogSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (toggleBtn && sidebar && backdrop) {
+          function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show');
+            document.body.classList.toggle('sidebar-open');
+          }
+          toggleBtn.addEventListener('click', toggleSidebar);
+          backdrop.addEventListener('click', toggleSidebar);
+        }
+      })();
+    </script>
+</body>
+
+</html>

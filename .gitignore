@@ -10,3 +10,6 @@ web/
 
 # Hugo lock
 .hugo_build.lock
+
+# Scratch directory
+scratch/
