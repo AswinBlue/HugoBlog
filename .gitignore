@@ -1,0 +1,12 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Expo / Temporary
+.expo/
+web/
+
+# Hugo lock
+.hugo_build.lock
