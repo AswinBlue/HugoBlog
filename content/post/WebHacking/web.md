@@ -1,18 +1,14 @@
 ---
-title: "Web"
+title: "웹 애플리케이션 아키텍처와 브라우저 렌더링 과정 및 네트워크 통신 기초"
+description: "URL 입력부터 DNS 조회, TCP 핸드셰이크, HTML/CSS 파싱, DOM/CSSOM 트리 구축, 렌더 트리 및 Reflow/Repaint까지 브라우저 동작 전 과정을 분석합니다."
+slug: "web-architecture-and-browser-rendering-process"
 date: 2025-03-06T22:46:50+09:00
-lastmod: 2025-03-06T22:46:50+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Security"]
+tags: ["web-architecture", "browser", "network", "frontend", "http"]
+ShowToc: true
+TocOpen: true
 ---
 # Web
 - HTTP를 이용하여 정보를 공유하는 인터넷 기반 서비스를 Web이라 한다.

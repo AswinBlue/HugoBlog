@@ -1,18 +1,14 @@
 ---
-title: "Pytest"
+title: "Python pytest 프레임워크를 활용한 단위 테스트 및 TDD 실전 가이드"
+description: "간결한 assert 구문, fixture를 활용한 테스트 의존성 주입, parametrize 다중 파라미터 테스트 및 coverage 코드 커버리지 측정법을 정리합니다."
+slug: "python-pytest-unit-testing-and-tdd-guide"
 date: 2025-07-28T21:30:40+09:00
-lastmod: 2025-07-28T21:30:40+09:00
-tags: ['pytest', 'unit_test']
-categories: ['dev', 'test']
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Python"]
+tags: ["python", "pytest", "unit-test", "tdd", "testing"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Pytest를 활용한 파이썬 프로젝트 테스트 가이드 ⚙️
@@ -46,13 +42,13 @@ draft: false
 
 자동화된 테스트는 코드의 안정성을 보장하고, 리팩토링에 대한 자신감을 줍니다. `pytest`는 간결한 문법과 강력한 기능으로 파이썬 테스트를 쉽게 만들어주는 프레임워크입니다.
 
-#### 설치
+### 설치
 `pytest-mock`은 `pytest`에서 모킹(Mocking)을 편리하게 사용하기 위한 플러그인입니다.
 ```bash
 pip install pytest pytest-mock
 ```
 
-#### 추천 프로젝트 구조
+### 추천 프로젝트 구조
 소스 코드와 테스트 코드를 분리하면 관리가 용이합니다.
 ```
 my_project/
@@ -66,11 +62,11 @@ my_project/
 
 ## 2. 기본 테스트 작성 및 실행
 
-#### 테스트 파일 및 함수 규칙
+### 테스트 파일 및 함수 규칙
 - 테스트 파일 이름은 `test_*.py` 또는 `*_test.py`로 만듭니다.
 - 테스트 함수 이름은 `test_*`로 시작해야 합니다.
 
-#### 기본 테스트 예시
+### 기본 테스트 예시
 `assert` 구문을 사용하여 조건이 참인지 검증합니다.
 ```python
 # tests/test_strategy.py
@@ -80,7 +76,7 @@ def test_foo_returns_true():
     assert result is True
 ```
 
-#### 테스트 실행
+### 테스트 실행
 프로젝트의 최상위 폴더(루트 디렉토리)에서 아래 명령어를 실행합니다.
 
 ```bash
@@ -98,7 +94,7 @@ pytest -s -v
 
 ## 3. Pytest 핵심 기능 활용하기
 
-#### 3.1. Fixture: 테스트 준비 및 정리 자동화
+### 3.1. Fixture: 테스트 준비 및 정리 자동화
 `@pytest.fixture` 데코레이터는 테스트를 실행하기 전에 필요한 객체나 데이터를 준비하고, 테스트가 끝나면 정리하는 역할을 합니다.
 
 ```python
@@ -122,7 +118,7 @@ def test_boo_with_fixture(strategy_instance):
     assert result == "Expected Value"
 ```
 
-#### 3.2. Mocking: 외부 의존성 분리하기
+### 3.2. Mocking: 외부 의존성 분리하기
 `mocker`는 `pytest-mock`이 제공하는 Fixture로, API 호출, DB 연결, `time.sleep`, `datetime.now` 등 테스트를 방해하는 외부 요소를 가짜로 대체합니다.
 
 ```python
@@ -140,7 +136,7 @@ def test_api_call(mocker, strategy_instance):
     assert result is True
 ```
 
-#### 3.3. Skip: 특정 테스트 건너뛰기
+### 3.3. Skip: 특정 테스트 건너뛰기
 `@pytest.mark.skip` 데코레이터를 사용하여 특정 테스트를 임시로 비활성화할 수 있습니다.
 
 ```python

@@ -1,18 +1,14 @@
 ---
-title: "Virtual_box"
+title: "VirtualBox 리눅스 가상머신 설치 및 게스트 확장(Guest Additions) 설정 가이드"
+description: "VirtualBox를 활용한 Ubuntu 가상머신 생성, 포트포워딩 네트워크 세팅, 클립보드 공유 및 해상도 자동 조절을 위한 게스트 확장 설치법을 설명합니다."
+slug: "virtualbox-linux-vm-install-and-guest-additions"
 date: 2023-07-02T20:03:24+09:00
-lastmod: 2023-07-02T20:03:24+09:00
-tags: ["linux"]
-categories: ["dev",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["virtualbox", "linux", "virtualization", "vm", "ubuntu"]
+ShowToc: true
+TocOpen: true
 ---
 
 # VirtualBox

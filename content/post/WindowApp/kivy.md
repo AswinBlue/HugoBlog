@@ -1,19 +1,15 @@
-+++
-title = "Kivy"
-date = 2021-09-09T18:43:28+09:00
-lastmod = 2021-09-09T18:43:28+09:00
-tags = ["python", "kivy", "gui",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Python Kivy 프레임워크를 활용한 크로스 플랫폼 GUI 앱 개발 기초"
+description: "파이썬으로 윈도우, 안드로이드, iOS용 GUI 앱을 제작하는 Kivy의 위젯 레이아웃 시스템, 이벤트 바인딩, KV 언어 문법 및 빌드 절차를 다룹니다."
+slug: "python-kivy-cross-platform-gui-app-development"
+date: 2021-09-09T18:43:28+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WindowApp"]
+tags: ["python", "kivy", "gui", "cross-platform", "app-development"]
+ShowToc: true
+TocOpen: true
+---
 
 #kivy
 
@@ -110,7 +106,7 @@ class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성�
 8. RelativeLayout
 9. ScatterLayout
 
-#### Commons
+### Commons
 - `size_hint` : 레이아웃 내 객체의 비율 설정
  - layout 안의 객체는 size 조절이 불가능하다. (`size:` 설정 해도 적용 안됨) `size_hint` 값이 default로 설정되어있기 때문이다.
  - `size_hint`값이 적용된 객체는 화면 크기에 따라 객체 크기도 함께 변경된다.
@@ -119,7 +115,7 @@ class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성�
  ex)
  - `spacing:"10dp"` : layout내부 요소간 간격 설정
 
-#### BoxLayout
+### BoxLayout
 - `orientation: "vertical"`: 세로정렬(가로 : "horizontal")
 ```
 <BoxLayoutSample>:
@@ -130,7 +126,7 @@ class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성�
         size_hint: .5, .6
 ```
 
-#### AnchorLayout
+### AnchorLayout
 - `ahcnor_x:"center"`: x축 정렬 위치, `left, right, center` 가능, default `center`
 - `ahcnor_y:"center"`: y축 정렬 위치, `top, bottom, center` 가능, default `center`
 - 객체를 순서대로 쌓는것이 아니라 지정한 자리에 그대로 넣는것이므로, 이전 객체는 이후에 나오는 객체에 덮어씌워질 수 있음
@@ -148,7 +144,7 @@ class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성�
 
 ```
 
-#### GridLayout
+### GridLayout
 - `rows`: Grid의 행 개수를 선언한다. default 1
 - `cols`: Grid의 열 개수를 선언한다. default 1
 - `size_hint`로 내부 요소의 비율을 조절하고 싶을 때, 같은 행/열에 속한 값들도 모두 같은 값으로 설정해야 적용이 된다.
@@ -180,7 +176,7 @@ class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성�
         pos:100, 200
 ```
 
-#### StackLayout
+### StackLayout
 - 내부 객체들을 가로 한줄로 나열한다. 한 줄에 있는 객체들의 비율이 100%를 넘어가면 다음줄부터 객체를 채워넣는다.
 - 가로 혹은 세로는 가장 큰 크기의 객체에 맞춰져 grid형식으로 정렬된다.
 ```
@@ -224,7 +220,7 @@ class StackExample(StackLayout):
 ### Widgets
 - 기본크기 100 X 100, 기본위치 (0,0) 이다.
 
-#### Commons
+### Commons
 - `pos_hint`: 정렬 위치
   - `size_hint`등으로 비율을 조절하면 기본적으로 좌측 상단으로 정렬이 된다.
   - 이때, 다른 방향으로 정렬을 하려면 `pos_hint:{"x":.5, "y":.5}`와 같이 설정 가능하다.
@@ -238,7 +234,7 @@ pos_hint:{"center_x":.5} # 중앙을 50%위치로 설정
 pos_hint:{"right":.5} # 우측부분을 50%위치로 설정
 ```
 
-#### Button
+### Button
 - 텍스트, 크기, 위치를 지정한 버튼
 - 아래쪽에 있는 내용이 나중에 그려져 이전 내용을 덮어씌운다.
 
@@ -258,7 +254,7 @@ MainWidget:
     pos: "100dp", "200dp"
 ```
 
-#### lalbel
+### lalbel
 - 텍스트, 크기, 위치, 글자색을 지정한 레이블
 
 ```

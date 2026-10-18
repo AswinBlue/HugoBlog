@@ -1,19 +1,15 @@
-+++
-title = "Nodejs"
-date = 2020-07-20T20:40:05+09:00
-lastmod = 2020-07-20T20:40:05+09:00
-tags = [ "nodejs", "webServer", ]
-categories = ["dev",]
-imgs = []
-cover = "" # image show on top
-readingTime = true # show reading time after article date
-toc = true
-comments = false
-justify = false # text-align: justify;
-single = false # display as a single page, hide navigation on bottom, like as about page.
-license = "" # CC License
-draft = false
-+++
+---
+title: "Node.js 비동기 이벤트 루프 아키텍처와 Express 웹 서버 구축 가이드"
+description: "단일 스레드 논블로킹 I/O와 이벤트 루프의 동작 원리, npm 패키지 관리, Express 미들웨어 체인 및 RESTful API 엔드포인트 구현을 다룹니다."
+slug: "nodejs-event-loop-and-express-server-guide"
+date: 2020-07-20T20:40:05+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebServer"]
+tags: ["nodejs", "express", "backend", "javascript", "rest-api"]
+ShowToc: true
+TocOpen: true
+---
 
 # Node.js
 

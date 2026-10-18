@@ -1,18 +1,14 @@
 ---
-title: "Github Action"
+title: "GitHub Actions CI/CD 파이프라인 구축 및 자동화 워크플로우 실전 가이드"
+description: "이벤트 트리거, 잡(Job)과 스텝(Step) 구성, secrets 환경변수 주입, 캐싱 액션을 활용한 빌드 속도 개선 및 자동 배포 파이프라인 구축법을 다룹니다."
+slug: "github-actions-ci-cd-pipeline-automation-guide"
 date: 2025-07-19T22:20:09+09:00
-lastmod: 2025-07-19T22:20:09+09:00
-tags: ['git', 'github', 'github action', 'workflow', 'pipeline']
-categories: ['dev', 'CI-CD', 'deploy']
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["DevOps"]
+tags: ["github-actions", "ci-cd", "devops", "automation", "workflow"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Github Action

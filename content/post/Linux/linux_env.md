@@ -1,18 +1,14 @@
 ---
-title: "Linux_env"
+title: "리눅스 환경 변수(Environment Variable) 설정 및 프로파일(.bashrc) 관리법"
+description: "export, env, printenv 명령어와 /etc/profile, ~/.bashrc 파일의 로딩 순서 및 영구 환경 변수 등록 방법을 체계적으로 설명합니다."
+slug: "linux-environment-variables-and-bashrc-profile"
 date: 2023-07-10T21:04:56+09:00
-lastmod: 2023-07-10T21:04:56+09:00
-tags: ["linux"]
-categories: ["dev"]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "bash", "environment-variables", "shell", "configuration"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Dev in Linux

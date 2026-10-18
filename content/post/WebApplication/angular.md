@@ -1,178 +1,212 @@
-+++
-title = "Angular"
-date = 2021-08-23T19:46:09+09:00
-lastmod = 2021-08-23T19:46:09+09:00
-tags = ["angular", "typescript",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
-# Angular
-- Angular JS와 Angular는 다르다. Angular JS는 초창기 Angular를 의미하고, 그냥 Angular는 Angular2 이상의 버전을 의미한다.
-- javascript기반의 textscript를 사용한다. 확장자가 ts로 끝난다.
+---
+title: "Angular 기본 개념 및 프로젝트 아키텍처와 템플릿 바인딩 가이드"
+description: "Angular CLI를 활용한 개발 환경 구축부터 프로젝트 아키텍처, 컴포넌트 생명주기와 부모-자식 데이터 통신(@Input, @Output), 라우팅 파라미터 처리, 템플릿 바인딩 문법까지 핵심 개념을 체계적으로 정리합니다."
+slug: "angular-basics-project-structure-template-syntax"
+date: 2021-08-23T19:46:09+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebApplication"]
+tags: ["angular", "typescript", "frontend", "spa", "javascript"]
+ShowToc: true
+TocOpen: true
+---
 
-## 개발환경 세팅
-1. nodejs 설치
-- `$ sudo apt install npm` :nodejs와 npm 동시에 설치
-2. angular client 설치
- - `$ npm install -g @angular/cli` 명령어를 이용하여 설치
-3. workspace 생성
- - client 설치가 완료되었으면 workspace를 생성하고 application을 생성한다.
- - `$ ng new <application_name>` 명령어를 이용하여 설치한다.
+Google에서 개발한 Angular는 엔터프라이즈급 대규모 단일 페이지 애플리케이션(SPA) 구축에 최적화된 컴포넌트 기반 프론트엔드 프레임워크입니다. 엄격한 타입 안정성을 제공하는 TypeScript를 기본 언어로 채택하고 있으며, 라우팅, 폼 관리, HTTP 통신 등 웹 개발에 필요한 필수 기능들을 프레임워크 차원에서 자체 내장하고 있습니다.
 
- - nodejs 버전이 낮다고 한다.  github에서 받아서 빌드하여 써 보자.
- - 공식 사이트는 https://github.com/nodejs 이다.
- - 소스코드를 받아 빌드하는 내용은 없고, 바로 바이너리를 다운받기를 권장하는 듯 하다.
- - https://nodejs.org/en/download/ 로 가서 리눅스용 바이너리를 받아보자.
- - .xz 형태의 파일이다. ``$ tar -xvf <file_name>`` 로 압축을 푼다.
- - 압축을 푸니 안의 내용들이 /usr/lib/ 경로에 어울릴 것 같다. mv 명령으로 옮겨준다.
- - bin 폴더 안의 내용은 링크로 /usr/local/lib/ 에 넣어준다.   
- `ln -s /usr/lib/<file>/bin/<binary> /usr/local/lib/bin/<binary>`
- - 다시 돌아와서 명령어를 수행하여 application을 생성한다. stylesheet format을 선택하라고 하는데, 가장 위에있는 CSS로 선택해 본다.
+이 글에서는 Angular와 AngularJS의 차이점, CLI 환경 설정부터 프로젝트 구조, 컴포넌트 통신, 라우팅, 필수 템플릿 지시자 문법까지 실무 핵심 사항을 정리합니다.
 
-4. application 실행
- - application을 생성하면 현재 경로에 <application_name>에 해당하는 폴더가 생성된다.
- - 테스트용으로 application을 실행해 보자.
- `$ng serve --open`
- - 4200 포트로 서버 접속이 가능함을 알 수 있다.
+---
 
-5. 방화벽 설정
- - 방화벽이 아직 열려있지 않은 것 같다. 방화벽을 열어보자.
- - iptables -I INPUT 1 -p tcp --dport 12345 -j ACCEPT
- - `$sudo ufw allow 4200/tcp`
+## 1. Angular 프레임워크 개요 및 AngularJS와의 차이
 
-## 프로젝트 구조
-- WORKSPACE
-  - src
-    - app : 화면을 구성하는 요소들의 root component, WORKSPACE와 같은 이름
-    - \<COMPONENT\> : root component의 일부를 구성하는 component, 원하는만큼 추가 가능, [css, html, ts] 항목들이 기본 세트로 생성됨
-     - COMPONENT.component.css : 기본적으로 비어있다.
-     - COMPONENT.component.html
-     - COMPONENT.component.ts : type script로 짜여진 코드, class들이 정의되어 있다.
-    - app.component.css
-    - app.component.html
-    - app.component.ts
-    - app.module.ts
+- **AngularJS (1.x 버전)**: 자바스크립트 기반 프레임워크로 양방향 데이터 바인딩과 스코프(`$scope`) 모델을 채택했으나, 프로젝트 규모가 커질수록 성능 저하와 복잡도 증가 문제가 있었습니다.
+- **Angular (2.x 이상)**: 이전 AngularJS와 코드 호환성을 완전히 분리하고 새롭게 재설계된 차세대 프레임워크입니다.
+  - TypeScript를 기반으로 정적 타입 검사와 최신 객체지향 프로그래밍 패러다임을 지원합니다.
+  - 컴포넌트 트리 기반 아키텍처를 도입하여 유지보수성과 렌더링 성능을 극대화했습니다.
 
+---
 
-### component
-- view라는 단위의 화면을 구성하는 모듈
-- `ng generate component COMPONENT_NAME` 명령으로 workspace에 component 생성 가능
-- component를 생성하면 css, html, ts파일을 기본적으로 갖는다.
-- component는 다른 component를 가질 수 있다. 최상위 component를 root component라고 한다.
+## 2. Angular CLI 개발 환경 구축 및 프로젝트 생성
 
-#### ts 파일
-- angular에서 제공하는 모듈을 import할 수 있다.
-- class를 선언하고, component에서 사용할 기능(함수)을 구현한 후 export한다.
-- component가 생성될 때 상위 component로 부터 input을 받을 수 있다.
-##### ts파일 문법
-  - `Component` : Component를 사용하기 위한 기본 모듈
-  - `OnInit` : Component 시작시 동작 정의, constructor 와 유사한 동작을 하지만 OnInit은 angular가 관할하고, constructor은 js가 관할하여 초기화하는 차이가 있다.
-  - `Input` : Component 생성시 상위 Component로 부터 받을 변수를 선언, 상위 Component에서는 해당 변수로 값을 집어넣어 줄 수 있다.
-  - `Output` : 상위 Component에서 사용할 수 있는 변수를 정의, Component에서 변수를 선언하면 상위 Component에서 해당 변수를 사용할 수 있다.
- - `@component` 로 다음 class가 컴퍼넌트임을 표시한다.
-selector : 해당 component가 view에서 어떤 이름으로 표시될지 명명한다. (Tag 이름이 된다.)
- - `templateUrl` : html 파일의 이름을 지정한다
- - `styleUrls` : css파일의 리스트를 나열한다.
+### 2.1. Node.js 및 Angular CLI 설치
+Angular 개발을 위해서는 Node.js 런타임과 전역 패키지 관리 도구인 Angular CLI가 필수적입니다.
 
+```bash
+# Node.js 및 npm 설치 (Ubuntu/Debian 기준)
+sudo apt update
+sudo apt install -y nodejs npm
+
+# Angular CLI 전역 설치
+npm install -g @angular/cli
 ```
- @Input() product;                        // product라는 변수로 input을 받겠다는 선언
- @Output() notify = new EventEmitter();   // notify 라는 변수를 상위 Component에서 사용 가능하게 하겠다고 선언
- // 한 component에서 다른 component를 호출할 때에는 ts 파일에서 정의한 이름을 태그로 생성한다.
- <app-product-alerts                      // 태그 이름이 곧 component 이름(selector에 정의한)이다.
-   [product]="product"                    // product라는 변수에 "product"라는 내용을 을 넣을 때 사용한다.
- (notify)="onNotify()">                   // notify라는 변수에서 이벤트가 들어오면 onNotify() 함수를 실행, (onNotify() 함수는 class 안에 정의되어 있어야 함)
- </app-product-alerts>
-```
-### Routing
-- app.modules.ts(main component의 ts파일) 파일에서 routing 설정이 가능하다.
 
+> Node.js 버전이 낮아 CLI 설치 오류가 발생할 경우, 공식 사이트(https://nodejs.org)에서 최신 LTS 바이너리를 다운로드하여 `/usr/local` 경로에 심볼릭 링크를 연결하거나 nvm(Node Version Manager)을 통해 최신 버전을 설치하는 것을 권장합니다.
+
+### 2.2. 프로젝트 생성 및 로컬 개발 서버 구동
+Angular CLI 명령어를 통해 표준 디렉터리 템플릿을 자동으로 스캐폴딩할 수 있습니다.
+
+```bash
+# 신규 애플리케이션 생성 (스타일시트 형식으로 CSS 선택)
+ng new my-angular-app
+
+# 생성된 프로젝트 폴더 진입 후 로컬 서버 실행 (기본 포트: 4200)
+cd my-angular-app
+ng serve --open
 ```
-import { RouterModule } from '@angular/router';                                     // Routing을 위해 필요한 모듈
-import { ProductListComponent } from './product-list/product-list.component';`      // ProductListComponent라는 변수에 './product-list/product-list.component파일을 대응
-import { ProudctDetailsComponent } from './product-detail/product-detail.component';
+
+원격 서버나 가상 머신에서 작업하는 경우 방화벽(ufw 또는 iptables)에서 4200 포트를 개방해야 합니다.
+```bash
+sudo ufw allow 4200/tcp
+```
+
+---
+
+## 3. Angular 프로젝트 아키텍처 및 컴포넌트 구조
+
+### 3.1. 디렉터리 구성 및 역할
+Angular 프로젝트의 기본 구조는 다음과 같이 루트 컴포넌트와 하위 모듈 단위로 계층화되어 있습니다.
+
+```text
+my-angular-app/
+└── src/
+    └── app/
+        ├── app.component.html   # 루트 컴포넌트 템플릿
+        ├── app.component.css    # 루트 컴포넌트 전용 스타일
+        ├── app.component.ts     # 루트 컴포넌트 로직 클래스
+        ├── app.component.spec.ts# 단위 테스트 스펙 파일
+        ├── app.module.ts        # 의존성 및 컴포넌트 등록 모듈
+        └── <COMPONENT_NAME>/    # 신규 추가된 하위 컴포넌트 폴더
+```
+
+컴포넌트 생성 명령어를 실행하면 CSS, HTML, TypeScript, Spec 파일이 세트로 자동 생성됩니다.
+```bash
+ng generate component product-alerts
+# 축약형: ng g c product-alerts
+```
+
+### 3.2. TypeScript 컴포넌트 선언 및 데코레이터
+컴포넌트는 화면의 특정 영역을 담당하는 독립적인 뷰(View) 단위입니다. `@Component` 데코레이터를 사용하여 HTML 템플릿 및 스타일을 클래스에 바인딩합니다.
+
+```typescript
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-product-alerts',          // HTML에서 호출할 태그 이름
+  templateUrl: './product-alerts.component.html',
+  styleUrls: ['./product-alerts.component.css']
+})
+export class ProductAlertsComponent implements OnInit {
+  // 부모 컴포넌트로부터 전달받을 입력 프로퍼티
+  @Input() product: any;
+
+  // 부모 컴포넌트로 이벤트를 방출하기 위한 출력 프로퍼티
+  @Output() notify = new EventEmitter<void>();
+
+  constructor() {
+    // 의존성 주입(DI) 및 순수 초기화 담당
+  }
+
+  ngOnInit(): void {
+    // Angular 생명주기 훅: 컴포넌트가 DOM에 마운트된 후 초기 데이터 로딩
+  }
+
+  handleClick(): void {
+    this.notify.emit();
+  }
+}
+```
+
+### 3.3. 부모-자식 컴포넌트 통신
+상위 컴포넌트 템플릿에서는 대괄호(`[]`)를 이용해 하위 컴포넌트에 값을 주입하고, 소괄호(`()`)를 통해 하위 컴포넌트에서 발생한 이벤트를 핸들링합니다.
+
+```html
+<!-- 상위 컴포넌트의 HTML 템플릿 예시 -->
+<app-product-alerts
+  [product]="currentProduct"
+  (notify)="onNotifyParent()">
+</app-product-alerts>
+```
+
+---
+
+## 4. Angular 라우터(Router)와 동적 파라미터 처리
+
+### 4.1. 라우트 모듈(RouterModule) 등록
+`app.module.ts`에서 URL 경로와 렌더링할 컴포넌트를 매핑합니다.
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+
+import { ProductListComponent } from './product-list/product-list.component';
+import { ProductDetailsComponent } from './product-detail/product-detail.component';
 
 @NgModule({
   imports: [
     BrowserModule,
-    ReactiveFormsModule,
-    RouterModule.forRoot([                            // Router 모듈로 Routing 세팅
-      { path: '', component: ProductListComponent },  // root 경로 '/' 에 위에서 ProductListComponent 변수에 대응시킨 파일을 매칭
-      { path: 'products/:productId', component: ProductDetailsComponent },          // 마찬가지로 '/products/{productId}' 에 ProudctDetailsComponent를 매칭
+    RouterModule.forRoot([
+      { path: '', component: ProductListComponent },
+      { path: 'products/:productId', component: ProductDetailsComponent },
     ])
   ],
+})
+export class AppModule { }
 ```
-- ./product-detail/product-detail.component.ts 에서 아래와 같은 설정을 추가로 해주어야 한다.
 
-```
-import { ActivatedRoute } from '@angular/router';           // routing을 당하는 곳에서 필요한 모듈
-export class ProductDetailsComponent implements OnInit {    // component 를 정의할 class 선언
-  product; -> product 변수 선언
-constructor(private route: ActivatedRoute,)                 //  라우팅 관련 정보를 route라는 변수에 받았다.
-  { } -> constructor 뒤에 붙여주는 형식, 비어있는 채로 둔다.
+### 4.2. ActivatedRoute를 통한 URL 파라미터 수신
+상세 페이지 컴포넌트에서는 `ActivatedRoute` 서비스를 주입받아 URL 경로의 동적 파라미터를 구독합니다.
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-product-details',
+  templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.css']
+})
+export class ProductDetailsComponent implements OnInit {
+  product: any;
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    // URL 경로에서 productId 추출 (:productId)
+    this.route.paramMap.subscribe(params => {
+      const productId = Number(params.get('productId'));
+      // 데이터 목록에서 일치하는 객체 조회 로직 수행
+    });
+  }
 }
-
-ngOnInit() {                                                // view 생성시 동작을 정의
-  this.route.paramMap.subscribe(params => {                 // constructor에서 정의한 route를 참조하여
-    this.product = products[+params.get('productId')];      // this.product는 products[index] 값을 가진다. 이때 index는 app.modules.ts에서 설정한 값이다. (url 경로에서 'products/' 다음에 들어간 숫자값)
-  });
-}
-```
-- ./product-detail/product-detail.component.html 에서 아래와 같이 설정한다.
-
-```
-<h2>Product Details</h2>
-<div *ngIf="product">                 // product에 값이 들어가 있다면 아래 수행. 즉, ts파일에서 대입시킨 products[idx] 값이 존재하면 아래 동작 수행
-<h3>{{ product.name }}</h3>           // json 형태의 값을 참조해 대입한다.
-<h4>{{ product.price | currency }}</h4>
-  <p>{{ product.description }}</p>
-</div>
 ```
 
-## 문법
-- 반복, 출력, 링크
+---
 
-```
+## 5. 핵심 템플릿 지시자 및 데이터 바인딩 문법
+
+Angular 템플릿은 HTML 표준 문법을 확장하여 직관적인 반응형 UI 구성을 지원합니다.
+
+### 5.1. 구조적 지시자 (*ngFor, *ngIf)
+- **`*ngFor`**: 배열 컬렉션을 순회하며 요소를 반복 렌더링합니다.
+- **`*ngIf`**: 참/거짓 조건에 따라 DOM 트리에 요소를 추가하거나 제거합니다.
+
+```html
+<!-- 목록 렌더링 및 라우터 링크 바인딩 -->
 <div *ngFor="let product of products; index as productId">
-/*
- *ngFor 은 반복을 뜻하는 예약어다. products 안의 원소를 하나씩 꺼내서 product 라 칭한다. 마치 java나 python의 ``for item in array`` 와 같다.
- ';' 로 구문을 구분할 수 있다.
- productId 변수에 index를 대입한다.
-*/
-　　<a [title]="product.name + ' details'" [routerLink]="['/products', productId]">
-/*
- [title] 은 마우스를 올릴 때 나오는 텍스트를 뜻한다.
- routerLink는 클릭시 넘어갈 링크이다. 링크를 []로 설정하면 []안의 내용을 appepnd 한 값을 의미한다. 즉 "/product/:productId" 의 주소를 나타낸다.
- ""안의 내용은 ts문법이고, 단순 텍스트는 '' 사이에 집어넣으면 된다.
-*/
-　　　　<h3>
-　　　　　　{{ product.name }}       // product 객체의 name 필드를 출력한다.
-　　　　</h3>
-　　</a>
+  <a [title]="product.name + ' 상세정보'" [routerLink]="['/products', productId]">
+    <h3>{{ product.name }}</h3>
+  </a>
+
+  <!-- 조건부 렌더링 -->
+  <p *ngIf="product.description">
+    설명: {{ product.description }}
+  </p>
 </div>
 ```
-- 조건
 
-```
-<p *ngIf="product.description">         // *ngIf는 조건문을 뜻하는 예약어다. product 객체에 description 필드가 존재하면 아래를 실행한다.
-  Description: {{ product.description }}
-</p>
-```
-
-- 버튼
-
-`<button (click)="share()">` (click)은 클릭 event 발생시 실행할 내용을 적는다. share()라는 함수를 실행하도록 연결한다.
-
--> 요점
-*ngFor
-*ngIf
-Interpolation {{ }}
-Property binding [ ]
-Event binding ( )
+### 5.2. 바인딩 문법 요약
+- **보간법 (Interpolation - `{{ }}`)**: 컴포넌트 클래스의 변수 및 표현식 결과를 문자열로 출력합니다.
+- **프로퍼티 바인딩 (Property Binding - `[ ]`)**: HTML 속성 또는 컴포넌트 프로퍼티에 동적 데이터를 바인딩합니다.
+- **이벤트 바인딩 (Event Binding - `( )`)**: 사용자 클릭, 입력 등의 DOM 이벤트를 감지하여 클래스 메서드를 실행합니다.
+- **양방향 데이터 바인딩 (`[(ngModel)]`)**: 폼 컨트롤과 데이터를 양방향으로 실시간 동기화합니다.

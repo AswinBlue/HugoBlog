@@ -1,90 +1,104 @@
 ---
-title: "Make"
+title: "GNU Make 기본 사용법과 Makefile 문법 및 내장 매크로 정리"
 date: 2023-07-13T18:35:05+09:00
 lastmod: 2023-07-13T18:35:05+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+description: "C/C++ 프로젝트의 분할 컴파일과 빌드 자동화를 지원하는 GNU Make의 기본 원리와 Makefile의 타깃·의존성 구조, 변수 치환, 내장 매크로($<, $@, $^) 및 실행 옵션을 정리합니다."
+slug: "gnu-make-makefile-syntax-and-macros"
+categories:
+  - "C++"
+tags:
+  - "c++"
+  - "c"
+  - "make"
+  - "makefile"
+  - "build-system"
+ShowToc: true
+TocOpen: true
 draft: false
 ---
 
-# make
-- 분할 컴파일을 통해 컴파일 작업 효율을 올리고, 이 과정을 자동화 하기 위해 일괄처리를 도와주는 도구이다. 
-- batch 파일로 컴파일 하면, 변경점을 감지하지 못해 batch파일을 수정하지 않고서는 분할 컴파일을 수행할 수 없다.
-- make파일은 파일들 간의 의존성을 정의하여, 특정 파일이 수정되면 어떤 파일을 컴파일 해야하는지 알아서 판단해 준다.
-- 리눅스 시스템의 수정 시간을 확인하여, 빌드 결과물이 생성된 시간과 소스가 수정된 시간을 비교해서 컴파일 혹은 링킹이 다시 필요한지 판단하는 원리이다.
+## GNU Make 개요 및 동작 원리
 
-## 기본구조
-- 파일 이름은 `Makefile` 으로 생성한다.
+GNU Make는 여러 소스 파일로 구성된 C/C++ 프로젝트의 분할 컴파일(Separate Compilation)을 자동화하고 빌드 효율을 극대화해 주는 빌드 도구이다.
+
+- **증분 빌드(Incremental Build)**:
+  소스 파일이 수정되었을 때 전체를 다시 컴파일하지 않고, 수정된 파일 및 이에 의존하는 파일들만 선별적으로 재컴파일한다.
+- **수정 시간(Timestamp) 비교**:
+  타깃 파일(Target)의 최종 생성 시간과 의존 파일(Dependencies)의 최종 수정 시간을 비교하여, 의존 파일의 시간이 더 최신일 때만 갱신 명령(Commands)을 실행하는 방식으로 동작한다.
+
+## Makefile 기본 구조
+
+Make는 실행 시 현재 디렉터리의 `Makefile`이라는 이름의 설정 파일을 기본적으로 탐색한다.
+
+```makefile
+TARGET: DEPENDENCIES
+	COMMANDS
 ```
-TARGET:DEPENDENCIES
-   COMMANDS
+
+- **주의사항**: `COMMANDS` 라인의 앞머리는 반드시 **Tab 문자**여야 하며 일반 공백(Space)을 사용하면 문법 오류가 발생한다.
+- `TARGET`: 명령어를 통해 최종적으로 생성할 목적물(실행 파일, 오브젝트 파일 등) 또는 가상 타깃이다.
+- `DEPENDENCIES`: 타깃을 생성하기 위해 필요한 소스 파일이나 오브젝트 파일들의 목록이다.
+- `COMMANDS`: 타깃을 생성하기 위해 쉘에서 실행할 명령어이다.
+- `@COMMANDS`: 명령어 앞에 `@`를 붙이면 쉘이 명령문 원문을 터미널에 에코하지 않고 실행 결과만 출력한다.
+- `#`: 주석 기호로 라인 단위 주석을 작성한다.
+
+```makefile
+# clean 가상 타깃 예시
+clean:
+	rm -f $(OBJ) $(TARGET)
 ```
-  - COMMANDS 앞에는 공백이 아니라 **tab문자**이다. 
-  - COMMAND를 실행하여 TARGET파일 생성한다는 의미이다.
-  - TARGET을 생성할 때 DEPENDENCIES 파일들이 필요하다. DEPENDENCIES파일이 수정되면 TARGET파일도 다시 컴파일 해야한다는 의미이다.
-- `# 주석` : 주석은 #으로 달 수 있다. 
-- `    @COMMANDS`: make파일은 실행시 '실행한 명령 원문' 과 '실행 결과' 를 모두 쉘이 출력한다. `@`를 붙이면 명령 원문은 출력하지 않는다.
-- 기본 형태를 약간 변형하여 명령어를 생성할 수도 있다. 
-  - `DEPENDENCIES` 를 없이 `TARGET` 과 `COMMANDS` 만 남기면, `make TARGET` 명령을 입력시 해당 `COMMANDS` 만 수행되도록 할 수 있다.
-    ```
-    clean:
-        rm -f ${OBJ}${TARGET}
-        # make clean 명령시 위 동작 수행
 
-    install:
-        ...
-        # 동일한 형태로 다른 명령도 작성 가능
-    ```
+### 변수 정의 및 문자열 치환
 
-### make 파일 정의 COMMANDS
-- 대부분의 명령들은 쉘 명령과 유사하다.
-- `echo <VALUE>` : VALUE 값을 출력한다. 
-- `VARIABLE = VALUE` : VARIABLE 이라는 이름의 변수를 선언하고, VALUE 값을 대입함
-  - 변수 선언시 자기 자신을 참조하는 형태(recursive)는 `=` 연산자로 사용 불가능하다. (ex: `VARIABLE = ${VARIABLE} + DATA`)
-  - 대신 `:=` 연산과 `+=` 연산을 사용 가능하다.
-  - ex) `VARIABLE := ${VARIABLE} + DATA`, `VARIABLE += DATA`
-- `$(VARIABLE)` : VARIABLE 변수에 해당하는 값을 호출 (`${VARIABLE}` 과 동일)
-  - TIP: 컴파일 도구를 변수로 지정해 놓으면 좋다. `CC=gcc` -> `$(CC) -c file.c`
-  - TIP: 최종 파일 이름을 변수로 지정해 놓으면 좋다. `PROJECT_NAME=myProject` -> `gcc -o $(PROJECT_NAME) file1.o file2.o`
-  - TIP: .o파일을 만드는 `-c` 옵션을 `CFLAGS` 로 변수로 사용하면 좋다.    
-  -> `CFLAGS = -I./include -c` 와 같이 include path 및 기타 설정이 가능하다.
-  - TIP: 링킹을 위한 `LFLAGS` 또한 같은 맥락에서 변수로 활용하면 좋다.
-- `${VARIABLE:ASIS=TOBE}` : VALUE 변수에서 ASIS라는 구문을 TOBE라는 구문으로 치환한다. (ex: `PROJECT_NAME:my=your`-> ${PROJECT_NAME} == yourProject)
+- `VARIABLE = VALUE`: 재귀적 확장 변수 (호출되는 시점의 최종 값으로 치환)
+- `VARIABLE := VALUE`: 단순 확장 변수 (선언되는 즉시 값이 평가되어 확정)
+- `VARIABLE += VALUE`: 기존 변수 값 뒤에 공백과 함께 추가 문자열 연결
+- `$(VARIABLE)` 또는 `${VARIABLE}`: 변수 값 참조
 
-### 내장 매크로
-- make 파일의 target-dependency-command 라인들에 일일이 파일 이름을 써 넣고 수정하기 번거롭기에, 아래와 같이 매크로를 활용해 좀더 편리하게 작업을 수행할 수 있도록 한다.
-  - 내장 매크로를 활용하면 command에 파일 이름을 직접쓰지 않아도 되게 된다.
-- `$<` : DEPENDENCIES 중 가장 선두
-- `$^` : DEPENDENCIES 전체를 의미
-- `$@` : TARGET을 의미
-- `$*` : 확장자가 없는 TARGET을 의미
-- `$?` : DEPENDENCIES 중 TARGET보다 수정 시간이 늦은 파일들
-- `.c.o:` : Makefile 안에서 언급된 모든 xxx.o 파일을 만들기 위해 동일한 이름을 가진 xxx.c 파일들을 컴파일하여 xxx.o 파일을 생성한다.
-- `%.o : %.c` : `.c.o` 와 동일한 효과를 낸다. 좀더 신규 스타일이다.
-- 최종 예시를 보면 다음과 같다.
-```
+```makefile
+# 컴파일러 및 플래그를 변수화하여 유지보수성 확보
 CC = gcc
-CFLAGS = -c
+CFLAGS = -Wall -O2 -I./include
+LDFLAGS = -L./lib -lmylib
+PROJECT_NAME = myProject
+
+# 문자열 치환: ${VARIABLE:ASIS=TOBE}
+SRCS = main.c func.c
+OBJS = $(SRCS:.c=.o) # main.o func.o 로 치환됨
+```
+
+### 내장 매크로 및 패턴 규칙
+
+반복적인 컴파일 룰을 단순화하기 위해 Make에서 제공하는 자동 내장 매크로(Automatic Variables)를 활용한다.
+
+- `$<`: 현재 룰의 의존성 파일(Dependencies) 목록 중 첫 번째 파일
+- `$^`: 현재 룰의 모든 의존성 파일 목록 (공백으로 구분)
+- `$@`: 현재 타깃(Target)의 이름
+- `$*`: 접미사(확장자)가 제외된 타깃의 이름
+- `$?`: 타깃보다 최신으로 갱신된 의존 파일 목록
+
+#### 패턴 규칙(Pattern Rule) 예시
+`.c` 소스 파일들로부터 동명의 `.o` 오브젝트 파일을 생성하는 빌드 룰을 일반화할 수 있다.
+
+```makefile
+CC = gcc
+CFLAGS = -Wall -c
 TARGET = a.out
 OBJ = main.o func1.o
 
-${TARGET} : ${OBJ}
-    ${CC} ${OBJ} -o ${TARGET}  # gcc main.o func1.o -o a.out 와 동일
+# 타깃 빌드: $^ 는 main.o func1.o, $@ 는 a.out
+$(TARGET): $(OBJ)
+	$(CC) $^ -o $@
 
-.c.o :  # 위에서 언급된 모든 .o 파일(OBJ)을 만들기 위해 .c 파일로 .o 파일 생성
-    ${CC} ${CFLAGS} $<  # $<는 가장 선두의 dependency를 의미함. 즉 gcc -c xxx.c 와 동일
+# 패턴 룰: 모든 .o 파일은 동명의 .c 파일을 컴파일하여 생성
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 ```
 
-## 쉘 명령어
-- `make` : 현재 경로에 있는 `Makefile` 을 실행한다. 
-- `make install` : 해당 경로의 소스를 컴파일하여 /usr/local/lib, /usr/local/bin 폴더로 .so파일과 .bin파일 복사
-- `make -f <FILE_NAME>` : Makefile 대신 FILE_NAME 을 make파일로 가정하고 실행한다.
-- `make -p` : 설정된 매크로 옵션들을 확인 가능
+## Make 명령어 실행 옵션
+
+- `make`: 현재 디렉터리의 Makefile에서 첫 번째 타깃을 기본으로 빌드 실행
+- `make <타깃명>`: 특정 타깃만 명시적으로 실행 (예: `make clean`, `make install`)
+- `make -f <파일명>`: 기본 `Makefile` 대신 지정한 파일을 빌드 설정 파일로 사용
+- `make -j <N>`: N개의 작업을 병렬로 동시 수행하여 멀티코어 컴파일 가속
+- `make -p`: Make에 내장된 기본 규칙 및 정의된 모든 매크로 데이터베이스 출력

@@ -1,18 +1,14 @@
 ---
-title: "Reverse Engineering"
+title: "x86-64 리버스 엔지니어링: 바이너리 정적/동적 분석 및 스택 프레임 분석"
+description: "컴파일된 ELF 바이너리를 Ghidra, IDA, GDB로 역공학 분석하고 C언어 소스코드로 디컴파일 및 제어 흐름을 복원하는 핵심 방법론을 다룹니다."
+slug: "x86-64-reverse-engineering-binary-analysis"
 date: 2024-05-12T14:42:07+09:00
-lastmod: 2024-05-12T14:42:07+09:00
-tags: ["C", "hacking",]
-categories: ["dev", "hacking",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Security"]
+tags: ["reverse-engineering", "binary-analysis", "assembly", "security", "gdb"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Reverse Engineering

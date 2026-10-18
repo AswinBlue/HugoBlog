@@ -1,18 +1,14 @@
 ---
-title: "Thread"
+title: "POSIX pthread를 활용한 멀티스레드 프로그래밍 및 동기화(Mutex) 기법"
+description: "스레드 생성과 종료(pthread_create/join), 임계 영역 보호를 위한 뮤텍스(Mutex), 조건 변수(Condvar) 및 경쟁 상태(Race Condition) 방어법을 정리합니다."
+slug: "posix-pthread-multithreading-and-mutex"
 date: 2023-07-23T15:05:46+09:00
-lastmod: 2023-07-23T15:05:46+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "multithreading", "pthread", "concurrency", "synchronization"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Thread
@@ -84,7 +80,7 @@ int __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr
     return prev != old_value;
 }
 ```
-#### Spin Lock
+### Spin Lock
 - while문을 반복하며 mutex를 계속 체크하는 기법
 ```
 void spin_lock(int* mutex)
@@ -94,7 +90,7 @@ void spin_lock(int* mutex)
 ```
 - CPU 활용도가 떨어지므로 임계영역이 짧은 경우만 사용 권장
 
-#### Sleep Lock
+### Sleep Lock
 - mutex를 기다리는 동안 thread를 sleep 시키면 thread에 할당된 리소스를 해제하여 다른 곳에 할당해 줄 수 있게 된다.
 - gcc에서는 slelep lock을 지원하는 라이브러리가 없지만, 시스템 커맨드 라이브러리에는 futex(fast user mutex)라는 함수로 sleep lock을 지원한다. C언어로 사용하려면 시스템 콜로 futex를 호출하면 된다.
 ```
@@ -109,7 +105,7 @@ void *foo(void *data)
 ```
 - __futex_wait 은 mutex_lock, __futex_wake는 mutex_unlock에 대응된다.
 
-#### Self Lock
+### Self Lock
 - recursive 함수에서 mutex를 사용한다면 하나의 함수에서 동일한 mutex를 두번 호출하게 되는 "selfl lock"이 발생할 수 있다. 
 - self lock이 발생하면 마찬가지로 deadlock이 발생한다.
 - 재귀 호출을 위한 `recursive mutex lock` 이 존재한다. mutex 생성시 attribute로 재귀함수를 위한 설정이 존재하며, mutex_lock을 한 thread에서 중복 호출 가능하며, mutex_lock을 호출한 수만큼 mutex_unlock을 호출해 주면 mutex가 해제된다. 
@@ -153,7 +149,7 @@ thread2()
 }
 ```
 
-#### Condition 내부 구조
+### Condition 내부 구조
 ```
 func1()
 {

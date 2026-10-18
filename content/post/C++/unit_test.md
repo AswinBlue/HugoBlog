@@ -1,20 +1,22 @@
 ---
-title: "Unit Test"
+title: "C++ 단위 테스트 완벽 가이드: Google Test 및 Google Mock 활용법"
 date: 2024-08-19T04:00:00+09:00
 lastmod: 2024-08-19T04:00:00+09:00
-tags: ["C++", "test", "unit test", "google test framework"]
-categories: ["dev",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+description: "C++ 소프트웨어 품질 향상을 위한 단위 테스트의 기본 원칙과 Google Test(gtest) 및 Google Mock(gmock) 프레임워크의 테스트 픽스처, 매크로, 테스트 대역 기법을 상세히 정리합니다."
+slug: "cpp-unit-test-googletest-and-googlemock-guide"
+categories:
+  - "C++"
+tags:
+  - "c++"
+  - "unit-test"
+  - "googletest"
+  - "googlemock"
+  - "tdd"
+  - "test-double"
+ShowToc: true
+TocOpen: true
 draft: false
 ---
-# Unit Test
 ## 테스트의 속성
 - 좋은 단위 테스트를 작성하기 위해서는 아래 세 가지 기준을 만족해야 한다. 
   1. 가독성
@@ -48,7 +50,7 @@ draft: false
 - 자동화 : 테스트는 실행 이후 완료 까지 추가 조작 없이 돌릴 수 있어야 한다. (필요하다면 최소화)
 - 자체 검사 : 코드를 확인하지 않고 테스트의 결과 만으로 테스트 목적과 에러 원인을 알 수 있어야 한다.
 - 반복 : 테스트를 여러 번 돌려도 동일한 결과가 도출되어야 한다.
-- 독리비 : 각각의 테스트는 개별로 동작이 가능해야 한다.
+- 독립성 : 각각의 테스트는 개별로 동작이 가능해야 한다.
 
 ## 테스트 가능 설계 SOLID 
 - Open-Closed Principle : 개방 폐쇄 원칙
@@ -238,7 +240,7 @@ draft: false
 - Implicit Setup 을 사용 할 경우에는 테스트가 시작되기 전 `SetUP()` 함수가 호출되고, 테스트가 완료 되면 `TearDown()` 함수가 호출된다. 
   - `SetUp()` 에서 fixture setup을 완료 해 주고, `TearDown()` 에서 사용한 리소스를 정리하면 되겠다.
 
-#### Global Fixture
+### Global Fixture
 - `testing::Environment` 를 상속받은 class 로 전역 fixture 를 설정 할 수 있다.
   - ex) `class MyEnvironment : public testing::Environment`
 - Environment class 에는 Test class 와 마찬가지로 `Setup`, `TearDown` 이 제공된다.
@@ -257,7 +259,7 @@ draft: false
 
 
 
-#### 느린 테스트 문제
+### 느린 테스트 문제
 - "신선한 fixture 전략" 을 사용하는 경우, SetUp 과 TearDown 에 시간이 많이 소요된다면 TestCase 가 많아질 수록 test 에 소요되는 시간이 늘어나 생산성이 떨어진다.
   - 테스트가 느리면 code 가 변경되어도 테스트를 수행하지 않게 될 수도 있다.
 - 이러한 문제를 해결하기 위해, xUnit Framework 에서는 수동으로 호출 할 수 있는 fixture 설치/해제 동작을 제공한다.
@@ -289,12 +291,12 @@ draft: false
 - 여러 test case 가 하나의 fixture 객체를 공유하기 때문에, fixture 관리가 제대로 되지 못한다면 "변덕스런 테스트 문제"가 발생할 수 있다. 즉, 신뢰성이 떨어질 수 있다.
 - C++ 에서는 생성자와 소멸자와 유사하고 대체 가능하지만, 특정 언어에서는 소멸자 개념이 없기 떄문에 xUnit Framework 관점에서는 생성자 소멸자 대신 SetUpTestSuite, TearDownTestSuite 를 사용하는 것이 바람직하다.
 
-#### 변덕스런 테스트 문제
+### 변덕스런 테스트 문제
 - test case 의 수행 횟수, 순서 등에 따라 test case 의 결과가 달라지는 현상
 - 어떤 test case 에 의해 다음 test case 의 test fixture 가 영향을 받아 발생
 
 
-### ASSERTION / EXCEPTATION
+### ASSERTION / EXPECTATION
 1. ASSERTION
    - ASSERTION 종류는 다음같다.
      - `ASSERT_EQ(a, b)` : a ==b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
@@ -320,21 +322,21 @@ draft: false
    - ASSERTION과 유사하지만, FAIL 판정이 되더라도 이후의 코드도 끝까지 수행한다. 
    - ASSERTION 대신 EXCEPTATION 을 사용하면 "죽은 단원문의 문제" 를 해결할 수 있다.
    - EXCEPTATION 종류는 다음과 같다.
-     - `EXCEPTATION_EQ(a, b)` : a ==b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_NE(a, b)` : a != b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_LT(a, b)` : a < b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_LE(a, b)` : a <= b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_GT(a, b)` : a > b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_GE(a, b)` : a >= b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_TRUE(a)` : a == true 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-     - `EXCEPTATION_FALSE(a)` : a == false 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_EQ(a, b)` : a ==b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_NE(a, b)` : a != b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_LT(a, b)` : a < b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_LE(a, b)` : a <= b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_GT(a, b)` : a > b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_GE(a, b)` : a >= b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_TRUE(a)` : a == true 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+     - `EXPECT_FALSE(a)` : a == false 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
 
    - segmentation fault 등으로 인해 테스트 프로그램이 비정상 종료 될 수 있는 경우 EXCEPTION 보다는 ASSERTION 을 사용하는 것이 권장된다.
 
 - C 문자열을 비교
-  - `EXCEPTATION_STREQ(a, b)` : 문자열a == b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-  - `EXCEPTATION_STRNE(a, b)` : 문자열a != b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
-  - `EXCEPTATION_STRCASEEQ(a, b)` : 대소문자 상관없이 문자열a == b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+  - `EXPECT_STREQ(a, b)` : 문자열a == b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+  - `EXPECT_STRNE(a, b)` : 문자열a != b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
+  - `EXPECT_STRCASEEQ(a, b)` : 대소문자 상관없이 문자열a == b 라면 `SUCCEED()`, 아니면 `FAIL()` 호출
 
 - 부동소수점 비교
   - 부동 소수점을 일반 판정문으로 비교를 하면 메모리에 표시되는 형태를 바로 비교하기 때문에 원하는 결과가 나오지 않을 수 있다.
@@ -702,7 +704,7 @@ draft: false
       // return os << std::format("({},{})", data.A, data.B);
   }
 
-  INITIATE_TEST_SUITE_P(prefix, TS,
+  INSTANTIATE_TEST_SUITE_P(prefix, TS,
       testing::Values(
           (1,1) (2,2) (3,3)
   ));
@@ -732,10 +734,10 @@ draft: false
   std::vector<std::string> str = {"black", "white"};
 
   // 튜플 형태 정의
-  using InputType = std::tueple<std::string, Color, int>
+  using InputType = std::tuple<std::string, Color, int>
 
   // data set 구성
-  INITIATE_TEST_SUITE_P(prefix, TS,
+  INSTANTIATE_TEST_SUITE_P(prefix, TS,
       testing::Combine(
           testing::ValuesIn(colors),
           testing::ValuesIn(str),
@@ -753,7 +755,7 @@ draft: false
   }
 
   ```
-- 한 Test Suite 에 대해 파라미터(`INITIATE_TEST_SUITE_P`) 를 여러 개 정의하면, 각 파라미터를 독립되게 이어서 진행한다. 
+- 한 Test Suite 에 대해 파라미터(`INSTANTIATE_TEST_SUITE_P`) 를 여러 개 정의하면, 각 파라미터를 독립되게 이어서 진행한다. 
 
 - 기타 파라미터 생성 함수
   - `testing::RANGE()` : 지정된 범위에 해당하는 숫자로 배열 구성
@@ -802,7 +804,7 @@ draft: false
   }
   ```
 
-### Test Double (테스트 대역)
+## 테스트 대역 (Test Double)
 - 테스트 대상 코드가 다른 "협력 객체"에 따라 영향을 받을 수 있을 때, "협력 객체" 를 대체 하기 위한 테스트용 객체를 생성하고, 이를 "테스트 대역" (test double) 이라 한다.
 - 테스트 대역의 역할 : 테스트 환경을 통제
 - 테스트 대역 적용 조건 : 제품 코드가 태스트 대역을 적용 할 수 있는 설계
@@ -902,7 +904,7 @@ draft: false
       // test case 에서 호출되는 IsValidFilename() 은 TestDoubleFileSystem 함수에서 정의된 함수가 호출되기 때문에 true 가 반환된다. 
       ```
 
-#### Test Stub
+### Test Stub
 - 목적 : 다른 Component로 부터의 받은 값(간접 입력)에 의존하는 로직을 독립적으로 검증이 필요할 때
 - 방법 : 입력 값을 생성하는 Component 를 test double 로 교체한다.
 
@@ -995,7 +997,7 @@ draft: false
         EXPECT_EQ(result, 100) << "10:00 일때";
     };
     ```
-#### Fake Object
+### Fake Object
 - 목적 : 협력 객체의 로직이 아직 미구현인 상태라 테스트가 불가능한 상황 해소
   - or 협력 객체가 사용하기 어려운 경우
   - or 협력 객체의 동작이 느린 경우
@@ -1072,7 +1074,7 @@ draft: false
   // 사용자 지정 타입의 출력을 위해 연산자 재정의
   std::ostream& operator<<(std::ostream& os, const User& user)
   {
-      retrurn os << "(" << user.GetName() << "," << user.GetAge() << ")";
+      return os << "(" << user.GetName() << "," << user.GetAge() << ")";
   }
 
   // 테스트 수행
@@ -1093,7 +1095,7 @@ draft: false
   ```
 
 
-#### Test Spy
+### Test Spy
 - 목적: SUT의 함수를 동작 할 때 발생하는 부수 효과를 관찰할 수 없어서 테스트가 어려운 경우
   - 특정 함수의 동작 결과를 저장 해 두었다가 나중에 출력 할 수 있는 test double 구현
 - 방법: 목격한 일을 기록 해 두었다가 이후 확인 할 수 있도록 만들어진 테스트 대역
@@ -1184,7 +1186,7 @@ draft: false
 - test code 가 SUT code 보다 더 많아지는 딜레마가 발생한다.
 
 
-#### Mock Object
+### Mock Object
 - 목적 : "상태기반 검증"이 아닌 "행위기반 검증"을 수행
   - 상태기반 검증 : SUT에 작용을 가한 후 내부 상태 변화를 확인하고 단언문을 통해 정상 동작 여부를 판단
   - 행위 기반 검증 : SUT 에 작용을 가한 후 함수 호출 여부, 호출 횟수, 호출 인자, 호출 순서 등의 정보를 통해 정상 동작 여부를 판단

@@ -1,19 +1,15 @@
-+++
-title = "Linux_apt"
-date = 2020-05-25T18:30:15+09:00
-lastmod = 2020-05-25T18:30:15+09:00
-tags = ["linux",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "우분투 APT 패키지 관리자 핵심 명령어 및 저장소(PPA) 설정 가이드"
+description: "데비안/우분투 계열 리눅스의 패키지 관리 도구인 apt, apt-get의 설치, 갱신, 의존성 충돌 해결 및 사용자 PPA 저장소 관리 팁을 정리합니다."
+slug: "ubuntu-apt-package-manager-and-ppa-guide"
+date: 2020-05-25T18:30:15+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["Linux"]
+tags: ["linux", "ubuntu", "apt", "package-manager", "devops"]
+ShowToc: true
+TocOpen: true
+---
 
 Linux 서버에 개발 환경을 세팅하는데 뭔가 제대로 되지 않아 이미 환경설정을 해 본 다른 사람에게 원격으로 도움을 요청했다. 
 

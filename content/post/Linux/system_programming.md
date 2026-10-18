@@ -1,18 +1,14 @@
 ---
-title: "System_programming"
+title: "리눅스 시스템 프로그래밍: POSIX 저수준 파일 I/O 및 디스크립터 제어"
+description: "open, read, write, close, lseek 시스템 콜과 파일 디스크립터(FD), 표준 I/O 버퍼링과의 차이점, 파일 오프셋 제어를 깊이 있게 분석합니다."
+slug: "linux-system-programming-posix-file-io"
 date: 2023-07-15T08:35:21+09:00
-lastmod: 2023-07-15T08:35:21+09:00
-tags: ["linux", "system_programming"]
-categories: ["dev",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "system-programming", "posix", "system-calls", "c"]
+ShowToc: true
+TocOpen: true
 ---
 
 # System Programming
@@ -90,7 +86,7 @@ _____________
 - `fopen` 으로 파일을 열게 되면 user는 파일의 읽고 쓸 위치를 설정하지 않는다.
 - 파일을 읽고 쓸 위치를 file offset이라고 하며, kernel 내부의 파일 구조체를 사용하여 kernel에서 자체적으로 관리된다.
 
-#### fseek & ftell
+### fseek & ftell
 - `fseek(FILE_POINTER, OFFSET, POSITION)` : 파일의 POSITION에서 offset 만큼 file offset을 이동. 
   - POSITION은 아래 세 가지를 사용 가능하다.
     1) SEEK_SET : 파일의 처음 위치

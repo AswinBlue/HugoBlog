@@ -1,18 +1,14 @@
 ---
-title: "Computer Science"
+title: "컴퓨터 구조 및 운영체제 핵심 CS 기초 개념 총정리"
+description: "폰 노이만 아키텍처, CPU 레지스터와 ALU, 메모리 계층 구조, 가상 메모리와 페이징 시스템 등 소프트웨어 엔지니어가 알아야 할 CS 기본기를 정리합니다."
+slug: "computer-science-architecture-and-os-fundamentals"
 date: 2023-01-19T21:59:14+09:00
-lastmod: 2023-01-19T21:59:14+09:00
-tags: ["CS",]
-categories: ["theory",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["ComputerScience"]
+tags: ["computer-science", "operating-system", "hardware", "cpu", "memory"]
+ShowToc: true
+TocOpen: true
 ---
 # Computer Science
 ## CPU
@@ -81,7 +77,7 @@ draft: false
 - SYSV 규약으로 만들어진 대표적인 예로는 리눅스가 있다.
 - SYSV ABI(Application Binary Interface) 함수 호출 규약에는 ELF 포맷, 링킹 방법 등이 정의되어 있다.
 
-#### SYSV 규약의 특징
+### SYSV 규약의 특징
 - 함수 호출시 인자를 순서대로 RDI, RSI(ESI), RDX(EDX), RCX(ECX), R8(R8D), R9(R9D) 에 저장하며 더 많은 인자를 받을 땐 스택을 사용한다.
 - 즉, `rdi, rsi, rdx, rcx, r8, r9, [rsp], [rsp+8], [rsp+0x10], [rsp+0x18], [rsp+0x20]` 순서로 레지스터 및 stack 의 메모리를 참조하게 된다.
 
@@ -126,7 +122,7 @@ draft: false
   - 공격자가 ELF에서 프로세스의 흐름에 관여하는 `.init_array`, `.fini_array` 과 같은 데이터 세그먼트들을 다른 함수로 덮어쓰면 프로세스의 흐름이 변경될 수 있다.
   - `.plt` section 은 code 영역이라 write 권한이 없어 overwrite가 불가능하고, `.got` 영역 에는 `Full RELRO` 가 적용되어있지 않다면 overwrite 가 가능하다.
 ### 메모리 관리
-#### ptmalloc (pthread malloc)
+### ptmalloc (pthread malloc)
 - 메모리 활용성을 높이기 위해 메모리 할당 및 해제 방법을 정의한 전략으로 아래와 같은 기능이 있다.
   1. 해제된 메모리 크기에 따라 알맞게 재활용
   2. 해제된 메모리의 위치를 저장하여 빠르게 접근

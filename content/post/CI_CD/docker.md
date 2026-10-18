@@ -1,264 +1,160 @@
-+++
-title = "Docker"
-date = 2021-08-12T10:41:00+09:00
-lastmod = 2021-08-12T10:41:00+09:00
-tags = [ "docker",]
-categories = ["dev",]
-imgs = []
-cover = "" # image show on top
-readingTime = true # show reading time after article date
-toc = true
-comments = false
-justify = false # text-align: justify;
-single = false # display as a single page, hide navigation on bottom, like as about page.
-license = "" # CC License
-draft = false
-+++
+---
+title: "Docker 핵심 아키텍처와 Dockerfile 최적화 작성부터 프로덕션 배포까지"
+description: "가상 머신 대비 도커의 경량화 원리, Dockerfile 핵심 명령어(COPY vs ADD, ENTRYPOINT vs CMD) 비교, 컨테이너 생명주기 관리 및 트러블슈팅을 정리합니다."
+slug: "docker-architecture-dockerfile-production-guide"
+date: 2021-08-12T10:41:00+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DevOps"]
+tags: ["docker", "container", "devops", "ci-cd", "dockerfile"]
+series: ["Docker와 컨테이너 실전 인프라"]
+ShowToc: true
+TocOpen: true
+---
 
-# Docker
-- 리눅스 커널의 cgroups와 namespace에 의해 제공되는 기술
-- 가상화 기능의 일종으로, 별도의 OS를 갖지 않아 VM(Virtual Machine) 보다 가볍다.
-- 게스트는 호스트 OS와 자원을 공유한다.
-- immutable infrastructure : 서비스 운영 환경을 통째로 이미지화 하여 배포하는 형태
+현대 소프트웨어 엔지니어링과 클라우드 네이티브 환경에서 컨테이너 기술은 표준 배포 패러다임으로 자리 잡았습니다. '내 로컬 컴퓨터에서는 잘 실행되는데 배포 서버에서는 동작하지 않는' 의존성 파편화 문제를 원천적으로 해결해주기 때문입니다.
 
-## Startup 
-### 설치
-- [링크 참조](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
-- docker api 리눅스 설치 : `sudo apt-get install docker`
+이 글에서는 리눅스 커널 수준의 도커 동작 원리부터 멀티 스테이지 빌드를 고려한 효율적인 Dockerfile 작성법, 컨테이너 생명주기 관리 명령어, 그리고 실무에서 자주 마주치는 데몬 연결 오류 해결법을 총정리합니다.
 
-### 실행
-1. `DockerFile` 이름의 파일을 생성하고 내용을 채워넣는다. 
-   - [공식 가이드](https://docs.docker.com/engine/reference/builder/)
-  
-   - python 서버 실행 예시
-      ```
-      # python:3.10의 이미지로 부터
-      FROM python:3.9
-      # 제작자 및 author 기입
-      LABEL maintainer="huisam@naver.com"
+---
 
-      # 해당 디렉토리에 있는 모든 하위항목들을 '/app/server`로 복사한다
-      COPY . /app/server
+## 1. 도커 컨테이너 가상화의 핵심 아키텍처
 
-      # image의 directory로 이동하고
-      WORKDIR /app/server
+도커(Docker)는 리눅스 커널의 두 가지 핵심 기술을 바탕으로 프로세스를 격리합니다.
+1. **cgroups (Control Groups)**: 프로세스 그룹별 CPU, 메모리, 네트워크 대역폭, 디스크 I/O 등 시스템 자원 할당량을 제어합니다.
+2. **namespaces**: 프로세스 트리(PID), 네트워크 인터페이스(NET), 파일시스템 마운트 포인트(MNT), 사용자 계정(USER)을 완전히 분리하여 각 컨테이너가 독립된 OS 위에서 구동되는 것처럼 환경을 격리합니다.
 
-      # 필요한 의존성 file들 설치
-      RUN pip3 install -r requirements.txt
+### 1.1. 가상 머신(VM)과 컨테이너의 성능 차이
+기존 하이퍼바이저 기반 가상 머신(VM)은 호스트 OS 위에 게스트 OS 전체를 별도로 구동해야 하므로 기가바이트(GB) 단위의 디스크 용량과 긴 부팅 시간, 상당한 CPU 오버헤드가 발생합니다. 반면 도커 컨테이너는 호스트 OS 커널을 직접 공유하면서 사용자 공간(User Space) 프로세스만 격리하므로 메가바이트(MB) 단위의 가벼운 이미지 크기와 밀리초(ms) 단위의 즉각적인 시작 속도를 제공합니다.
 
-      # 환경 설정 세팅
-      RUN python setup.py install
+### 1.2. 불변 인프라 (Immutable Infrastructure)
+도커는 인프라 변경 시 기존 컨테이너를 패치하는 대신, 변경점이 반영된 완전히 새로운 이미지를 빌드하여 통째로 교체 배포하는 **불변 인프라** 원칙을 실현합니다. 이를 통해 서버 환경의 드리프트(Drift) 현상을 원천 방지할 수 있습니다.
 
-      # container가 구동되면 실행
-      ENTRYPOINT ["python", "Server.py"]
-      ```
+{{< ad-inarticle >}}
 
-   - 리눅스 실행 예시
-      ```
-      FROM ubuntu:18.04
+---
 
-      ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
-      ENV LC_CTYPE=C.UTF-8
+## 2. 실전 Dockerfile 작성과 명령어 명세
 
-      RUN apt update
-      RUN apt install -y \
-          gdb \
-          gcc \
-          git \
-          python3 \
-          python3-pip \
-          ruby \
-          sudo \
-          tmux \
-          vim \
-          wget
-      RUN pip3 install pwntools
+애플리케이션을 컨테이너 이미지로 패키징하기 위해 `Dockerfile` 스크립트를 정의합니다.
 
-      # install pwndbg
-      WORKDIR /root
-      RUN git clone https://github.com/pwndbg/pwndbg
-      WORKDIR /root/pwndbg
-      RUN git checkout 2023.03.19
-      RUN ./setup.sh
+### 2.1. Python 웹 서버 Dockerfile 예시
+```dockerfile
+# 1. 경량화된 Python 기본 런타임 이미지 지정
+FROM python:3.9-slim
 
-      # install pwntools
-      RUN pip3 install --upgrade pip
-      RUN pip3 install pwntools
+# 메타데이터 레이블 지정
+LABEL maintainer="aswinblue@example.com"
 
-      # install one_gadget command
-      RUN gem install one_gadget
+# 컨테이너 내부 작업 디렉터리 설정
+WORKDIR /app/server
 
-      WORKDIR /root
-      ``` 
-   - 별도의 이미지가 필요하다면 생성 혹은 다운로드 하고, DockerFile 에서 경로를 설정한다.
-   - 일반적인 iso 파일은 docker에서 자체 지원한다.
-2. `docker build <DOCKER_FILE_PATH> -t my_image` 명령어로 빌드 수행.
-   - ex) `docker build . -t version:ubuntu1804 .` : ubuntu1804 버전(version) 태그를 가진 docker 이미지 빌드
-   - ex) `docker build . -t my_image .` : my_image 이름(name)을 가진 docker 이미지 빌드
-   - `-t` : 빌드 한 이미지에 태그를 추가 (컨테이너 실행 혹은 이미지 관리에 태그를 이용)
-     
-3. `docker run -d -t -v ~:/volume --privileged --name=my_container my_image`
-   - `--name=my_container`: 'my_container' 라는 이름으로 컨테이너 생성
-   - `-t`: tty 설정
-   - `-d`: background 실행
-   - `-v .:/volume`: 현재 디렉터리를 /volume 경로의 폴더에 연결
-   - `my_image`: docker build 명령어로 빌드한 이미지 중 my_image 라는 이름의 이미지를 사용
-4. `docker exec -it -u root my_container bash`
-   - 생성된 'my_container' 에 root 계정으로 bash 실행하여 접근
-5. 오류가 발생한다면  [오류와 해결방법](./#오류와-해결방법) 참조
+# 빌드 캐시 최적화를 위해 의존성 정의 파일 먼저 복사
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-### 관리
-#### 이미지
-- `docker images` : 로컬에 저장된 docker 이미지 확인
-- `docker search IMAGE_NAME` : 이미지 이름을 docker hub 에 검색
-- `docker image pull IMAGE_NAME:TAG` : 이미지 이름과 태그를 이용해 'IMAGE_NAME:TAG' 에 해당하는 이미지를 docker hub에서 다운로드
-- `docker image rm IMAGE_NAME` : 이미지 이름이나 ID로 이미지를 삭제
-#### 컨테이너
-- 실행시킨 docker 들은 (`docker run` 명령 수행)는 컨테이너 형태로 남아있다.
-- `docker ps -a` : 컨테이너 목록 확인
-- `docker stop CONTAINER_NAME` : CONTAINER_NAME 컨테이너 중지
-- `docker rm CONTAINER_NAME` : CONTAINER_NAME 컨테이너 삭제
-- `docker container start CONTAINER_NAME` : CONTAINER_NAME 컨테이너 실행
-- `docker container top CONTAINER_NAME` : CONTAINER_NAME 컨테이너 동작 프로세스 정보 확인
+# 애플리케이션 전체 소스코드 복사
+COPY . .
 
-### 오류와 해결방법
-1. is docker daemon running? 에러
-   - `service docker status` 입력시 docker daemon이 꺼져있는지 확인
-   - `service docker start` 명령으로 daemon 실행
-     - 만약 명령은 수행되나 켜지지 않는다면 systemctl명령 수행
-       - `systemctl start docker` : docker를 daemon으로 실행
-       - `systemctl enable docker` : OS실행시 docker daemon을 기본 실행
-     - systemctl 명령도 안된다면 `/lib/systemd/system/docker.service` , `/lib/systemd/system/docker.socket` 이 제대로 있는지 확인하여 설치 여부를 재확인한다.    
-[참조](https://velog.io/@pop8682/Docker-Cannot-connect-to-the-Docker-daemon-at-unixvarrundocker.sock.-Is-the-docker-daemon-running-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0)   
+# 외부 포트 노출 선언
+EXPOSE 8000
 
-2. init 프로세스(PID 1)이 /bin/bash로 실행되지 않을 때, docker 실행 방법
-   - `docker run -t -i ubuntu:16.04 /bin/bash`
-
-3. `The container name "CONTAINER" is already in use by container`
-   - 동일 한 이름의 컨테이너가 이미 존재해서 발생하는 에러
-   - `docker ps -l` 로 컨테이너를 확인한다. 
-   - `docker stop CONTAINER_NAME` 로 컨테이너 종료
-   - `docker rm CONTAINER_NAME` 로 컨테이너 삭제
-   - 다시 docker를 실행시키면 문제가 해결된다.
-
-4. `container ~~~~ is not running`
-   - 컨테이너가 실행되고 있지 않아서 발생하는 오류이다. 
-   - `docker container start CONTAINER_NAME` 명령으로 컨테이너를 실행시킨 후에는 `docker exec` 명령으로 컨테이너에 정상 접속할 수 있다.
-
-## DockerFile 명령어
- - `FROM`: base image를 지정하는 명령어
-   - DockerFile의 시작은 무조건 FORM 이 필요하다.  
-   - `FROM <IMAGE>:<VERSION>` 형태로 사용한다.
-   `FROM base:${CODE_VERSION}`
- - `MAINTAINER` : 메인테이너 정보
- - `ARG`: 변수를 선언  
-   - `ARG CODE_VERSION=latest`
-   - 선언한 변수는 `${CODE_VERSION}` 형태로 참조 가능하며, build시 자동으로 argument로 사용된다. 
-   - `ARG port` 와 같이 값을 정의하지 않고 선언만 한 경우에는, --build-arg 옵션으로 값 설정이 가능하다.  
-     - `docker build --build-arg port=80`
- - `RUN`: 컨테이너가 이미지를 실행하기 전 수행할 쉘 명령어
- - `CMD`: 컨테이너 실행 시 디폴트로 실행할 커맨드를 설정
-   - `CMD ["executable","param1","param2"]` 형태로 사용
-   - ENTRYPOINT와 조합하여 사용 가능하며, ENTRYPOINT에서 "executable"(명령어) 를 선언한 상태라면 CMD에서 executable 없이 param만 선언 가능하다. `CMD ["param1","param2"]`
-   - 여러개의 CMD를 선언하면 가장 마지막의 것만 동작
-   - `CMD /code/run-app` 와 같이 사용
- - `COPY`: 호스트 컴퓨터의 디렉터리나 파일을 Docker 이미지의 파일 시스템으로 복사
-   - `COPY: <SRC> <DEST>`
-   - `COPY: ["<SRC1>", "<SRC2>", ... <DEST>]`
- - `ADD`: 현재 이미지의 파일들을 내부 이미지의 특정 디렉터리에 복사. 이미지 안에 해당 경로가 없으면 생성하여 추가
-   - `ADD <DIR_SOURCE> <DIR_DEST>`
-   - COPY의 상위호환 명령어로, 압축 파일이나 링크상의 파일도 추가 가능하다. 
- - `ENV`: 환경변수를 설정하기 위한 명령어
- - `EXPOSE`: 외부와 연결할 포트, 컨테이너 실행시 -p 옵션을 사용하여 컨테이너로 유입되는 트래픽을 관리하려면 설정해 두어야 함.
-   - `EXPOSE <port> [<port>/<protocol>...]`
-   - 프로토콜은 tcp,udp 중 선택 가능
- - `ENTRYPOINT`: 컨테이너 시작시 수행할 명령어
-   - `ENTRYPOINT ["<CMD>", "<PARAM1>", "<PARAM2>"]` 형태로 사용
-   - `ENTRYPOINT ["npm", "start"]`
- - `LABEL`: 이미지에 metadata를 정의하는 명령어
-   - `LABEL <key>=<value> <key>=<value> <key>=<value> ...`
- - `STOPSIGNAL`: 시스템이 종료하기 위한 SIGNAL을 설정한다. 
-   - SIGINT, SIGKILL 등을 설정할 수 있으며, 이를 전달받으면 컨테이너가 종료하게 된다.
-   - 설정하지 않으면 SIGTERM 이 자동으로 세팅된다. 
- - `USER`: 
- - `VOLUME`: 볼륨을 mount 하기 위한 자리를 세팅하는 명령어
-   - `VOLUME ["경로1", "경로2", ...]`
-   - run의 -v 옵션과 유사하지만, docker가 임의로 생성한 디렉터리에 volume을 연결한다. 이는 docker volume 명령어로 관리 가능하지만, 컨테이너가 삭제되고 나면 직접 접근하기 힘들다.
- - `WORKDIR`: 컨테이너에서 작업 디렉터리 이동
-   - 리눅스의 cd 명령과 유사
- - `ONBUILD`: 빌드 후에 동작해야 할 명령들을 설정하는 명령어
-   - DockerFile 명령어는 이미지 빌드를 위한 명령어이며, 빌드 할 때 마다 동일한 결과물을 산출한다. 하지만 빌드된 이미지의 결과물을 다음 빌드 때 사용하고 싶다면 이 명령을 사용한다.
-        ```
-        ONBUILD
-        Learn more about the "ONBUILD" Dockerfile command.
-         ADD . /app/src
-        ONBUILD RUN /usr/local/bin/python-build --dir /app/src
-        ```
-   - 다음 빌드 때 ONBUILD가 호출된 순서대로 명령이 동작한다. 
-   - `docker inspect` 명령어로 확인 가능
-
-## Docker 라이브러리 명령어
-- 이미지 : 특정 환경을 만들기 위해 세팅된 정보.
-- 컨테이너 : 실행가능한 상태의 프로세스. 이미지를 컨테이너에 담아 실행시킬 수 있다.
-
-### 생성 및 설정
-- 버전 확인: `docker -v `
-- 이미지 다운: `docker pull <이미지명>[:태그]`
-- 이미지 생성 : `docker build . -t <이미지명> [태그]`
-  - 현재 경로에서 Dockerfile을 찾아 그 안의 명세에 따라 빌드가 된다.
-- 설치된 도커 이미지 확인: `docker images `
-
-### 실행
-- 컨테이너 생성, 실행하지 않고 정지: ` docker create [옵션] <이미지명>[:태그] `
-- 컨테이너 실행 후 CLI 접속: ` docker attach <컨테이너 id 또는 이름> `
-- 컨테이너 실행. 지정된 작업 수행: ` docker start <이미지명> `
-- 이미지 다운받아 실행: ` docker run <이미지명> `
-- 환경변수 설정: ` docker run -e <환경변수=설정값> `
-
-#### 옵션
-- 이미지 다운받아 실행 후 CLI 접속: ` docker run -it <이미지명> `
-- 컨테이너 실행시 이름 지정: ` docker run --name <컨테이너명> <이미지명> `
-- 디렉터리 연결: ` docker run -v <로컬경로>:<컨테이너 내부 경로> <이미지명> `
-- 포트 연결: ` docker run -p <로컬포트>:<컨테이너 포트> <이미지명> `
-- 백그라운드 실행: ` docker run -d <이미지명> `
-- 프로세스 종료시 컨테이너 자동 삭제: ` docker run -rm <이미지명> `
-
-### 관리
-- 실행중인 컨테이너 확인: `docker ps`
-- 생성된 컨테이너 확인: `docker container list`
-- 컨테이너 종료: ` docker stop <컨테이너 id 또는 이름> `
-- 일시중지: ` docker container pause <컨테이너명> `
-- 일시중지 해제: ` docker container unpause <컨테이너명> `
-- 컨테이너 삭제: ` docker rm <컨테이너 id 또는 이름> `
-- 모든 컨테이너 삭제: ``` docker rm `docker ps -a -q```
-- 볼륨까지 같이 삭제: ` docker rm -v <컨테이너 id 또는 이름> `
-- 이미지 삭제: ` docker rmi [옵션] <이미지 id> `
-- 컨테이너 내부에서 커맨드라인을 수행하도록 외부에서 입력: `docker exec [옵션] <컨테이너 id 또는 이름> <커맨드>`
-- 컨테이너 실행 후 지정된 명령어 수행: ` docker exec -it <컨테이너 id 또는 이름> [명령어] `
-- 백그라운드 실행중인 도커 로그 확인: ` docker logs -f <컨테이너 id 또는 이름>`
-
-
-## .dockerignore
-- Docker 이미지 생성시 들어가지 않을 파일들을 지정 가능
-
-## docker-compose
-- 각각의 Dockerfile들을 묶어 하나의 시스템을 구성하는 도구
-- docker 실행시 명령어를 미리 작성해 놓은 스크립트라고 보면 된다.
-- `` docker-compose up `` 명령으로 docker-compose 파일 빌드 가능. 하위 경로에 Dockerfile들이 각각의 서비스에 해당됨
+# 컨테이너 부팅 시 실행할 엔트리포인트 지정
+ENTRYPOINT ["python", "Server.py"]
 ```
-version: '3' 				// 도커 컴퍼즈 버전 3이상 요구
-	services: 				// 서비스 내용들이 아래에 옴
-		service1: 			// 서비스 이름으로, 마음대로 정의 가능
-			build: ./S1 		// docker-compose 파일로부터 경로를 지정
-			volumes:
-				- ./S1:/home/root 	//	docker run -v 옵션 적용과 동일
-			ports:
-				- "1234:1234"		// docker run -p 옵션 적용과 동일
-			environment:
-				- DEBUG_LEVEL=debug	//	환경변수 설정 가능
-			links: // docker-compose 3부터는 필요없어진 기능, 네트워크 연결을 위해 사용
-				- service2
-		service2: 			// 또다른 서비스, 위와 같이 작성 가능
 
-		...
+### 2.2. 핵심 Dockerfile 명령어 상세 비교
+- **`FROM <IMAGE>:<TAG>`**: 빌드 기반이 될 베이스 이미지를 지정하며 모든 Dockerfile의 첫 번째 명령이어야 합니다.
+- **`COPY` vs `ADD`**:
+  - `COPY`: 로컬 파일/디렉터리를 컨테이너 내부로 단순 복사합니다. 일반적인 소스코드 복사 시 보안성과 명확성을 위해 항상 `COPY` 사용을 권장합니다.
+  - `ADD`: 로컬 파일 복사뿐 아니라 원격 URL 다운로드 및 `tar.gz` 압축 파일의 자동 풀림 기능을 지원합니다.
+- **`ENTRYPOINT` vs `CMD`**:
+  - `ENTRYPOINT`: 컨테이너가 실행될 때 반드시 고정 실행되는 기본 바이너리나 명령어를 정의합니다.
+  - `CMD`: `ENTRYPOINT`에 전달할 기본 파라미터를 제공하거나 단독 기본 명령을 지정합니다. 사용자가 `docker run` 시 인자를 넘기면 `CMD` 내용은 쉽게 오버라이딩됩니다.
+- **`ARG` vs `ENV`**:
+  - `ARG`: 이미지 빌드 시점(`docker build --build-arg`)에만 유효한 임시 변수입니다.
+  - `ENV`: 빌드된 이미지 및 런타임 컨테이너 실행 환경 전반에 유지되는 영구 환경변수입니다.
+- **`USER`**: 기본 `root` 계정 대신 보안을 위해 권한이 제한된 일반 사용자 계정으로 프로세스를 실행하도록 전환합니다.
+- **`VOLUME`**: 컨테이너가 삭제되어도 보존되어야 하는 데이터 영속성 마운트 포인트를 선언합니다.
+
+---
+
+## 3. 컨테이너 생명주기 관리 및 필수 CLI 명령어
+
+### 3.1. 이미지 빌드 및 실행
+- 이미지 빌드:
+  ```bash
+  docker build -t my-app:1.0.0 .
+  ```
+- 백그라운드 분리 실행 및 포트 바인딩:
+  ```bash
+  docker run -d --name my-container -p 8080:8000 -v $(pwd)/logs:/app/logs my-app:1.0.0
+  ```
+- 실행 중인 컨테이너 내부 쉘 접속:
+  ```bash
+  docker exec -it my-container bash
+  ```
+
+### 3.2. 상태 모니터링 및 정리
+- 실행 및 중지된 전체 컨테이너 목록: `docker ps -a`
+- 컨테이너 실시간 리소스(CPU/메모리) 점검: `docker stats`
+- 실시간 표준 출력 로그 모니터링: `docker logs -f my-container`
+- 미사용 컨테이너 및 댕글링 이미지 일괄 정리: `docker system prune -f`
+
+---
+
+## 4. 자주 발생하는 실무 에러와 트러블슈팅
+
+### 4.1. Cannot connect to the Docker daemon 에러
+- **원인**: 백그라운드에서 동작해야 하는 도커 시스템 데몬(`dockerd`)이 비활성화되었거나 권한이 없는 경우입니다.
+- **해결 방법**:
+  ```bash
+  # 서비스 상태 확인 및 기동
+  sudo systemctl status docker
+  sudo systemctl start docker
+
+  # 현재 계정에 docker 그룹 권한 부여
+  sudo usermod -aG docker $USER
+  ```
+
+### 4.2. Conflict. The container name is already in use
+- **원인**: 동일한 이름(`--name`)으로 이미 생성된 컨테이너가 남아있어 충돌하는 현상입니다.
+- **해결 방법**:
+  기존 컨테이너를 중지하고 삭제하거나, `docker run --rm` 옵션을 부여하여 프로세스 종료 시 자동 파기되도록 설정합니다.
+  ```bash
+  docker stop my-container && docker rm my-container
+  ```
+
+---
+
+## 5. 멀티 컨테이너 오케스트레이션: docker-compose 기초
+
+복수의 마이크로서비스(예: 웹 서버 + DB + Redis 캐시)를 단일 스크립트로 오케스트레이션할 때는 `docker-compose.yml`을 활용합니다.
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/mydb
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
 ```
+
+위 설정을 작성한 후 `docker compose up -d` 명령어를 입력하면 네트워크 연결과 볼륨 마운트가 자동으로 구성되며 전체 서비스 스택이 백그라운드에서 기동됩니다.

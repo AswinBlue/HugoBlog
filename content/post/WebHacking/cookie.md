@@ -1,92 +1,107 @@
 ---
-title: "Cookie"
+title: "웹 쿠키(Cookie)와 세션(Session) 동작 원리 및 보안 플래그(HttpOnly, Secure) 설정법"
+description: "무상태 프로토콜인 HTTP에서 상태 유지를 위한 쿠키(Cookie)와 세션(Session)의 동작 메커니즘, 보안 플래그(HttpOnly, Secure, SameSite), SOP와 CORS 정책 및 보호 기법을 총정리합니다."
+slug: "web-cookie-session-and-security-flags"
 date: 2025-03-09T16:10:13+09:00
-lastmod: 2025-03-09T16:10:13+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["WebHacking"]
+tags: ["cookie", "session", "web-security", "http", "cors"]
+ShowToc: true
+TocOpen: true
 ---
 
-# Cookie
-- HTTP의 특징(Connectionless, Stateless) 때문에 Web Server 는 HTTP로 요청된 패킷들이 어떤 Web Client에서 전달된 것인지 구분할 수 없다. 
-  - IP 주소와 User-Agent 등의 정보는 매번 변경될 수 있다.
-- Client의 정보와 요청의 내용을 구체화하기 위해, Server는 Client 마다 고유한 Cookie를 발급하고, Client는 Server에 요청을 보낼 때마다 Cookie를 같이 전송한다.
-- Server는 Request 패킷에 들어있는 Cookie 를 통해 Client의 정보와 상태를 기록한다.
-- Cookie 는 key-value 로 구성된 파일이며, Client 에 저장된다.
+기본 HTTP 프로토콜은 연결을 유지하지 않는 비연결성(Connectionless)과 이전 요청의 상태를 기억하지 않는 무상태성(Stateless)을 기본 특징으로 갖습니다. 따라서 사용자가 로그인에 성공하더라도 다음 요청에서 웹 서버는 해당 클라이언트가 누구인지 식별할 수 없습니다.
 
-## Cookie의 단점
-- 4KB의 크기 제한
-- 쿠키로 인해 웹의 반응성이 느려질 수 있음
-- 도메인 내의 모든 페이지가 같은 쿠키를 전달 받음
-- HTTP 프로토콜로 Cookie 요청시 암호화 되지 않아 보안이 취약함
-- 쿠키는 사용자의 로컬에 텍스트로 저장 되어있어 쉽게 내용 확인이 가능함
-- 악의적인 Client 가 Cookie 를 변조할 수 있음
+이를 해결하기 위해 클라이언트와 서버는 쿠키(Cookie)와 세션(Session) 메커니즘을 사용합니다. 이 글에서는 쿠키와 세션의 동작 원리부터 세션 하이재킹 방어, 쿠키 보안 플래그, 동일 출처 정책(SOP) 및 CORS 설정까지 종합적으로 살펴봅니다.
 
-## Modern Storage APIs
-- Cookie 의 단점을 해결하기 위해 사용되는 방법이다.
-- Local storage, Session storage 등이 있다.
+---
 
-## Session
-- Session 은 Server 에서 생성한 랜덤한 문자열이고, Server 가 Client 마다 고유한 값을 발급한다.
-- Client 가 변조하면 안되는 정보들을 서버에 저장하기 위해 Server 와 Client는 Session 이라는 정보를 추가로 주고 받는다.
-  - Client 가 본인을 인증하기 위해 Cookie 에 자신의 인증 정보를 담아서 Server 로 전달하면, Server는 새로운 Session ID를 생성한다.
-  - Server는 생성한 Session ID를 Client에게 반환한다. 
-  - Server는 Client로 부터 수신한 인증 정보와 본인이 생성한 Session ID를 묶어서 자신의 DB에 저장한다. 
-  - 이후 Server는 Client 로 부터 인증 정보를 받지 않고 Session ID 만으로 Client를 구분할 수 있다.
+## 1. HTTP 무상태성과 쿠키(Cookie)의 동작 원리
 
-- 만약 공격자가 이용자의 쿠키를 훔칠 수 있으면 이용자의 인증 상태를 훔칠 수 있는데, 이를 `Sessions Hijacking` 이라고 한다.
+쿠키는 웹 서버가 클라이언트(웹 브라우저)에 전송하여 로컬에 저장하도록 하는 Key-Value 쌍 형태의 작은 텍스트 데이터 조각입니다.
 
-## Cookie in HTTP
-- HTTP 통신에서 Server가 브라우저에게 Cookie를 생성하려면 response 패킷에 아래와 같이 `Set-Cookie` 구문을 넣으면 된다.
-    ```
-    Set-Cookie: name=test;
-    Set-Cookie: age=30; Expires=Fri, 30 Sep 2022 14:54:50 GMT;
-    ```
-- Client 에서 Cookie 를 조작하려면 Javascript 를 활용한다.
-    ```
-    document.cookie = "name=test;"
-    document.cookie = "age=30; Expires=Fri, 30 Sep 2022 14:54:50 GMT;"
-    ```
+### 1.1. 쿠키의 개념과 한계점
+- **동작 방식**: 서버가 응답 헤더로 쿠키를 내려주면, 브라우저는 해당 도메인으로 요청을 보낼 때마다 `Cookie` 요청 헤더에 자동으로 쿠키를 동봉하여 전송합니다.
+- **쿠키의 주요 한계점**:
+  - 도메인당 최대 4KB 내외의 용량 제한이 있습니다.
+  - 매 HTTP 요청마다 헤더에 포함되므로 불필요하게 대역폭을 낭비할 수 있습니다.
+  - 클라이언트 브라우저 로컬 파일 시스템에 저장되므로 사용자가 쉽게 열람 및 임의 변조할 수 있습니다.
+  - 암호화되지 않은 HTTP 환경에서는 패킷 스니핑을 통해 민감 데이터가 그대로 노출됩니다.
 
-## SOP (Same Origin Policy)
-- 악의적인 웹 페이지에서 javascript 를 통해 Client 가 다른 웹 페이지로 패킷을 보내게 한다면, Client 의 Session 과 Cookie 를 사용해 웹 페이지에 패킷을 보낼 수 있게 된다.
-- Web Client 에서는 동일한 출처(origin) 로 판별된 사이트를 대상으로만 읽어들일 수 있는 제약을 만들었고, 이를 SOP 라 한다.
-- 데이터 읽기는 막지만, 쓰기는 허용된다.
+### 1.2. HTTP Set-Cookie 헤더와 브라우저 조작
+서버는 응답 시 `Set-Cookie` 헤더를 통해 브라우저에 쿠키 생성을 지시합니다.
 
-### 동일 출처 (same origin)
-- 웹 사이트의 URL은 프로토콜, 포트, 호스트 세 가지로 구성된다.
-- 예를들어 `https://google.com:443` URL은 아래와 같이 분석된다.
-  - 프로토콜(scheme) : `https`
-  - 호스트 : `google.com`
-  - 포트 : `443`
-- `https://google.com/menu:443` : same origin. path가 다른 것은 허용
-- `http://google.com:443` : cross origin. 프로토콜(scheme)이 다름
-- `https://naver.com:443` : cross origin. 호스트가 다름
-- `https://google.com:123` : cross origin. 포트가 다름
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Set-Cookie: sessionId=abc12345; Expires=Fri, 30 Sep 2026 14:00:00 GMT; Path=/; HttpOnly; Secure; SameSite=Strict
+```
 
-### CORS (Cross-Origin Resource Sharing)
-- SOP 제약사항에도 예외는 있다. 이미지나 자바스크립트, CSS 등의 리소스를 불러오는 \<img>, \<style>, \<script> 등의 태그는 SOP의 영향을 받지 않습니다.
-- 또한, 필요에 의해 cross origin 간에도 데이터를 교환해야 할 상황이 있는데, 이 경우 CORS와 관련된 HTTP 헤더를 추가하여 데이터를 요청할 수 있다. 
+클라이언트 자바스크립트에서는 `document.cookie` 프로퍼티를 통해 쿠키를 조회하거나 설정할 수 있습니다. (단, `HttpOnly` 플래그가 없는 경우에만 접근 가능합니다.)
+
+```javascript
+document.cookie = "username=guest; max-age=3600; path=/";
+```
+
+---
+
+## 2. 세션(Session) 기반 인증과 세션 하이재킹 방어
+
+쿠키에 패스워드나 권한 정보를 직접 저장하면 보안상 치명적이므로, 민감 정보는 서버 측에 보관하고 클라이언트에게는 난수화된 식별자(Session ID)만 전달합니다.
+
+### 2.1. 세션 발급 및 라이프사이클
+1. 클라이언트가 로그인 자격 증명(ID/PW)을 서버에 전송합니다.
+2. 서버는 자격 증명을 검증한 후 암호학적으로 안전한 무작위 문자열인 `Session ID`를 생성합니다.
+3. 서버는 세션 저장소(Redis, RDBMS 또는 인메모리)에 `Session ID &rarr; 사용자 정보` 맵을 저장합니다.
+4. 서버는 `Set-Cookie` 헤더에 `Session ID`를 담아 클라이언트에 반환합니다.
+5. 이후 클라이언트는 매 요청마다 세션 쿠키를 동봉하며, 서버는 세션 ID를 키로 조회하여 사용자를 즉시 식별합니다.
+
+### 2.2. 세션 하이재킹(Session Hijacking) 위협
+공격자가 스니핑이나 XSS 공격을 통해 희생자의 세션 ID 쿠키를 탈취하면, 아이디와 비밀번호를 알지 못하더라도 서버로부터 정상 사용자로 인가받을 수 있습니다. 이를 세션 하이재킹이라 하며, 이를 차단하기 위해 엄격한 쿠키 보안 플래그 설정이 필수적입니다.
+
+---
+
+## 3. 웹 보안을 위한 쿠키 핵심 플래그 설정
+
+프로덕션 환경에서는 쿠키를 발급할 때 다음 3대 보안 플래그를 반드시 활성화해야 합니다.
+
+### 3.1. `HttpOnly` (XSS 공격 방어)
+`HttpOnly` 속성을 지정하면 브라우저의 자바스크립트(`document.cookie`)를 통한 쿠키 접근이 완전히 차단됩니다. 악성 스크립트가 주입되는 XSS(Cross-Site Scripting) 취약점이 발생하더라도 공격자가 사용자의 인증 쿠키를 탈취할 수 없습니다.
+
+### 3.2. `Secure` (HTTPS 암호화 강제)
+`Secure` 속성을 추가하면 암호화된 HTTPS 통신을 통해서만 쿠키가 서버로 전송됩니다. 평문 HTTP 통신 구간에서 일어날 수 있는 중간자 공격(MITM) 및 패킷 스니핑을 원천 차단합니다.
+
+### 3.3. `SameSite` (CSRF 공격 방어)
+교차 출처(Cross-Site) 요청 시 쿠키가 전송되는 정책을 제어하여 사용자의 의도치 않은 요청 실행(CSRF)을 방어합니다.
+- **`SameSite=Strict`**: 어떠한 타사 사이트 링크나 요청에서도 쿠키를 일체 전송하지 않는 가장 엄격한 모드.
+- **`SameSite=Lax` (기본값)**: 사용자가 링크를 클릭하여 이동하는 최상위 탐색(Top-level GET navigation)을 제외한 서드파티 이미지, iframe, POST 요청에서는 쿠키 전송을 차단.
+- **`SameSite=None`**: 모든 교차 사이트 요청에 쿠키를 전송 (반드시 `Secure` 플래그와 함께 사용해야 함).
+
+---
+
+## 4. 동일 출처 정책(SOP)과 교차 출처 리소스 공유(CORS)
+
+### 4.1. 동일 출처 정책(SOP - Same-Origin Policy)
+웹 브라우저는 보안을 위해 한 출처(Origin)에서 로드된 문서나 스크립트가 다른 출처의 리소스와 상호작용하는 것을 기본적으로 제한합니다. 출처는 **프로토콜(Scheme), 호스트(Host), 포트(Port)** 3가지 요소의 조합으로 판별됩니다.
+
+- `https://example.com:443/api/user` (기준 출처)
+- `https://example.com:443/board` &rarr; **Same Origin** (경로만 다름)
+- `http://example.com:443/` &rarr; **Cross Origin** (프로토콜 불일치)
+- `https://api.example.com:443/` &rarr; **Cross Origin** (서브도메인 호스트 불일치)
+- `https://example.com:8080/` &rarr; **Cross Origin** (포트 번호 불일치)
+
+### 4.2. CORS (Cross-Origin Resource Sharing)와 Preflight
+SOP 제약 하에서도 프론트엔드와 백엔드 서버가 다른 도메인으로 분리된 경우 안전하게 데이터를 교환할 수 있도록 HTTP 헤더를 통해 권한을 위임하는 메커니즘입니다.
+
+- 브라우저는 `PUT`, `DELETE` 요청이나 커스텀 헤더가 포함된 복합 요청 시 본 요청 전에 `OPTIONS` 메서드로 **프리플라이트(Preflight)** 질의를 서버로 전송합니다.
+- 서버가 응답 헤더에 허용 정책을 명시해야 실제 요청이 수행됩니다.
+  ```http
+  Access-Control-Allow-Origin: https://frontend.example.com
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Authorization, Content-Type
+  Access-Control-Allow-Credentials: true
   ```
-  xhr = new XMLHttpRequest();
-  xhr.withCredentials = true;
-  ```
-  - 이 경우, 수신측에 메시지 요청을 질의하는 용도로 `OPTIONS` 메소드 데이터가 전달된다. 
-  - 이러한 패킷을 `CORS preflight` 라고 한다. 
-  - 요청 패킷의 헤더에 `Access-Control-Request` 구문이 들어있고, 회신 패킷의 헤더에는 `Access-Control-Allow` 구문이 들어가 있다.
-  - Server 의 회신에 적힌 CORS 정책을 보고, Client는 데이터를 요청할지 판단한다.
 
-### JSONP (JSON with Padding)
-- javascript 는 SOP 의 예외 취급을 받는 속성을 이용하여 \<script> 태그 형태로 cross origin 의 데이터를 받아오는 기법이다.
-- Server 에 데이터를 요청할 때 callback 함수의 이름을 넘겨주면, 대상 서버는 전달된 callback 함수로 데이터를 감싸 응답합니다
-  - ex) request: `<script src='http://theori.io/whoami?callback=myCallback'></script>`
-  - ex) response: `myCallback({'id':'dreamhack'});`
-- JSONP는 CROS 가 생성되기 전에 쓰이던 방법으로, 최근에는 사장되는 추세이다.
+### 4.3. 레거시 우회 기법인 JSONP의 한계
+과거 CORS 표준이 정립되기 전에는 `<script>` 태그가 SOP의 제약을 받지 않는다는 점을 악용하여 콜백 함수로 JSON 데이터를 감싸서 수신하는 JSONP(JSON with Padding) 기법을 사용했습니다. 그러나 JSONP는 오직 GET 요청만 가능하고 임의 스크립트 실행으로 인한 XSS 보안 위협이 높아 현재는 완전히 사장되었습니다.

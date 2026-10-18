@@ -1,24 +1,21 @@
 ---
-title: "DevTool"
+title: "React와 Tailwind CSS로 만든 올인원 웹 개발자 유틸리티 'DevTool' 개발기"
 date: 2025-07-19T21:44:00+09:00
 lastmod: 2025-07-19T21:44:00+09:00
-tags: ['React',]
-categories: ['dev', 'web']
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+description: "React와 Tailwind CSS를 활용해 클라이언트 사이드에서 안전하게 인코딩, 포맷팅, Diff 체크를 지원하는 올인원 웹 개발자 유틸리티 'DevTool'의 아키텍처와 최적화 기록입니다."
+slug: "react-developer-utility-dev-tools"
+categories: ["Projects"]
+tags: ["react", "tailwind-css", "web-tools", "diff-checker", "frontend", "portfolio"]
+series: ["프로젝트 개발기"]
+ShowToc: true
+TocOpen: true
 draft: false
 ---
 
-# DevTool
+# DevTool: React 기반 개발자 통합 유틸리티 웹 개발 문서
 
-**버전:** 1.0.0
-**최종 수정일:** 2025년 7월 19일
+- 버전: 1.0.0
+- 최종 수정일: 2025년 7월 19일
 
 ## 1. 프로젝트 개요
 

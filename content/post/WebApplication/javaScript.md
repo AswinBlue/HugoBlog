@@ -1,164 +1,167 @@
-+++
-title = "JavaScript"
-date = 2020-06-23T20:38:45+09:00
-lastmod = 2020-06-23T20:38:45+09:00
-tags = [
-    "javaScript",
-    "webServer",
-]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "모던 자바스크립트(ES6+) 핵심 문법과 비동기 프로그래밍(Promise / async-await)"
+description: "let/const 스코프, 화살표 함수, 구조 분해 할당, 이벤트 루프(Event Loop) 동작 원리 및 Promise와 async/await를 활용한 비동기 흐름 제어를 총정리합니다."
+slug: "modern-javascript-es6-async-await-guide"
+date: 2020-06-23T20:38:45+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebApplication"]
+tags: ["javascript", "es6", "frontend", "async-await", "web-development"]
+ShowToc: true
+TocOpen: true
+---
 
-# JavaScript
- - 기본적으로 HTML 위에서 돌아가는 코드
- 1) body 태그 안에 <script> </script> 태그를 넣고 안에 작성
-    - document를 호출하고, .으로 함수를 호출한다.
-    - querySelector('')로 원하는 element 선택 가능, ''안의 내용은 css 선택자 문법과 같음
-    - querySelectorAll('')로 원하는 속성의 element들을 nodeList(배열과 유사)형태로 선택 가능
+자바스크립트(JavaScript)는 정적인 HTML/CSS 웹 페이지에 동적인 인터랙션과 비즈니스 로직을 부여하는 표준 스크립트 프로그래밍 언어입니다. 브라우저 내장 자바스크립트 엔진(V8, JavaScriptCore 등)을 통해 실행되며, 브라우저 환경뿐만 아니라 Node.js를 통해 서버 사이드 런타임으로도 폭넓게 활용됩니다.
 
-       ex ) ``document.querySelector('body')``
+이 글에서는 HTML과의 연동 방식, ES6+ 변수 선언 및 데이터 타입, DOM 요소 탐색/조작, 객체와 메서드, 비동기 타이머 제어까지 핵심 기초 문법을 정리합니다.
 
-       ex ) ``document.querySelector('#new')``
+---
 
-       ex ) ``document.write("hello world")``
+## 1. 자바스크립트 개요 및 HTML 연동 방식
 
- 2) 태그 안에 javaScript를 사용하는 속성값으로 사용
+자바스크립트는 브라우저의 DOM(Document Object Model) 트리에 접근하여 HTML 요소를 동적으로 생성, 수정, 삭제할 수 있습니다.
 
-    ex ) ``<input type="button" value="hello" onclick="alert('hello')">``
+### 1.1. 스크립트 작성 및 외부 파일 로드
+- **내부 스크립트**: HTML 문서 내 `<script>` 태그를 선언하여 코드를 직접 작성합니다.
+  ```html
+  <script>
+    console.log("Hello, JavaScript!");
+  </script>
+  ```
+- **외부 스크립트 (권장)**: 별도의 `.js` 파일로 로직을 분리하고 `src` 속성으로 참조하여 재사용성과 캐싱 이점을 확보합니다.
+  ```html
+  <script src="main.js" defer></script>
+  ```
+- **인라인 이벤트 핸들러**: HTML 태그의 이벤트 속성에 자바스크립트 코드를 직접 바인딩합니다.
+  ```html
+  <button onclick="alert('버튼 클릭됨!')">확인</button>
+  ```
 
-    - 특정 태그 안에서 자기자신을 호출할 때에는 querySelector를 호출하지 않고 this를 사용하면 된다.
+### 1.2. DOM 요소 탐색과 내용 조작
+CSS 선택자 문법을 사용하여 DOM 트리의 특정 엘리먼트를 손쉽게 획득할 수 있습니다.
 
-       ex ) ``<input type="button" id="hello" onclick="document.querySelector('#hello').style.color='black';">``
+```javascript
+// 단일 요소 선택 (CSS 선택자와 동일)
+const heading = document.querySelector('h1');
+const submitBtn = document.querySelector('#btn-submit');
 
-       ex ) ``<input type="button" id="hello" onclick="this.style.color='black';">``
+// 복수 요소 선택 (NodeList 컬렉션 반환)
+const menuItems = document.querySelectorAll('.nav-item');
 
-    - var 로 변수를 선언 가능하다. (var 이 없어도 된다)
+// 내용 및 스타일 동적 변경
+submitBtn.textContent = "제출 완료";
+submitBtn.style.backgroundColor = "#2b6cb0";
+```
 
- 3) 별도의 파일로 분리한 후 파일의 링크를 지정한다.
+---
 
-    ex ) ``<script src="script.js"> </script>``
+## 2. 데이터 타입과 변수 선언 (ES6+ 표준)
 
+### 2.1. 변수 선언 키워드 (`const`, `let`)
+과거의 `var` 키워드는 함수 레벨 스코프와 호이스팅 부작용으로 인해 유지보수에 위험이 따릅니다. 모던 자바스크립트에서는 블록 레벨 스코프를 지원하는 `const`와 `let`을 사용합니다.
+- **`const`**: 재할당이 불가능한 상수를 선언할 때 기본으로 사용합니다.
+- **`let`**: 값 재할당이 필요한 가변 변수에 한정하여 사용합니다.
 
-## 연산자
- - = : 대입 연산자
- - == : 비교 연산자, 좌항과 우항이 같으면 true
- - === : 비교 연산자, 좌항과 우항의 type 까지 비교
+```javascript
+const maxLimit = 100;
+let currentScore = 0;
+currentScore += 10;
+```
 
-   ex ) ``null === undefined : false``
+### 2.2. 원시 타입과 일치 연산자 (`===`)
+자바스크립트의 기본 원시(Primitive) 타입에는 `String`, `Number`, `Boolean`, `Null`, `Undefined`, `Symbol`, `BigInt`가 있습니다.
 
-   ex ) ``null == undefined : true``
+연산자 사용 시 암묵적 타입 변환이 일어나는 동등 연산자(`==`) 대신, 값과 자료형을 모두 엄격하게 비교하는 **일치 연산자(`===`)**를 사용해야 버그를 방지할 수 있습니다.
 
-   ex ) ``123 == "123" : true``
+```javascript
+// 동등 연산자 (값만 비교, 암묵적 형변환 발생)
+123 == "123";      // true
+null == undefined;  // true
 
-   ex ) ``123 === "123" : false``
+// 일치 연산자 (값과 타입 모두 비교 - 권장)
+123 === "123";     // false
+null === undefined; // false
+```
 
- - \+ : 덧셈 연산자, 문자열 병합에도 사용 가능
+---
 
-## 배열
- - var NAME = [] 형태로 선언
- - .length : 배열의 길이를 반환하는 메소드
+## 3. 배열과 객체(Object) 다루기
 
-## 함수 선언
- - function FUNCTION_NAME () {} 형태로 함수 선언, ()안에는 인자가, {}안에는 함수 body가 들어간다.
- - 인자로 self를 넣으면 python의 함수가 호출된 객체를 지칭하도록 사용할 수 있다.
- - return 예약어를 통해 함수 종료시 값을 반환 가능(return 필수 아님)
- - 동일한 이름의 함수가 다시 정의되면 이전의 함수는 삭제된다.
+### 3.1. 배열과 유용한 내장 메서드
+배열은 순서가 있는 데이터의 집합이며 대괄호(`[]`)로 선언합니다.
 
-## 객체
- - var NAME = {}; 형태로 선언 가능
+```javascript
+const fruits = ["사과", "바나나", "포도"];
+console.log(fruits.length); // 3
 
-   ex ) ``var coworker = {"designer" : "A", "programmer" : "B", "data scientist" : "C"};``
- - 객체의 값은 . 이나 [] 로 참조 가능, property라고 칭한다.
+// 요소 추가 및 순회
+fruits.push("오렌지");
+fruits.forEach((item, index) => {
+  console.log(`${index}: ${item}`);
+});
+```
 
-   ex ) ``coworker.designer``
+### 3.2. 객체(Object)와 메서드, `this`
+객체는 키(Key)와 값(Value)의 쌍으로 구성되며 중괄호(`{}`)로 정의합니다. 객체 내부에 선언된 함수를 메서드(Method)라고 하며, 메서드 내부에서 `this`는 해당 함수를 호출한 객체 자신을 가리킵니다.
 
-   ex ) ``coworker["data scientist"]``
+```javascript
+const userProfile = {
+  name: "홍길동",
+  role: "프론트엔드 개발자",
+  skills: ["JavaScript", "React"],
+  introduce() {
+    return `안녕하세요, ${this.name}(${this.role})입니다.`;
+  }
+};
 
- - 객체의 필드들은 ,로 구분해야 한다. 함수도 {} 다음에 ,를 찍어준다.
+// 속성 접근 (마침표 표기법 및 대괄호 표기법)
+console.log(userProfile.name);
+console.log(userProfile["role"]);
+console.log(userProfile.introduce());
 
-   ex ) ``var coworker = { "designer":"A", showAll:function( ){ }, "programmer":"B" }``
+// 객체 키 순회 (for...in)
+for (const key in userProfile) {
+  if (Object.prototype.hasOwnProperty.call(userProfile, key)) {
+    console.log(`${key}: ${userProfile[key]}`);
+  }
+}
+```
 
- - 이미 선언된 객체에 새로운 값 추가 혹은 기존 값 변경 가능
+---
 
-   ex ) ``coworker.new = "D"``
+## 4. 이벤트 핸들링과 비동기 타이머 함수
 
-   ex ) ``coworker.programmer = "E"``
+### 4.1. 이벤트 리스너 등록 (`addEventListener`)
+HTML 인라인 속성 대신 자바스크립트 코드에서 `addEventListener`를 사용하는 것이 유지보수와 관심사 분리에 유리합니다.
 
- - for ( .. in \~\~ ) {}  : 객체 내부 순회, ..는 내부 원소를 지칭할 변수를 선언하고, \~\~에는 객체를 넣어준다.
+```javascript
+const actionBtn = document.querySelector('#action-btn');
 
-   ex ) ``for (var key : coworker) {}``
- - 객체 내부에 함수도 선언 가능, method라고 칭한다.
+actionBtn.addEventListener('click', (event) => {
+  console.log("이벤트 발생 타깃:", event.target);
+  alert("버튼이 정상적으로 클릭되었습니다.");
+});
+```
 
-   ex ) ``var body = { setColor:function( ){ } }``
+### 4.2. 비동기 타이머 메서드 (`setTimeout`, `setInterval`)
+브라우저의 Web API를 활용하여 지정된 지연 시간 후 작업을 실행하거나 일정 주기로 작업을 반복합니다.
 
-   ex ) ``coworker.setColor = function() {}``
+```javascript
+// 3초(3000ms) 후 1회 실행
+const timerId = setTimeout(() => {
+  console.log("3초 후 실행되는 지연 작업");
+}, 3000);
 
- - 객체 내부의 메소드에서 객체를 칭할 때에는 this를 사용
+// 필요 시 예약 취소
+clearTimeout(timerId);
 
-   ex ) ``funciton () { for (var key in this) {} }``
-
-
-## 데이터 타입
- - primitive
-    * Boolean
-    * Null
-    * Undefined
-    * Number
-      - 연산으로 계산 가능
-    * String
-      - ' ' 나 " " 로 묶어서 사용
-      - \+ 으로 concatenate 가능
-    * Symbol
- - Object
-
-### 문자열 (String)
- - `.startWith(STRING)` : 문자열이 STRING 으로 시작하면(prefix) true를 반환, 아니면 false를 반환 
- - `.slice(VALUE)` : 시작점으로 부터 VALUE만큼의 글자를 제거 (문자열 자르기)
- - `.substring(VALUE)` : 시작점으로 부터 VALUE만큼의 글자를 제거 ()
- - `.replace("/^AB", '')` : 정규식을 이용, AB로 시작하는 prefix 제거 (문자열 치환)
- 
-### Json
- - `.hasOwnProperty(KEY)` : json 데이터에 KEY 라는 key가 존재한다면 true를 반환, 아니면 false를 반환
-
-## 이벤트
- - onclick : 클릭 이벤트가 일어났을 때
- - onchange : 텍스트 에디터의 내용이 변경되었을 경우
- - onkeydown : 키를 눌렀을 때
-
-## 메소드
- - alert(' ') : 브라우저의 경고창에 '' 안의 내용을 띄움
- - .length : 문자열의 길이를 반환, 배열의 길이를 반환
- - .indexOf(' ') : 문자열 중 ''에 속하는 문자 혹은 문자열이 시작되는 index를 반환, 0부터 카운팅
- - .trim() : 문자열의 공백을 제거
- - .value : element의 값을 뜻하는 변수 호출
-
-
-## 함수
- - `var repeat = setInterval(function, time)` : time 만큼 delay를 주고 function을 반복한다. 독립 thread로 동작한다.
- - `clearInterval(repeat)` : 인자로 받은 interval 반복함수를 정지한다.
- - `var result = setTimeout(function, time)` : time만큼 delay후 function을 실행한다. 실행후 result에는 'true'가 저장된다.
-
-## Jquery
- - javascript상에서 document를 대체하여 사용성을 높인 라이브러리
- - ``$()`` 로 시작한다.
-
-   ex ) ``$('a').css('color','red')``  : 모든 'a' 태그의 css 속성 중 color을 red로 변경
-
-## 참조
- - document < DOM (Document Object Model) < window
- - ajax : 웹페이지를 변경하지 않고 내용 변경
- - cookie : 사용자에게 개별화된 서비스 제공
- - offline web application : 인터넷이 끊겨도 동작하는 어플리케이션
- - webRTC : 화상통신 웹
- - speech(로 시작하는 API) : 사용자 음성 처리
- - webGL : 3차원 그래픽
- - webVR : 가상현실
+// 1초마다 반복 실행
+let counter = 0;
+const intervalId = setInterval(() => {
+  counter++;
+  console.log(`경과 시간: ${counter}초`);
+  if (counter >= 5) {
+    clearInterval(intervalId); // 5초 후 반복 중지
+  }
+}, 1000);
+```

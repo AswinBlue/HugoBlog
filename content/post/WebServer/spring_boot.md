@@ -1,19 +1,15 @@
-+++
-title = "Spring_boot"
-date = 2022-05-30T19:20:23+09:00
-lastmod = 2022-05-30T19:20:23+09:00
-tags = ['spring_boot', 'java', 'server']
-categories = ['dev']
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Spring Boot 실전 프로젝트: Gradle 빌드, REST API 구축 및 배포 가이드"
+description: "스프링 부트의 자동 구성(Auto-Configuration), Starter 의존성, Gradle 빌드 도구, JPA 리포지토리 연동 및 프로덕션 JAR 배포 절차를 총정리합니다."
+slug: "spring-boot-gradle-rest-api-production-guide"
+date: 2022-05-30T19:20:23+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebServer"]
+tags: ["spring-boot", "java", "gradle", "rest-api", "backend"]
+ShowToc: true
+TocOpen: true
+---
 
 # Spring Boot
   - Spring boot는 서버 생성을 위한 도구로, spring 프레임워크에 편의성을 향상시킨 프레임워크이다.  
@@ -223,7 +219,7 @@ draft = false
 ### MVC 모델
 - model, view, control 을 나누어 개발하는 형태를 MVC 모델이라고 한다.
 
-#### View template
+### View template
 - view template 은 controller와 model을 합친 개념으로, 화면을 구성하는 역할을 한다.  
 - mustache 패키지를 설치하여 view template를 만들 수 있다.  
 
@@ -276,7 +272,7 @@ draft = false
       - layout을 template화 하여 사용 가능하다. 재사용 되는 부분을 모듈화 하여 파일로 분리하고, 이를 다른 파일에서 불러올 수 있다.
       - `{{>FILE_NAME}}` 형태로 다른 파일을 호출해 올 수 있다.
 
-#### Controller
+### Controller
 - Controller는 request를 받아 어떤 화면을 보여줄지 결정하는 routing 로직을 담당하게 된다. 
 - controller class는 `@Controller` annotation을 붙여서 선언하며 routing 함수로는 `@GetMapping`, `@RequestMapping` annotation을 사용하여 정의한다.
 
@@ -284,7 +280,7 @@ draft = false
     - 에러 화면도 controller에 의해 유도되며 BasicErrorController가 이를 담당한다.
     - `application.yml` 파일에서 따로 설정을 하지 않았다면 `server.error.path=/error` 가 기본이다.
   
-#### JPA
+### JPA
 - spring은 mysql, postgress, M2 등 여러 DB를 적용할 수 있다.
 - controller는 Java로 구현되고, DB는 sql로 동작하기 때문에 java로 sql을 조작하기 위한 JPA라는 라이브러리가 필요하다.
 - `Entity` : java 객체를 DB가 이해할 수 있게 재구성한 데이터
@@ -404,7 +400,7 @@ draft = false
     ```
 
 
-#### 데이터 교환
+### 데이터 교환
 - view에서 사용자 입력을 받아 처리하는 과정을 다룬다.
 - 앞서 JPA를 통해 구현한 DB 시스템에 데이터를 넣을 수 있다. 
 

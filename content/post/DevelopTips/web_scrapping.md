@@ -1,19 +1,15 @@
-+++
-title = "Web_scrapping"
-date = 2021-08-23T19:00:44+09:00
-lastmod = 2021-08-23T19:00:44+09:00
-tags = ["web", "scrapping", "regular expression",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Python BeautifulSoup 및 Selenium 웹 스크래핑 크롤러 구축 가이드"
+description: "정적 HTML 파싱을 위한 BeautifulSoup4와 자바스크립트 동적 렌더링 수집을 위한 Selenium 웹 드라이버 활용법 및 차단 우회 팁을 정리합니다."
+slug: "python-web-scraping-beautifulsoup-selenium-crawler"
+date: 2021-08-23T19:00:44+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DevelopTips"]
+tags: ["python", "web-scraping", "beautifulsoup", "selenium", "crawler"]
+ShowToc: true
+TocOpen: true
+---
 
 # Web Scrapping
 ## x-path

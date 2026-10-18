@@ -1,18 +1,14 @@
 ---
-title: "Pwntool"
+title: "Pwntools 라이브러리를 활용한 시스템 취약점 익스플로잇 자동화 스크립트 작성법"
+description: "파이썬 Pwntools 모듈의 로컬/원격 프로세스 I/O 통신, 페이로드 패킹(p64/u64), ELF 바이너리 심볼 파싱 및 대화형 쉘 획득 기법을 정리합니다."
+slug: "pwntools-python-exploit-scripting-guide"
 date: 2024-03-09T10:09:44+09:00
-lastmod: 2024-03-09T10:09:44+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Security"]
+tags: ["pwntools", "python", "system-hacking", "exploit", "security"]
+ShowToc: true
+TocOpen: true
 ---
 
 # pwntool

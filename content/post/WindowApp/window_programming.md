@@ -1,18 +1,14 @@
 ---
-title: "Window_programming"
+title: "Windows PE 파일 구조 및 Win32 API 기반 윈도우 시스템 프로그래밍 기초"
+description: "윈도우 실행 파일의 표준 포맷인 PE(Portable Executable) 구조(DOS Header, NT Header, Section Table)와 Win32 API 핸들 및 윈도우 프로시저를 분석합니다."
+slug: "windows-pe-format-and-win32-system-programming"
 date: 2024-05-12T16:02:25+09:00
-lastmod: 2024-05-12T16:02:25+09:00
-tags: ["window", "hacking",]
-categories: ["dev", "hacking",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["WindowApp"]
+tags: ["windows", "win32", "pe-format", "system-programming", "c"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Window Programming

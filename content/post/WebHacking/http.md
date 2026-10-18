@@ -1,18 +1,14 @@
 ---
-title: "HTTP"
+title: "HTTP 프로토콜 핵심 구조: 요청·응답 메시지, 메서드 및 상태 코드 총정리"
+description: "HTTP 1.1과 HTTP/2의 차이, Start Line, Header, Body 구조, GET/POST/PUT/DELETE 멱등성 및 2xx, 3xx, 4xx, 5xx 상태 코드의 의미를 설명합니다."
+slug: "http-protocol-structure-methods-status-codes"
 date: 2025-03-06T20:17:24+09:00
-lastmod: 2025-03-06T20:17:24+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Security"]
+tags: ["http", "network", "web-standards", "rest-api", "web-security"]
+ShowToc: true
+TocOpen: true
 ---
 
 # HTTP(Hyper Text Transfer Protocol)

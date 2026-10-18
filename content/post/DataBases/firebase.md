@@ -1,19 +1,15 @@
-+++
-title = "Firebase"
-date = 2022-01-19T21:02:46+09:00
-lastmod = 2022-01-19T21:02:46+09:00
-tags = ["firebase","DB",]
-categories = ['dev']
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Firebase Authentication 및 Firestore 실전 연동과 보안 규칙(Rules) 가이드"
+description: "구글 Firebase를 활용한 사용자 인증 플로우, Cloud Firestore NoSQL 데이터베이스 CRUD 연동, 보안 규칙 작성 및 실시간 리스너 활용법을 설명합니다."
+slug: "firebase-authentication-and-firestore-security-rules"
+date: 2022-01-19T21:02:46+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DataBases"]
+tags: ["firebase", "firestore", "nosql", "authentication", "baas"]
+ShowToc: true
+TocOpen: true
+---
 
 # firebase
 - firebase는 실시간 db로 유명하며, google에 인수되고 폭이 넓어졌다.
@@ -59,7 +55,7 @@ export const authService = firebase.auth();
 - 다만, 주의할 점은 firebase API를 이용해 인증 서비스를 이용하면, 이후 확보된 사용자층을 다른 플랫폼으로 옮길 수 없다는 점이다.
 - 로그인에 사용된 계정들은 콘솔창에서 관리할 수 있으며, 비밀번호 재설정 등을 위한 메일도 커스텀할 수 있도록 환경이 제공된다.
 
-#### React code
+### React code
 ```
 import { authService } from "../components/AppFirebase";
 
@@ -68,8 +64,7 @@ const data = await authService.signInWithEmailAndPassword(email, password)  // e
 
 ```
 
-#### email 인증
+### email 인증
 - Authentication 탭에서 signed-in method를 선택한다.
 - 원하는 '로그인 제공업체' 를 선택하여 추가한다.
 
-#####

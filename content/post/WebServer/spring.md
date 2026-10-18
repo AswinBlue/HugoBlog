@@ -1,19 +1,15 @@
-+++
-title = "Spring basic"
-date = 2021-08-23T19:21:55+09:00
-lastmod = 2021-08-23T19:21:55+09:00
-tags = ["spring", "java"]
-categories = ["dev", "basic",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Spring 프레임워크 핵심 개념: IoC 제어의 역전, DI 의존성 주입 및 AOP"
+description: "엔터프라이즈 자바 개발의 핵심인 스프링 컨테이너(ApplicationContext), 빈(Bean) 생명주기, 컴포넌트 스캔 및 관점 지향 프로그래밍(AOP)의 원리를 정리합니다."
+slug: "spring-framework-ioc-di-and-aop-core"
+date: 2021-08-23T19:21:55+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebServer"]
+tags: ["spring", "java", "backend", "ioc-di", "enterprise"]
+ShowToc: true
+TocOpen: true
+---
 # Spring basic
 
 ## 설치

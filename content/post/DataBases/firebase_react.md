@@ -1,19 +1,15 @@
-+++
-title = "Firebase_react"
-date = 2022-02-12T19:32:34+09:00
-lastmod = 2022-02-12T19:32:34+09:00
-tags = ['react', 'firebase',]
-categories = ['dev',]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "React 프로젝트에 Firebase SDK 연동 및 실시간 데이터 바인딩 실전 가이드"
+description: "React 웹 애플리케이션에 Firebase v9+ 모듈러 SDK를 설치하고 환경변수 설정, Firestore 실시간 구독(onSnapshot), 소셜 로그인 구현법을 정리합니다."
+slug: "react-firebase-sdk-realtime-database-integration"
+date: 2022-02-12T19:32:34+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DataBases"]
+tags: ["react", "firebase", "frontend", "realtime-database", "baas"]
+ShowToc: true
+TocOpen: true
+---
 
 # Firebase with React
 - react에서 firebase를 활용하는 방법

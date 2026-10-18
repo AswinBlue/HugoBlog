@@ -1,19 +1,15 @@
-+++
-title = "Cryptocurrency"
-date = 2022-02-02T13:22:27+09:00
-lastmod = 2022-02-02T13:22:27+09:00
-tags = ["cryptograph", "cryptocurrency", "bitcoin",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "블록체인 분산 원장 원리와 비트코인·이더리움 암호화폐 아키텍처 이해하기"
+description: "P2P 네트워크, 작업 증명(PoW) 합의 알고리즘, 스마트 컨트랙트 동작 메커니즘 및 블록 해시 체이닝 구조를 암호학적 관점에서 분석합니다."
+slug: "blockchain-cryptocurrency-architecture-and-consensus"
+date: 2022-02-02T13:22:27+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["Crypto"]
+tags: ["blockchain", "cryptocurrency", "bitcoin", "ethereum", "fintech"]
+ShowToc: true
+TocOpen: true
+---
 
 # Cryptocurrency
 
@@ -38,7 +34,7 @@ draft = false
   - collision을 쉽게 구하는 방법이 있는가?
    -> 특정 hash function에 대해서는(SHA256에 대해서도 최단기간 collision을 찾아내는 방법이 알려져 있다.) 가능하지만, 대부분은 그렇지 않다.
 
-#### hash as message digest
+### hash as message digest
 - collision을 구하는 것이 매우 어렵기 때문에, H(x) = H(y)라면, x = y라고 확신해도 된다.
 - 즉, hash를 이용해 데이터 전송/비교에 드는 비용을 절감 가능하다. (전체 message 대신 hash만 비교)
 
@@ -48,7 +44,7 @@ draft = false
  - high min-entropy 를 가진 무작위 상수 'r'을 x와 조합(concatenate)하여 hash function의 input에 넣으면 hiding 속성을 갖게 된다. (`H(r|x)`)
   - high min-entropy 란 넓고 고르게 퍼져있음을 뜻한다. 즉, 넓은 선택범위 안에서 특정 값이 특출나게 여려번 중복해서 뽑히지 않는다는 뜻이다. (no particular value is chosen with more than negligible probability)
 
-#### commitment
+### commitment
 - 편지를 동봉하듯 데이터가 가지고 있는 내용을 공개하지 않고 데이터를 공개하는 것
 - commitment를 위해 제공하는 commitment API 는 다음과 같이 동작한다.
   - `(commitment, key) = commit(msg)` msg를 동봉하고, 그 결과로 commitment와 key를 생성한다. commitment는 봉투에 해당하고, key는 열쇠에 해당한다.
@@ -185,7 +181,7 @@ draft = false
 - 분산의 개념은 암호화 회폐 이전에 서버 동작에서도 논제가 되었다. 여러개의 서버가 병렬로 동작할 때, consistency를 유지하기 위해 distributed consensus protocol이 필요했다.
 - 방법중 하나로 distributed key-value store 방식이 있는데, DNS, public key directory, stock trade 등 여러 방면에서 사용되고 있고, altcoin에도 사용되고 있다.
 
-#### public consensus in crypto currency
+### public consensus in crypto currency
 - 암호화 화폐에서는 transaction가 모여 block을 이루고, 이를 모아 block chain을 만든다.
 - block chain에 들어간 모든 block들은 consensus된 내용들이어야 한다.
 - transaction 하나를 consensus 해도 괜찮지만, block 단위로 consensus하여 효율을 높인다.
@@ -210,7 +206,7 @@ draft = false
 - consensus system은 즉각적이지 않고, consensus를 수행하는데도 약 1시간 정도가 소요된다. 하지만 시간이 지날수록 transaction이 반영되지 않거나 잘못될 확률은 exponential하게 줄어들게 된다.
 
 
-#### consensus without identity
+### consensus without identity
 - bitcoin에서는 persistent long term identities 없이 consensus가 이루어진다. 즉, node를 칭할 수 있는 identity가 없다.
 - identity가 있다면 다음과 같은 이점이 있다.
   1) 실용성(pragmatic) : 프로토콜에서 id를 이용한 로직을 사용할 수 있다.
@@ -222,7 +218,7 @@ draft = false
   - 이러한 identity가 없는 특징 때문에 p2p network는 Sybil attack에 취약하다.
     - Sybil attack : 한 명이 가상의 node들을 다수로 만들어 마치 여러 사람인 것 처럼 보이게 하는 것.
 
-##### weaker assumption
+- **weaker assumption**:
 - node마다 identity를 부여하고, 이 부여받은 identity를 검증하는 작업은 매우 복잡하다.
 - authenticated 된 identity를 부여하는 것 대신 랜덤한 token을 node에 부여한다.
 - token으로 특정 node를 구분할 수 있으며, 특정 사용자가 여러 node들을 만드려 할 경우 해당 node들에 동일한 token을 부여하는 방식으로 Sybil attack을 방지할 수도 있다.
@@ -263,7 +259,7 @@ draft = false
   ```
   - 일반적인 bitcoin에서는 transaction이 정상적으로 이루어진 것을 판단하기 위해서 6 confirmation을 확인한다. 이는 시간과 확률의 trade-off 관계에서 성립된 수치이다.
 
-#### honesty problematic
+### honesty problematic
 - 우리는 탈 중앙화를 위해 랜덤한 node에서 block을 받아 block chain에 적용하기로 했다. 하지만 모든 node가 honest 한지에 대해서는 보장할 수 없다.
 - 각 node들은 현실 정보의 개인정보를 갖고있지 않기 때문에 block chain에 위해를 가하는(double spent 같은 공격) node를 처벌할 수 없다.
 - 대신 올바른 block들을 만들어주는 node들에 대해 보상을 주는 방법은 가능하다. 이는 block chain으로 구성된 내용이 가치를 가지는 crypto currency 이기 때문에 가능하다.
@@ -294,7 +290,7 @@ draft = false
 3) Sybil attack 의 방지(2번의 심화 형태)  
 - 위 세가지 문제점은 모두 연관되어 있고, 하나의 방법으로 해결 가능하다.
 
-#### Proof of work
+### Proof of work
 - 직접 random 한 node를 선택하는 대신, resource(computing power) 의 비율로 다음 node가 선택되게 하는 방법이다.
 - 즉, 각 node들이 각각의 computing power을 이용해 서로 경쟁하도록 하는 것이다.
 - 이러한 경쟁 방법을 Hash puzzle이라 부른다.
@@ -305,7 +301,7 @@ draft = false
 - 이를 통해 단순히 node의 숫자를 늘려서 다음 block을 선택할 기회를 얻을 확률을 높일 수 없게 되었다.
 - 또한 누군가가 랜덤한 block을 선출하는 것이 아닌, 경쟁과 확률을 통해 자연적으로 선출될 수 있도록 하였다.
 
-##### Proof of work의 속성
+- **Proof of work의 속성**:
 1. Difficult to compute
 - hash puzzle을 푸는데는 현재(14.8) 기준 block당 약 10^20 hash를 계산해야 한다. (target space의 크기가 1/10^20 이란 의미)
 - 일반적인 PC로는 감당할 수 없고, 많은 양의 computing power을 사용하여야 하는 작업이다.

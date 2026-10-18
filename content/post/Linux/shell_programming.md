@@ -1,18 +1,14 @@
 ---
-title: "Shell Programming"
+title: "리눅스 Bash 쉘 스크립트 프로그래밍 기초 문법 및 업무 자동화 가이드"
+description: "변수 선언, 조건문(if/case), 반복문(for/while), 함수, 명령줄 인자 처리($1, $@) 등 실무 자동화 스크립트 작성에 필요한 Bash 문법을 정리합니다."
+slug: "linux-bash-shell-scripting-automation"
 date: 2023-07-13T18:29:44+09:00
-lastmod: 2023-07-13T18:29:44+09:00
-tags: ["linux", "shell_programming"]
-categories: ["dev"]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "bash", "shell-script", "automation", "devops"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Shell Programming

@@ -1,19 +1,15 @@
-+++
-title = "Golang"
-date = 2022-01-14T21:52:14+09:00
-lastmod = 2022-01-14T21:52:14+09:00
-tags = ["go",]
-categories = ["dev"]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Go 언어 핵심 기초 문법과 고루틴(Goroutine) 동시성 프로그래밍"
+description: "Go 언어의 타입 시스템, 슬라이스, 맵, 구조체 및 고루틴과 채널을 활용한 경량 비동기 동시성 프로그래밍 기초를 체계적으로 정리합니다."
+slug: "golang-core-syntax-and-concurrency"
+date: 2022-01-14T21:52:14+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["GoLang"]
+tags: ["golang", "go", "backend", "concurrency"]
+ShowToc: true
+TocOpen: true
+---
 
 # Go
 

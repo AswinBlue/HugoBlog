@@ -1,30 +1,29 @@
 ---
-title: "Youtube Downloader"
+title: "Python yt-dlp와 FFmpeg를 활용한 YouTube 재생목록 음원 다운로더 제작기"
 date: 2025-03-09T20:40:01+09:00
 lastmod: 2025-03-09T20:40:01+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+description: "Windows 환경에서 Python yt-dlp 라이브러리와 FFmpeg를 활용하여 YouTube 재생목록의 음원을 MP3로 일괄 추출하고 중복 다운로드를 방지하는 자동화 스크립트 구현기입니다."
+slug: "python-yt-dlp-youtube-mp3-downloader"
+categories: ["Projects"]
+tags: ["python", "yt-dlp", "ffmpeg", "youtube-downloader", "automation", "portfolio"]
+series: ["프로젝트 개발기"]
+ShowToc: true
+TocOpen: true
 draft: false
 ---
-# Youtoube Download
-Window OS에서 Python으로 Youtube 영상을 다운로드 하는 방법
 
-## 1. Python Code 작성
+# YouTube Downloader: Python과 yt-dlp를 활용한 YouTube 음원 다운로더 제작 문서
 
-1. yt-dlp 패키지를 다운받는다.
-  - `pip install yt-dlp` 명령으로 손쉽게 다운로드 가능하다.
-  - github 주소는 다음과 같다. : https://github.com/yt-dlp/yt-dlp
+Windows OS 환경에서 Python과 `yt-dlp`를 활용하여 YouTube 재생목록 영상을 고음질 MP3 음원으로 일괄 추출하는 자동화 도구 제작 과정입니다.
 
-2. 코드를 작성한다.
-  - 아래는 샘플 코드이다. 
+## 1. Python 다운로드 스크립트 작성
+
+1. yt-dlp 패키지 설치
+   - `pip install yt-dlp` 명령으로 손쉽게 설치할 수 있습니다.
+   - GitHub 저장소: https://github.com/yt-dlp/yt-dlp
+
+2. 코드 작성
+   - 아래는 재생목록 다운로드 및 재시도 로직을 포함한 전체 파이썬 스크립트 예시입니다.
 
     ```python
     import yt_dlp
@@ -61,10 +60,10 @@ Window OS에서 Python으로 Youtube 영상을 다운로드 하는 방법
         ydl_opt = {
             'outtmpl': output_dir,
             'format': 'bestaudio/best',  # 다운로드할 포맷 지정
-                    'download_archive': 'downloaded.txt',  # 다운로드 아카이브 파일 지정(미리 다운받은 항목들을 체크하여 중복으로 받지 않도록 하는 기록파일)
+            'download_archive': 'downloaded.txt',  # 다운로드 아카이브 파일 지정 (중복 다운로드 방지)
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',  # mp3포멧으로 변환
+                'preferredcodec': 'mp3',  # mp3 포맷으로 변환
                 'preferredquality': '192',
             }],
             'verbose': True,  # 자세한 디버깅 정보 출력
@@ -88,29 +87,24 @@ Window OS에서 Python으로 Youtube 영상을 다운로드 하는 방법
     print('모든 항목 다운로드 완료')
     ```
 
-   - 다른것들은 수정할 필요 없고, `download_lists` 에 다운로드 할 Youtube 재생목록을 넣어준다.
-     - `name` 에는 다운로드할 폴더의 이름을 적어준다.
-     - `url` 에는 Youtube 재생목록의 url 을 기입한다. 
-       - ![재생목록](/IMAGE_YOUTUBE_DOWNLOADER/image1.png)
-       - 위 이미지에 보이는 화면에서 url 을 복사해서 붙여넣는다.
+   - `download_lists` 변수에 다운로드할 YouTube 재생목록을 등록합니다.
+     - `name`: 음원이 저장될 로컬 디렉터리 이름
+     - `url`: YouTube 재생목록 URL
+     ![재생목록](/IMAGE_YOUTUBE_DOWNLOADER/image1.png)
 
-## 2. 코덱 다운
+## 2. FFmpeg 코덱 설치 및 환경 변수 설정
 
-- ffmpeg 코덱을 다운받아야 하며, [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html) 에서 다운로드 가능하다.
-- 실행 파일을 다운로드 받고, 환경 변수에 `bin/` 폴더 경로를 추가한다.
-  - 환경변수 세팅은 Window 11 기준 아래 그럼처럼 '시작' 버튼에서 '환경' 이라는 글자를 입력해서 설정 창으로 진입할 수 있다.
-  - ![환경변수](/IMAGE_YOUTUBE_DOWNLOADER/image2.png)
+- 음원 추출 및 MP3 변환을 위해 FFmpeg 코덱 설치가 필요합니다. [FFmpeg 공식 다운로드 페이지](https://ffmpeg.org/download.html)에서 바이너리를 다운로드합니다.
+- 다운로드한 압축을 풀고 `bin/` 폴더 경로를 시스템 환경 변수 `Path`에 추가합니다.
+  - Windows 11 기준 시작 메뉴에서 '환경 변수'를 검색하여 '시스템 속성' -> '환경 변수' 메뉴에서 설정 가능합니다.
+  ![환경변수](/IMAGE_YOUTUBE_DOWNLOADER/image2.png)
 
-## 3. 실행
+## 3. 스크립트 실행 및 결과 확인
 
-- 작성한 python 코드를 실행시키면 프로젝트 루트 경로에 download_lists.name 으로 설정한 폴더가 생성되고, 폴더 안에 download_lists.url 재생목록에 있는 음악들이 다운로드 된다.
-- `downloaded.txt` 파일로 이미 다운받은 파일들을 체크하여 중복 다운로드를 수행하지 않는다. (python 코드에서 ydl_opt 변수 참조)
+- 작성한 Python 코드를 실행하면 프로젝트 루트 경로에 `download_lists.name` 폴더가 생성되고, 재생목록 내의 음원들이 MP3 포맷으로 다운로드됩니다.
+- `downloaded.txt` 아카이브 파일에 다운로드 완료된 영상 ID가 기록되어 다음 실행 시 이미 다운로드된 항목은 자동으로 스킵됩니다.
 
-## Keep in mind
+## 4. 저작권 유의사항 (Keep in Mind)
 
-<aside>
-☀️ 저작권이 있는 영상을 무단으로 배포하거나 상업적으로 사용하는 행위는 불법입니다.
-
-</aside>
-
-
+> [!WARNING]
+> 저작권이 있는 음원 및 영상 콘텐츠를 무단으로 배포하거나 상업적 목적으로 사용하는 행위는 법적 제재를 받을 수 있습니다. 본 스크립트는 개인적인 연구 및 오프라인 보관 목적에 한하여 사용해야 합니다.

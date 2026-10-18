@@ -1,188 +1,163 @@
-+++
-title = "Tailwind"
-date = 2022-06-02T21:55:38+09:00
-lastmod = 2022-06-02T21:55:38+09:00
-tags = ["css",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Tailwind CSS 유틸리티 클래스 기반 고속 UI 컴포넌트 스타일링 가이드"
+description: "유틸리티 퍼스트 CSS 프레임워크인 Tailwind CSS의 설치 및 tailwind.config.js 설정, PostCSS 연동 빌드, Flexbox 정렬 유틸리티 클래스, 반응형 접두사(sm/md/lg) 활용법을 체계적으로 정리합니다."
+slug: "tailwind-css-utility-first-ui-styling"
+date: 2022-06-02T21:55:38+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["WebApplication"]
+tags: ["tailwind-css", "css", "frontend", "ui-design", "responsive-web"]
+ShowToc: true
+TocOpen: true
+---
 
-# Tailwind
-- Css 프레임워크로 빠르고 효율적으로 css를 설정할 수 있는 툴이다.
-- [Tailwind Docs](https://tailwindcss.com/docs)
+Tailwind CSS는 별도의 커스텀 CSS 파일을 작성하지 않고도 HTML 마크업 내부에서 클래스 이름을 조합하여 UI를 빠르게 조립할 수 있는 **유틸리티 퍼스트(Utility-First)** CSS 프레임워크입니다. BEM 등 복잡한 네이밍 컨벤션에 대한 고민을 덜어주며, 사용되지 않는 스타일을 프로덕션 빌드 단계에서 자동으로 제거(Purge/JIT 엔진)하여 초경량 스타일시트를 유지할 수 있습니다.
 
-## Installation
-1. tailwind 모듈 설치 
-   - `npm install -D tailwindcss@latest` 명령을 사용하여 설치가 가능하다.
-   - `npx tailwindcss init` 명령을 사용하면 현재 경로에 tailwind.config.js 파일이 생성되며, 현재 프로젝트에서 tailwind를 적용할 수 있게 된다.
-     - tailwind.config.js 파일은 다음과 같이 구성된다.   
+이 글에서는 Tailwind CSS의 설치 환경 설정, PostCSS 연동, Flexbox 기반 레이아웃 정렬 클래스, 그리고 반응형 웹 디자인 접두사 활용법을 정리합니다.
 
-    ```
-    module.exports = {
-      // 포함할 항목
-      content: ['./src/**/*.{html,js,jsx,ts,tsx, mustache}'],
-      // 제외할 항목 (최신 버전에서 사용되지 않는 문법)
-      // purge: ["./src/**/*.html", "./src/**/*.js"],
-      // jit mode는 purge와 함께 세트로 사용되었고, 세트로 사라졌다.(?)
-      // mode: process.env.NODE_ENV ? 'jit' : undefined,
-      darkMode: 'class', // [false, 'mdeia', 'class']
-      theme: {
-        fontFamily: {
-          display: ['Open Sans', 'sans-serif'],
-          body: ['Open Sans', 'sans-serif'],
-        },
-        extend: {
-          fontSize: {
-            14: '14px',
-          },
-          backgroundColor: {
-            'main-bg': '#FAFBFB',
-            'main-dark-bg': '#20232A',
-            'secondary-dark-bg': '#33373E',
-            'light-gray': '#F7F7F7',
-            'half-transparent': 'rgba(0, 0, 0, 0.5)',
-          },
-          borderWidth: {
-            1: '1px',
-          },
-          borderColor: {
-            color: 'rgba(0, 0, 0, 0.1)',
-          },
-          width: {
-            400: '400px',
-            760: '760px',
-            780: '780px',
-            800: '800px',
-            1000: '1000px',
-            1200: '1200px',
-            1400: '1400px',
-          },
-          height: {
-            80: '80px',
-          },
-          minHeight: {
-            590: '590px',
-          },
-          backgroundImage: {
-            'hero-pattern':
-              "url('https://demos.wrappixel.com/premium-admin-templates/react/flexy-react/main/static/media/welcome-bg-2x-svg.25338f53.svg')",
-          },
-        },
+---
+
+## 1. Tailwind CSS 설치 및 프로젝트 설정
+
+Node.js 환경에서 Tailwind 패키지를 설치하고 구성 파일을 생성합니다.
+
+```bash
+# 개발 의존성 설치
+npm install -D tailwindcss postcss autoprefixer
+
+# 기본 tailwind.config.js 설정 파일 생성
+npx tailwindcss init -p
+```
+
+### 1.1. `tailwind.config.js` 구성
+`content` 속성에 유틸리티 클래스가 사용될 템플릿 파일들의 경로를 명시합니다. Tailwind는 이 파일들을 정적 분석하여 실제 사용된 클래스만을 추출하여 빌드합니다.
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{html,js,jsx,ts,tsx}",
+    "./public/index.html"
+  ],
+  darkMode: 'class', // 'media' 또는 'class' 기반 다크모드
+  theme: {
+    fontFamily: {
+      display: ['Pretendard', 'sans-serif'],
+      body: ['Pretendard', 'sans-serif'],
+    },
+    extend: {
+      colors: {
+        'brand-primary': '#2563eb',
+        'brand-dark': '#1e293b',
       },
-      plugins: [],
-    };
-    ```
+      spacing: {
+        '128': '32rem',
+      }
+    },
+  },
+  plugins: [],
+};
+```
 
-   - tailwind는 react와 같은 framework에서는 자동으로 적용이 가능하지만, 그 외의 경우에는 postcss 등과 같은 모듈의 도움이 필요하다.  
-   - tailwind 모듈 설치와 tailwind.config.js 구성이 끝났다면, tailwind로 작성된 css를 코드에 추가해줘야 한다. index.css에 아래 구문을 추가한다. 
-      ```
-      @tailwind base;
-      @tailwind components;
-      @tailwind utilities;
-      ```
+### 1.2. 기본 스타일시트에 Tailwind 지시자 추가
+프로젝트 메인 CSS 파일(예: `src/index.css`) 최상단에 Tailwind의 기본 레이어를 불러옵니다.
 
-2. postcss
-   - react 사용시에는 postcss를 설치하지 않아도 되므로 스킵해도 된다. 
-   - `npm install -D postcss postcss-cli` : postcss 모듈과, 명령어 입력을 위한 postcss-cli를 설치한다. 이후 cmd창에 postcss 명령어가 동작한다.  
-   - `postcss SOURCE_FILE -o OBJECT_FILE` : SOURCE_FILE 의 내용을 참조하여 OBJECT_FILE 경로에 파일 생성. SOURCE_FILE의 내용은 아래와 같다.   
-      ```
-      @tailwind base;
-      @tailwind components;
-      @tailwind utilities;
-      ```
-     
-   - `--watch` 옵션을 붙이면 파일 변경시 다시 빌드하지 않아도 된다.
-    
-3. script
-  - package.json 파일에 tailwind용 스크립트를 작성한다.
-    ```
-    "scripts": {
-      "build:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o target/classes/static/css/tailwind.css",
-      "watch:postcss":"npx cross-env NODE_ENV=production postcss base.tailwind.css -o src/main/resources/static/css/tailwind.css -w"
-    }
-    ```
-  - 이후 `npm run build:postcss` 명령으로 쉽게 tailwind 빌드를 할 수 있다.  
-  - tailwind.config.js 를 변경하면 빌드를 새로 해줘야 하지만, `-w` 옵션으로 동작시키면 tailwind.config.js를 변경해도 실시간으로 변경점이 적용된다.
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
-  - tailwind를 적용할 파일들을 앞서 tailwind.config.js 파일에서 'content' 항목에 넣어 지정했었다. 이 파일들에 새로운 class를 사용하였다면 postcss 명령으로 새로 build를 해줘야 한다.
+---
 
-4. Config
-   - Project root 경로에 tailwind.config.js 파일에서 tailwind에 사용되는 custom 설정을 할 수 있다.   
-     1. font
-         - theme.extend.fontFamily에 사용할 font 이름을 정의하고, 
-       
-           ```
-            theme: {
-              extend: {
-                fontFamily: {
-                  body: ['Nunito'],
-                }
-              }
-            },
-           ```
-        - 빌드할 tailwind.css 원본 파일에 해당 font가 정의된 url을 import한다.
-        - [google에서 지원하는 font 사이트](https://fonts.google.com/) 에서 font들 import 가능
+## 2. PostCSS 연동 및 빌드 스크립트 구성
 
-           ```
-           @import url('@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;1,200&display=swap');')
-           @tailwind base;
-           @tailwind components;
-           @tailwind utilities;
-           ```
+프레임워크 자체 플러그인 외에 순수 HTML이나 서버 템플릿(Thymeleaf 등) 환경에서 빌드할 경우 PostCSS CLI를 함께 사용합니다.
 
-## Classes
-- tailwind에서 사용되는 대표적인 Class들에 대해 사용법을 설명한다.
+```bash
+npm install -D postcss-cli cross-env
+```
 
-### Box
-1. flex
-   - flex는 특정 tag 안의 내용물들을 가로로 정렬시켜준다.
-       ```
-         <div class="flex">
-         <div>1</div>
-         <div>2</div>
-         <div>3</div>
-         </div>
-       ```
+`package.json`의 scripts에 빌드 및 감시(Watch) 명령어를 추가합니다.
 
-### 위치 정렬
-- 위치는 `content`, `item`, `self` 세 가지에 대해 정렬이 가능하다.
-- y축 정렬(위아래)은 `align`으로 하고, x축 정렬(좌우)은 `justify`로 한다.
+```json
+{
+  "scripts": {
+    "build:css": "cross-env NODE_ENV=production postcss src/input.css -o dist/output.css --minify",
+    "watch:css": "postcss src/input.css -o dist/output.css --watch"
+  }
+}
+```
 
-1. justify content: 가로방향 정렬
-   - `justify-start`: 좌측 모서리 기준 정렬
-   - `justify-end`: 우측 모서리 기준 정렬
-   - `justify-center`: 가운데 정렬
-   - `justify-between`: 컨테이너 좌우 공간 없이 각 항목들 동등 간격으로 배치
-   - `justify-around`: 컨테이너 좌우도 공간을 넣으며 항목들 좌우에 일정한 margin을 두고 배치
-   - `justify-evenly`: 컨테이너 좌우를 포함하여 항목들 사이 간격이 동일하도록 배치
-   
-1. align items: 세로방향 정렬
-   - `items-start`: 위쪽 모서리를 기준으로 정렬
-   - `items-end`: 아래쪽 모서리를 기준으로 정렬
-   - `items-center`: 정중앙 가로선을 기준으로 정렬
-   - `items-baseline`: container의 baseline, 즉 내용물이 표시되는 기준점이 서로 통일되도록 정렬
-   - `items-stretch`: 가장 긴 항목에 맞게 다른 항목들을 늘려서 정렬
+---
 
-### Responsive items
-- 화면 크기에 따라 다르게 Css를 다르게 적용하고 싶다면, `sm:`, `md:`, `lg:`, `xl:`, `2xl:` class를 이용하면 된다.
-- 기본 설정으로는 각각 640px, 768px, 1024px, 1280px, 1536px 이상일 때 특정 속성을 갖도록 설정할 수 있다.
-- 아무것도 붙이지 않으면 0~640px의 속성을 정의하며, 더 큰 화면에 대해서는 `sm`, `md` 등으로 속성을 덮어쓰는 형식으로 반응형 페이지를 만든다.   
-  - `  ` : 0px ~ 640px
-  - `sm` : 640px ~ 768px
-  - `md` : 768px ~ 1024px
-  - `lg` : 768px ~ 1024px
-  - `xl` : 1024px ~ 1280px
-  - `2xl` : 1280px ~ 1536px
+## 3. 핵심 유틸리티 클래스: Flexbox 및 박스 정렬
 
-   ``<h1 class="text-sm md:text-lg lg:text-xl"> test </h1>``
-     - 화면 크기에 따라 글자 크기가 바뀌는 예시
+Tailwind는 CSS Flexbox 레이아웃을 몇 가지 직관적인 클래스로 제어할 수 있도록 지원합니다.
 
-## Refs
+### 3.1. Flexbox 컨테이너 선언
+- `flex`: 컨테이너를 가로 flex 방향으로 배치합니다.
+- `flex-col`: 아이템을 세로 방향으로 적재합니다.
+
+```html
+<div class="flex items-center justify-between p-4 bg-white shadow-md rounded-lg">
+  <span class="font-bold text-gray-800">로고</span>
+  <nav class="space-x-4">
+    <a href="#" class="text-gray-600 hover:text-blue-600">홈</a>
+    <a href="#" class="text-gray-600 hover:text-blue-600">서비스</a>
+  </nav>
+</div>
+```
+
+### 3.2. 가로축 정렬 (`justify-*`)
+- `justify-start`: 주축 시작점(좌측) 정렬
+- `justify-center`: 주축 중앙 정렬
+- `justify-end`: 주축 끝점(우측) 정렬
+- `justify-between`: 첫 아이템과 끝 아이템을 양 끝에 붙이고 사이 공간 균등 배분
+- `justify-around`: 아이템 둘레에 동일한 여백 배치
+- `justify-evenly`: 모든 간격(양 끝 포함)을 균등하게 분할
+
+### 3.3. 세로축 정렬 (`items-*`)
+- `items-start`: 교차축 상단 정렬
+- `items-center`: 교차축 수직 중앙 정렬
+- `items-end`: 교차축 하단 정렬
+- `items-stretch`: 컨테이너 높이에 맞춰 아이템 높이 확장
+
+---
+
+## 4. 반응형 웹 디자인 접두사(Breakpoints)
+
+Tailwind는 모바일 퍼스트(Mobile-First) 원칙을 따릅니다. 접두사가 없는 기본 클래스는 모든 화면 크기(0px 이상)에 적용되며, 특정 중단점 이상에서 오버라이드할 때 접두사를 사용합니다.
+
+- **기본(접두사 없음)**: 0px ~ 639px (모바일 화면)
+- **`sm:`**: 640px 이상 (소형 태블릿)
+- **`md:`**: 768px 이상 (일반 태블릿/아이패드)
+- **`lg:`**: 1024px 이상 (노트북/데스크톱)
+- **`xl:`**: 1280px 이상 (대형 모니터)
+- **`2xl:`**: 1536px 이상 (초고해상도 디스플레이)
+
+```html
+<!-- 모바일에서는 1열, 태블릿에서 2열, 데스크톱에서 4열로 확장되는 그리드 -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div class="p-6 bg-gray-100 rounded-lg">카드 1</div>
+  <div class="p-6 bg-gray-100 rounded-lg">카드 2</div>
+  <div class="p-6 bg-gray-100 rounded-lg">카드 3</div>
+  <div class="p-6 bg-gray-100 rounded-lg">카드 4</div>
+</div>
+```
+
+---
+
+## 5. 테마 커스터마이징 및 폰트 확장 팁
+
+Google Fonts 등 외부 웹 폰트를 Tailwind에 등록하려면 `tailwind.config.js`의 `theme.extend.fontFamily`에 폰트 이름을 추가하고 메인 CSS 파일에서 웹폰트 URL을 임포트합니다.
+
+```css
+/* src/input.css */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+이렇게 등록된 커스텀 폰트는 `font-display`, `font-body` 등의 클래스로 즉시 사용 가능합니다.

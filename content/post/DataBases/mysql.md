@@ -1,22 +1,15 @@
-+++
-title = "Mysql"
-date = 2020-07-02T20:29:29+09:00
-lastmod = 2021-08-16T14:15:00+09:00
-tags = [
-"DB",
-"mysql",
-]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "MySQL 관계형 데이터베이스 기초: DDL, DML 쿼리 작성 및 계정 권한 관리"
+description: "데이터베이스/테이블 생성, SELECT/INSERT/UPDATE/DELETE 핵심 질의문, 외래키 제약조건, 사용자 계정 생성과 GRANT 권한 부여 방법을 정리합니다."
+slug: "mysql-rdbms-basics-sql-queries-permissions"
+date: 2020-07-02T20:29:29+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DataBases"]
+tags: ["mysql", "rdbms", "sql", "database", "backend"]
+ShowToc: true
+TocOpen: true
+---
 
 # mysql
 

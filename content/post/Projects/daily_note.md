@@ -1,29 +1,26 @@
 ---
-title: "DailyNote"
+title: "React Native와 Firebase 기반 사진 일기 앱 '하루기록' 개발기"
 date: 2025-07-30T19:43:52+09:00
 lastmod: 2025-07-30T19:43:52+09:00
-tags: ['App',]
-categories: ['dev', 'advertisement', 'design', 'deploy',]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+description: "React Native(Expo)와 Firebase 기반의 사진 일기 앱 '하루기록' 개발 기록입니다. MVP 기획부터 Google 소셜 로그인 연동, 로컬 및 EAS 빌드 환경 구축, Cloud Vision API 연동 전략까지의 설계와 구현 과정을 상세히 정리했습니다."
+slug: "react-native-firebase-daily-note-app"
+categories: ["Projects"]
+tags: ["react-native", "expo", "firebase", "mobile-app", "portfolio"]
+series: ["프로젝트 개발기"]
+ShowToc: true
+TocOpen: true
 draft: false
 ---
-# Daily Note
+
+# Daily Note: 사진 일기 앱 '하루기록' (DailyNote) 개발 문서
+
 사진 일기 앱 "하루기록" (DailyNote) 개발 Document
 
-
-##  기획서
+## 기획서
 
 1. 앱 개요 및 핵심 가치  
 
     **"하루기록"** 은 단순한 사진 기록을 넘어, 사용자의 감정과 경험을 데이터로 시각화하여 '더 나은 나'를 발견하도록 돕는 인터랙티브 사진 일기 앱입니다.
-
 
     Target User: 자신의 일상을 의미 있게 기록하고 싶어 하는 사람, 감정의 변화나 생활 패턴을 객관적으로 파악하고 싶은 사람, 꾸준한 기록을 통해 성취감을 느끼고 싶은 사람.
 
@@ -57,7 +54,7 @@ draft: false
          - 여러 속성을 겹쳐서 비교하는 기능 (예: 기분 점수와 운동 시간의 상관관계)
          - 지도 위에 일기가 작성된 위치를 핀으로 표시
          - 지도 핀 클릭 시: 1차) 사진 썸네일과 요약 표시 → 2차) 전체 일기 화면으로 이동
-      
+       
       2. 캘린더 (Calendar):
          - 일기를 작성한 날짜에 시각적 표시 (예: 작은 사진 썸네일)
          - 연/월/주 단위 보기 전환
@@ -126,6 +123,7 @@ Phase 4: 고도화 및 수익화
     개인정보 처리방침: 위치 정보, 사진, 개인 기록을 다루므로, 어떤 데이터를 수집하고 어떻게 사용하는지 명확하게 고지하는 개인정보 처리방침을 반드시 작성하고 앱 내에 게시해야 합니다.
 
 ## 구현
+
 1. 개발환경 구축
 
    react native 를 사용하여 앱을 개발 할 계획이다.
@@ -150,13 +148,13 @@ Phase 4: 고도화 및 수익화
 2. Firebase 연동
     1. [firebase 콘솔](https://console.firebase.google.com/) 로 이동하여 구글 로그인
     2. [프로젝트 추가] 버튼을 누른 후 프로젝트 이름 입력
-    3. 생성된 프로젝트의 대시보드에서 + 버튼을 클릭,  `웹 아이콘` </> 선택하여 앱 추가
+    3. 생성된 프로젝트의 대시보드에서 + 버튼을 클릭, `웹 아이콘` </> 선택하여 앱 추가
     4. 앱 이름을 선정하고 [앱 등록] 버튼 클릭
     5. 'firebase SDK 추가' 단계에서 보여주는 firebaseConfig 정보를 복사 해 놓는다. 
     6. 개발환경 구축 단계에서 생성했던 프로젝트 위치로 들어가 `npx expo install firebase` 명령어로 firebase 를 설치한다.
     7. 프로젝트 최 상위 경로에 `firebaseConfig.js` 파일을 생성하고 아래와 같이 작성한다. 이전에 복사해 놓은 firebaseConfig 정보도 넣어준다.
 
-        ```
+        ```javascript
         // firebaseConfig.js
 
         import { initializeApp } from 'firebase/app';
@@ -200,15 +198,15 @@ Phase 4: 고도화 및 수익화
         - 왼쪽 메뉴에서 빌드->Storage 클릭
         - [시작하기] 버튼 클릭
         - Storage 사용을 위해 결제 계정 연동이 필요하기에, 결제 계정을 생성하고 연동하는 작업이 선행되어야 할 수 있다.
-        - 버킷 옵션(storage 위치) 은 기본설정을 유지, 보안 규칙 설정에는 **테스트 모드** 로  설정
+        - 버킷 옵션(storage 위치) 은 기본설정을 유지, 보안 규칙 설정에는 **테스트 모드** 로 설정
          ![Storage](/IMAGE_HARUGIROK/firebase_storage.png)
 
     9. firebase 보안 규칙 수정
-       1.  Firebase 콘솔로 이동하여 프로젝트를 연다.
-       2.  왼쪽 메뉴에서 Storage를 클릭
-       3.  상단 탭에서 규칙(Rules) 탭을 선택
-       4.  기존에 있던 규칙의 `timestamp.date` 를 수정해 허가 기간을 늘리거나, 아래의 코드로 교체
-            ```
+       1. Firebase 콘솔로 이동하여 프로젝트를 연다.
+       2. 왼쪽 메뉴에서 Storage를 클릭
+       3. 상단 탭에서 규칙(Rules) 탭을 선택
+       4. 기존에 있던 규칙의 `timestamp.date` 를 수정해 허가 기간을 늘리거나, 아래의 코드로 교체
+            ```javascript
             rules_version = '2';
 
             service firebase.storage {
@@ -220,17 +218,17 @@ Phase 4: 고도화 및 수익화
                 }
             }
             ```
-       5.  게시(Publish) 버튼을 눌러 변경사항을 저장
-       6.  동일한 절차를 `Firestare Database` 메뉴에 대해서도 수행해 준다.
+       5. 게시(Publish) 버튼을 눌러 변경사항을 저장
+       6. 동일한 절차를 `Firestore Database` 메뉴에 대해서도 수행해 준다.
    
 3. 로그인 기능 구현
     1. Google 로그인과 Firebase 인증에 필요한 라이브러리들을 설치한다.
-        ```
+        ```bash
         npx expo install @react-native-google-signin/google-signin
         npx expo install @react-native-async-storage/async-storage
         ```
     2. 로그인 기능을 App.js 파일에 함수로 구현
-        ```
+        ```javascript
         import React, { useEffect, useState } from 'react';
         import { StyleSheet, Text, View, Button } from 'react-native';
         import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -297,7 +295,7 @@ Phase 4: 고도화 및 수익화
           - 원격은 `eas build --profile development --platform android` 
           - 로컬은 `npx expo run:android`
 
-    4. 이때 안든로이드 expo 앱으로 프로젝트를 실행시키면 `Invariant Violation : TurboModuleRegistry.getEnforcing(...):'RNGoogleSignin' could not be found. Verify that a module by this name is registered in the native binary.` 에러가 발생한다. 이는 Expo Go 앱에 @react-native-google-signin/google-signin 라이브러리의 네이티브 코드가 포함되어 있지 않기 때문에 발생하는 것으로, 아래 과정을 통해 해결한다.
+    4. 이때 안드로이드 expo 앱으로 프로젝트를 실행시키면 `Invariant Violation : TurboModuleRegistry.getEnforcing(...):'RNGoogleSignin' could not be found. Verify that a module by this name is registered in the native binary.` 에러가 발생한다. 이는 Expo Go 앱에 @react-native-google-signin/google-signin 라이브러리의 네이티브 코드가 포함되어 있지 않기 때문에 발생하는 것으로, 아래 과정을 통해 해결한다.
         - `eas build --profile development --platform android` 명령을 입력하여 eas 툴로 빌드 시작. 이후 나오는 설정들은 기본 설정을 사용하면 된다.
         - 빌드가 완료되면 QR코드가 나오는데, 이 QR 코드를 휴대폰의 Expo 앱으로 스캔하고, 앱 설치 화면이 뜨면 앱 설치 파일을 다운받고 앱을 설치한다. 
           - 이 명령은 앱 빌드에 필요한 native library 를 apk 파일에 포함하여 빌드하는 명령어로, 한 번만 수행한 후 라이브러리의 수정이 없다면 추가로 실행할 필요가 없다.
@@ -310,19 +308,19 @@ Phase 4: 고도화 및 수익화
        - 화면에서 "OAuth2.0 클라이언트 ID" 리스트를 보면 "Web client (auto created by Google Service)" 가 기본으로 생성되어 있을 것이며, 이 클라이언트 ID 를 복사하여 앞서 작성한 App.js 파일의 webClientId 부분에 붙여넣기 한다.   
        ![OAuth2](/IMAGE_HARUGIROK/google_oauth.png)   
 
-
 4. 내비게이션 및 메인 화면 구성
     1. 네비게이션 라이브러리 설치
-        ```npx expo install @react-navigation/native
+        ```bash
+        npx expo install @react-navigation/native
         npx expo install react-native-screens react-native-safe-area-context
         npx expo install @react-navigation/native-stack
         ```
-    2. 
+
 5. AI 기능 추가
    - AI API 활성화, 체험 및 비용 구조 파악을 목표로 한다.
    - 사진 분석 후 라벨 설정을 위해 "Cloud Vision API" 를 사용한다.
    1. [Google Cloud Console](https://console.cloud.google.com/) 로 이동
-   2. 좌측 메뉴에서  "API 및 서비스" -> "라이브러리" 로 이동한다.
+   2. 좌측 메뉴에서 "API 및 서비스" -> "라이브러리" 로 이동한다.
 
    ![AI_api](/IMAGE_HARUGIROK/AI_api.png)  
    
@@ -330,49 +328,43 @@ Phase 4: 고도화 및 수익화
 
    ![AI_api2](/IMAGE_HARUGIROK/AI_api2.png)  
 
-   
    - 비용 구조 확인
      - Vision API: 이미지를 1,000건 분석할 때마다 요금이 부과됨. (예: 라벨 감지 기능은 1,000건당 약 $1.5) 즉, 사진 한 장 분석에는 약 0.2원 정도가 소요.
-
      - Natural Language API: 텍스트 1,000자를 '1 유닛'으로 계산하며, 1,000 유닛(총 100만 자)당 요금이 부과됨. (예: 감정 분석은 1,000 유닛당 약 $0.5) 즉, 일기 한 편(500자) 분석에는 약 0.3원 정도가 소요.
-
      - 결론: 크레딧($300 = 약 40만 원)이 있다면, 수십만 건의 사진과 일기를 분석할 수 있는 엄청난 양이므로 테스트 단계에서는 비용 걱정 없이 사용 가능.
 
 6. 일기 작성 화면 UI
-   1. 스마트폰의 갤러리를 연동하기 위한 라이브러리로 "expo-image-picker" 라이브러리를 사용할 것이다. `npx expo install expo-image-picker` 명령어로 모듈을 설치한다
+   1. 스마트폰의 갤러리를 연동하기 위한 라이브러리로 "expo-image-picker" 라이브러리를 사용할 것이다. `npx expo install expo-image-picker` 명령어로 모듈을 설치한다.
    2. 코드에 image picker 연동부를 작성한다.
-      ```
+      ```javascript
       import * as ImagePicker from 'expo-image-picker'; // ImagePicker import 추가
 
       export default function AddEntryScreen({ navigation }) {
-          ...
             const handlePickImage = async () => {
                 // 1. 미디어 라이브러리 접근 권한 요청
                 const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
                 if (permissionResult.granted === false) {
-                Alert.alert("권한 필요", "사진을 선택하려면 앨범 접근 권한이 필요합니다.");
-                return;
+                    Alert.alert("권한 필요", "사진을 선택하려면 앨범 접근 권한이 필요합니다.");
+                    return;
                 }
 
                 // 2. 이미지 피커 실행
                 const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images, // 이미지만 선택
-                allowsEditing: true, // 편집 허용
-                aspect: [1, 1],      // 1:1 비율로 크롭
-                quality: 1,          // 최고 화질
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images, // 이미지만 선택
+                    allowsEditing: true, // 편집 허용
+                    aspect: [1, 1],      // 1:1 비율로 크롭
+                    quality: 1,          // 최고 화질
                 });
 
                 // 3. 결과 처리
                 if (!result.canceled) {
-                // 선택된 이미지의 주소(uri)를 상태에 저장
-                setImageUri(result.assets[0].uri);
+                    // 선택된 이미지의 주소(uri)를 상태에 저장
+                    setImageUri(result.assets[0].uri);
                 }
             };
       }
       ```
-   3. 
-
 
 7. 일기 저장 기능 구현
 8. 캘린더 및 일기 보기
@@ -382,15 +374,11 @@ Phase 4: 고도화 및 수익화
 12. 지도 뷰 구현하기
 13. 게이미피케이션(출석, 포인트) 적용하기
 
-
-
-
-
 ## Expo 사용법
 - EAS : 원격 안드로이드 빌드 서비스를 제공하는 플랫폼이지만, 무료로 사용할 경우 대기시간이 매우 길다.
-- `npx expo start --dev-client` : expo sersver 를 실행하는 명령어
-- `npx expo start --clear` : cache를 제거하는 명령어. 실행후 서버 구동되면 Ctrl + c로 바로 종료
+- `npx expo start --dev-client` : expo server 를 실행하는 명령어
+- `npx expo start --clear` : cache를 제거하는 명령어. 실행 후 서버 구동되면 Ctrl + C로 바로 종료
 - `npx expo run:android` : 네이티브 코드를 포함하여 로컬에서 android 를 다시 빌드하는 명령어. native code가 포함된 라이브러리를 추가/삭제 할 경우 실행시켜줘야 하는 명령어다. 
-  - `Exception thrown when executing UIFrameGuarded` 에러가 발새하고 각종 모듈이 부재하다는 오류가 뜨면 빌드를 다시 해보자.
+  - `Exception thrown when executing UIFrameGuarded` 에러가 발생하고 각종 모듈이 부재하다는 오류가 뜨면 빌드를 다시 해보자.
 - `eas build --profile development --platform android` : EAS 서비스를 사용해서 원격으로 안드로이드를 빌드하는 명령어
 - `cd android; .\gradlew clean` : android 폴더 내에 gradlew와 관련된 캐시 데이터를 삭제하는 명령어

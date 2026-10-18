@@ -1,19 +1,15 @@
-+++
-title = "VsCode"
-date = 2022-04-16T09:07:48+09:00
-lastmod = 2022-04-16T09:07:48+09:00
-tags = []
-categories = []
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "VS Code 생산성 극대화를 위한 단축키 및 필수 확장 플러그인 추천"
+description: "Visual Studio Code의 멀티 커서 편집, 터미널 분할 단축키, Git Lens, Prettier, ESLint 등 개발 효율을 2배 이상 높여주는 환경 설정 팁입니다."
+slug: "vscode-productivity-shortcuts-and-extensions"
+date: 2022-04-16T09:07:48+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DevelopTips"]
+tags: ["vscode", "development-tools", "ide", "productivity"]
+ShowToc: true
+TocOpen: true
+---
 
 # VS code
 - visual studio code 사용법

@@ -1,19 +1,15 @@
-+++
-title = "Jython"
-date = 2021-08-23T19:20:47+09:00
-lastmod = 2021-08-23T19:20:47+09:00
-tags = ["jython", "python", "java",]
-categories = ["dev",]
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Jython을 활용한 Java 런타임 위 Python 코드 상호 운용 가이드"
+description: "JVM 위에서 동작하는 Python 구현체인 Jython의 환경 세팅과 Java 클래스를 Python에서 호출하거나 반대로 임베딩하는 연동법을 정리합니다."
+slug: "jython-java-python-interoperability"
+date: 2021-08-23T19:20:47+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["Java"]
+tags: ["java", "python", "jython", "interoperability", "jvm"]
+ShowToc: true
+TocOpen: true
+---
 # Jython
 - Java 환경에서 python을 실행하게 하는 방법 중 하나
 - 역으로 Jython 환경에서 java를 실행 가능하기도 하다.

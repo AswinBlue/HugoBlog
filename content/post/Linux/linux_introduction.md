@@ -1,18 +1,14 @@
 ---
-title: "Linux_introduction"
+title: "리눅스 기본 개념과 파일 시스템 계층 구조(FHS) 및 권한 관리 가이드"
+description: "리눅스 커널과 쉘의 역할, FHS 표준 디렉터리 구조(/bin, /etc, /var), chmod/chown 파일 퍼미션 설정 및 심볼릭 링크 개념을 총정리합니다."
+slug: "linux-fundamentals-fhs-and-permissions"
 date: 2023-07-10T21:31:47+09:00
-lastmod: 2023-07-10T21:31:47+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "filesystem", "permissions", "operating-system", "basics"]
+ShowToc: true
+TocOpen: true
 ---
 
 # Linux

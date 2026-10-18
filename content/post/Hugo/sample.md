@@ -1,22 +1,15 @@
-+++
-author = "Hugo Authors"
-title = "Markdown Syntax Guide"
-date = "2019-03-11"
-description = "Sample article showcasing basic Markdown syntax and formatting for HTML elements."
-tags = [
-    "markdown",
-    "css",
-    "html",
-    "themes",
-]
-categories = [
-    "themes",
-    "syntax",
-]
-series = ["Themes Guide"]
-aliases = ["migrate-from-jekyl"]
-draft = false
-+++
+---
+title: "Hugo 마크다운 포스트 서식 및 Shortcode 문법 샘플 가이드"
+description: "PaperMod 테마에서 지원하는 코드 블록 하이라이팅, 접기(collapse), 테이블, 이미지 캡션 및 인아티클 광고 Shortcode 작성 문법 샘플입니다."
+slug: "hugo-markdown-syntax-and-shortcodes-sample"
+date: 2019-03-11
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DevOps"]
+tags: ["hugo", "markdown", "shortcodes", "blogging"]
+ShowToc: true
+TocOpen: true
+---
 
 This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.
 <!--more-->
@@ -27,18 +20,18 @@ The following HTML `<h1>`—`<h6>` elements represent six levels of section head
 # H1
 ## H2
 ### H3
-#### H4
-##### H5
-###### H6
+### H4
+- **H5**:
+- **H6**:
 
 ``
 The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
 # H1
 ## H2
 ### H3
-#### H4
-##### H5
-###### H6
+### H4
+- **H5**:
+- **H6**:
 ``
 
 ## Paragraph
@@ -57,12 +50,12 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 
 The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with in-line changes such as annotations and abbreviations.
 
-#### Blockquote without attribution
+### Blockquote without attribution
 
 > Tiam, ad mint andaepu dandae nostion secatur sequo quae.
 > **Note** that you can use *Markdown syntax* within a blockquote.
 
-#### Blockquote with attribution
+### Blockquote with attribution
 
 > Don't communicate by sharing memory, share memory by communicating.</p>
 > — <cite>Rob Pike[^1]</cite>
@@ -79,7 +72,7 @@ Tables aren't part of the core Markdown spec, but Hugo supports supports them ou
   Bob | 27
 Alice | 23
 
-#### Inline Markdown within tables
+### Inline Markdown within tables
 
 | Inline&nbsp;&nbsp;&nbsp;     | Markdown&nbsp;&nbsp;&nbsp;  | In&nbsp;&nbsp;&nbsp;                | Table      |
 | ---------- | --------- | ----------------- | ---------- |
@@ -87,7 +80,7 @@ Alice | 23
 
 ## Code Blocks
 
-#### Code block with backticks
+### Code block with backticks
 
 ```
 html
@@ -102,7 +95,7 @@ html
 </body>
 </html>
 ```
-#### Code block indented with four spaces
+### Code block indented with four spaces
 
     <!DOCTYPE html>
     <html lang="en">
@@ -115,7 +108,7 @@ html
     </body>
     </html>
 
-#### Code block with Hugo's internal highlight shortcode
+### Code block with Hugo's internal highlight shortcode
 {{< highlight html >}}
 <!DOCTYPE html>
 <html lang="en">
@@ -131,19 +124,19 @@ html
 
 ## List Types
 
-#### Ordered List
+### Ordered List
 
 1. First item
 2. Second item
 3. Third item
 
-#### Unordered List
+### Unordered List
 
 * List item
 * Another item
 * And another item
 
-#### Nested list
+### Nested list
 
 * Item
 1. First Sub-item

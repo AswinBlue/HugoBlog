@@ -1,26 +1,22 @@
-+++
-title = "Algorithm"
-date = 2022-04-24T18:16:23+09:00
-lastmod = 2022-04-24T18:16:23+09:00
-tags = []
-categories = []
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "핵심 알고리즘 및 시간 복잡도(Big-O) 분석 총정리 가이드"
+description: "정렬(Quick, Merge), 이진 탐색, 그래프 순회(DFS/BFS), 동적 계획법(DP)의 동작 원리와 공간/시간 복잡도 계산법을 체계적으로 정리합니다."
+slug: "algorithms-data-structures-and-big-o-complexity"
+date: 2022-04-24T18:16:23+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["Algorithm"]
+tags: ["algorithm", "data-structures", "big-o", "sorting", "search"]
+ShowToc: true
+TocOpen: true
+---
 
 # Algorithm
 
 ## 그래프 탐색
 ### SP(Shortest Path)
 단일 출발점에서 단일 목적지까지 최단 경로를 찾는 알고리즘
-#### DFS
+### DFS
 1. 용도 :
   - 경로가 있는지 확인할 때 사용 가능
 2. 자로구조 :
@@ -37,7 +33,7 @@ draft = false
 4. 예시 :
 
 
-#### BFS
+### BFS
 1. 용도 :
   - 최단경로 탐색에 사용 가능
 2. 자로구조 :
@@ -52,7 +48,7 @@ draft = false
 
 ### SSSP (Single Source Shortest Path)
 단일 출발점에서 모든 node까지 최단 경로를 찾는 알고리즘
-#### Dijkstra
+### Dijkstra
 1. 용도: 
  - cycle이 없는 graph
  - 음수 node가 없는 graph
@@ -69,13 +65,13 @@ draft = false
 		list[edge.destination] = list[M] + edge.cost // 값 갱신
 	}
  ```
-#### Bellman-Ford
+### Bellman-Ford
 1. 용도:
 2. 자료구조:
 3. 방법:
 ### APSP (All Pair Shortest Path)
 모든 node에서 모든 node로 가는 최적 경로를 찾는 알고리즘
-#### Floyd-Warshall
+### Floyd-Warshall
 1. 용도:
 2. 자료구조:
 3. 방법:

@@ -1,19 +1,15 @@
-+++
-title = "Linux commands"
-date = 2021-08-12T10:41:00+09:00
-lastmod = 2021-08-12T10:41:00+09:00
-tags = [ "linux", "sed",]
-categories = ["dev",]
-imgs = []
-cover = "" # image show on top
-readingTime = true # show reading time after article date
-toc = true
-comments = false
-justify = false # text-align: justify;
-single = false # display as a single page, hide navigation on bottom, like as about page.
-license = "" # CC License
-draft = false
-+++
+---
+title: "실무에서 자주 쓰는 리눅스 필수 명령어 및 파일 시스템 탐색 가이드"
+description: "ls, find, grep, awk, sed, tar, xargs 등 서버 운영 및 개발 생산성을 극대화하는 리눅스 핵심 쉘 명령어 활용법과 파이프라인 예제를 다룹니다."
+slug: "essential-linux-commands-and-shell-tips"
+date: 2021-08-12T10:41:00+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["Linux"]
+tags: ["linux", "bash", "cli", "command-line", "sysadmin"]
+ShowToc: true
+TocOpen: true
+---
 # Linux Command
 - 리눅스에서 사용되는 명령어들을 정리한다.
 - 자주 사용되는 모듈의 명령어도 포함한다.

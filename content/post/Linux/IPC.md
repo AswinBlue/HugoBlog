@@ -1,256 +1,172 @@
 ---
-title: "IPC"
+title: "리눅스 프로세스 간 통신(IPC) 기법 총정리: 시그널, 파이프, 메시지 큐, 세마포어, 공유 메모리"
+description: "리눅스 환경에서 독립적인 프로세스 간 데이터를 교환하고 동기화하기 위한 대표적인 IPC 기법인 시그널, 파이프, 메시지 큐, 세마포어, 공유 메모리의 핵심 동작 원리와 C 언어 시스템 콜 API 활용법을 상세히 정리합니다."
+slug: "linux-ipc-mechanisms-overview"
 date: 2023-07-27T20:37:08+09:00
-lastmod: 2023-07-27T20:37:08+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
----
-# IPC (Inter Process Communicatrion)
-
-## Signal
-- Signal은 프로세스간 동기화를 위해 프로세스간 전송하는 신호를 의미한다.
-- Software Interrupt 라고도 한다.
-- 커널에서 `kill -<SIGNAL_NUMBER> <PROCESS_ID>` 명령으로 특정 PROCESS_ID에 ISGNAL_NUMBER에 해당하는 signal을 전달할 수 있다.
-- signal은 총 64까지 정의되어 있고 1~31까지가 일반적으로 사용하는 signal이다. 34~63은 고성능 네트워크 통신을 위한 시그널이다. (32, 33는 미정의)
-  - `kill -l`  명령으로 signal 리스트를 확인할 수 있다. 
-    1. SIGHUP
-    2. SIGINT : 인터럽트, Ctrl+C 명령으로 전송 가능
-    3. SIGQUIT Coredump시 발생
-    4. SIGILL : Illegal instruction
-    5. SIGTRAP : debugger is tracing
-    6. SIGABRT : Abort process
-    7. SIGBUS : bus error
-    8. SIGFPE : Floating point exception
-    9. SIGKILL : 강제 종료
-    10. SIGUSR1	: User-defined signal 1, 마음대로 사용 가능
-    11. SIGSEGV	: invalid virtual memory reference
-    12. SIGUSR2 : User-defined signal 2, 마음대로 사용 가능
-    13. SIGPIPE	: 반대편이 연결되지 않은 pip에 신호 전송시 발생하는 에러
-    14. SIGALRM : alarm() 함수에 의해 발생한 시그널 1
-    15. SIGTERM : 종료 요청, SIGKILL(9)보다 안전한 종료 방법, SIGINT와 유사한 성능
-    16. SIGSTKFLT : Stack fault
-    17. SIGCHLD : 자식 process가 종료될 때 부모에게 전달하는 신호
-    18. SIGCONT : SIGSTOP 에 의해 정지된 경우, 다시 시작하라는 신호
-    19. SIGSTOP : process 정지
-    20. SIGTSTP : process 일시정지, Ctrl+Z 명령으로 전송 가능
-    21. SIGTTIN	: background 에 있을 때 read 요청을 받은 경우 발생
-    22. SIGTTOU : background 에 있을 때 write 요청을 받은 경우 발생
-    23. SIGURG : 긴급 통신을 받은 경우 (Out Of Band)
-    24. SIGXCPU : 설정된 CPU 사용량을 초과하여 프로세스가 동작 한 경우
-    25. SIGXFSZ : 파일 크기가 허용된 크기를 초과한 경우
-    26. SIGVTALRM : 프로세스 실행시간 관리를 위한 시그널1
-    27. SIGPROF : 프로세스 실행시간 관리를 위한 시그널2
-    28. SIGWINCH : Window change
-    29. SIGIO, SIGPOLL : Input/output is now possible
-    30. SIGPWR, SIGLOST : Power failure
-    31. SIGUNUSED, SIGSYS : Unused signal. 
-
-
-### Signal Library in C
-- `signal.h` 에 정의된 signal 함수로 signal을 무시(ignore)하거나, 시그널 발생시 특정 함수를 동작(catch)시키도록 설정할 수 있다. 
-- 처리되지 않은 (ignore 또는 catch 처리) signal을 받으면 기본적으로 해당 프로세스는 종료한다.
-- SIGKILL(강제종료 용도)과 SIGSTOP(디버깅시 일시정지 용도)시그널을 제외한 모든 시그널을 무시할 수 있다.
-
-1. `signal(SIGNAL, PID)`
-  - pid > 0 : PID에 SIGNAL 전달
-  - pid < 0 : PID의 절댓값에 해당하는 groupId를 가진 프로세스들에 SIGNAL 전달
-  - pid == 0 : 자신과 같은 groupId를 가진 프로세스들에 SIGNAL 전달
-
-2. `alarm(TIME)` : TIME초 이후 SIGALRM 시그널 발생
-    - alarm timer가 만기되기 전 새로운 alarm을 호출하면 값을 덮어쓴다. 대신 alarm 함수는 남은 시간을 반환 한다.
-    - alarm(0) 을 호출하면 알림이 취소된다.
-
-- 시그널 처리 flag는 bit연산으로 관리된다.
-- sigset_t 타입의 bit 하나하나들은 1~64까지의 signal을 의미하고, 아래와 같이 set을 연산하여 process에서 signal을 설정할 수 있다.
-
-1. `sigemptyset(siget_t* SET)` : SET 모든 비트를 0으로 세팅. 
-2. `sigfillset(int SIGNAL, sigset_t* SET)` : | 연산으로 SET 에서 SIGNAL에 해당하는 비트만 1로 세팅
-3. `sigdelset(int SIGNAL, sigset_t* SET)` : & 연산으로 SIGNAL에 해당하는 비트만 0으로 세팅
-4. `sigismember(int SIGNAL, sigset_t* SET)` : SET에서 SIGNAL비트가 1로 세팅되었다면 true 반환
-5. `sigprocmask(int HOW, siget_t* NEW, sigset_t* OLD)` : 특정 SIGNAL을 무시하도록 설정할 수 있다. 
-    - 필요할 경우 OLD에 siget_t* 타입 변수를 집어넣으면 현재 프로세스에 설정된 set을 담아낸다. 
-    - SIG_BLOCK : NEW에 set된 signal들을 추가로 무시한다. 
-    - SIG_UNBLOCK : NEW에 set 된 signal들의 무시처리를 해제한다.
-    - SIG_SETMASK : 기존 값에 상관없이 NEW에 set 된 signal들만 무시하도록 set을 덮어쓴다.
-
-- signal 을 처리하여 signal에 의해 process가 정지되지 않는 구간을 `임계영역` 이라 한다.
-
-
-## Pipe
-- 프로세스간 단방향 통신을 위해 프로세스들의 표준 입출력을 서로 교차하여 연결하는 기법이다. 
-- 프로세스간 데이터 전송시 주로 사용된다.
-- flow control이 기본적으로 제공된다. 
-
-### Pipe Library in C
-
-- `pipe(int[2] fd)` : 파일 디스크립터 두개를 생성하고, 단방향 통신을 생성함
-  - file descriptor를 두 개 열고, fd[0] fd[1]에 그 번호를 넣어준다.
-    - `write(fd[1], ...)`, `read(fd[0], ...)` 으로 사용
-  - fd[0]은 writing을, fd[1]은 reading을 위한 descriptor이다. 
-  -  파이프 사용을 마치면 fd[0]과 fd[1]에 대해 각각 close를 해 주어야 한다.
-     -  `close(fd[0])`, `close(fd[1])` 로 사용
-
-- pipe를 생성하고 fork를 호출하면 자식 프로세스는 부모 프로세스의 file descriptor를 모두 가져가기 때문에, 부모와 자식간 pipe를 통해 데이터를 전송할 수 있게 된다. (물론 단방향이다. 양방향을 원한다면 pipe를 두번 생성한다)
-- 쉘에서 명령을 입력할 때 `|`로 두 명령을 연결시키면, 앞선 명령의 표준 출력 값이 뒷쪽 명령의 input으로 들어간다.
-  - ex) `cat file.txt | grep target` : file.txt 파일을 출력한 결과에서(cat) target 이라는 문자열을 찾는다(grep).
-  - '|' 명령도 pipe로 fd[0], [1]을 생성하고, dup()를 이용해 fd[0]과 fd[1]을 표준 입력/출력 자리로 복사시키는 기법으로 구현한 것이다.
-    ```
-    int fd[2], pid;
-    pipe(fd);
-    pid = fork();
-    if (pid == 0)
-    {
-        close(fd[1]); // 입력용 파이프 제거
-        dup2(fd[0], 0); // 출력 파이프를 표준 입력으로 재배치
-        ... // 이후 parent process 동작 수행
-    }
-    close(fd[0]); // 출력용 파이프 제거
-    dup2(fd[1], 1); // 입력 파이프를 표준 출력으로 재배치
-    ... // 이후 child process 동작 수행
-
-    ```
-
-
-## Message Queue
-
-### IPC namespace
-- 이 외에도 공유메모리, 세마포어, 소켓, FIFO 등으로 프로세스간 통신이 가능하다.
-- 그중 message queue, shared memory, semaphore은 IPC 통신을 위한 framework이다.
-  - 파이프나 FIFO가 file descriptor을 사용해 통신했던 것과 달리, Key_t 타입의 identifier 라는 IPC를 위한 구분자로 채널(통신을 위한 라인)을 구분한다.
-  - 동일한 구조체를 통해 커널이 관리하며, 인터페이스도 유사하다.
-  - 권한은 아래와 같은 형태로 관리되며, 실행 권한이 없는 것만 제외하고 파일시스템과 유사하다.
-    ```
-      struct ipc_perm {
-        ushort uid;
-        ushort gid;
-        ushort cuid;
-        ushort cgid;
-        ushort mod;
-        ushort seq;
-        key_t key;
-      }
-
-    ```
-  
-- 커널에서 `ipcs` 명령어로 IPC 구성에 대한 정보를 확인할 수 있다. 
+categories: ["Linux"]
+tags: ["linux", "ipc", "shared-memory", "system-programming", "semaphore", "pipe"]
+ShowToc: true
+TocOpen: true
 ---
 
-- message queue는 msqid_ds 구조체에 정보를 담아 관리하고, message들은 struct msgbuf 구조의 linked list 형태로 msqid_ds 구조체에 연결된다. 
-- 각 message들은 data, length, type을 가지고 있고, type은 사용자가 원하는 대로 설정 가능한 값이다.
-```
-struct msgqid_ds {
-    struct ipc_perm msg_perm; // 권한
-    struct msg *msg_first; // msg linked list 시작점
-    struct msg *msg_last; // msg linked list 종료점
-    time_t msg_stime; // 마지막 send가 실행된 시각
-    time_t msg_rtime; // 마지막 receive가 실행된 시각
-    time_t msg_ctime; // 마지막 change가 실행된 시각
-    short msg_lspid; // 마지막 send를 한 pid
-    ushort msg_lrpid; // 마지막 receive를 한 pid
-    ushort msg_qbytes; // message queue의 최대 사이즈
-    ushort_msg_cbytes; // message queue에서 사용중인 바이트
+# 리눅스 프로세스 간 통신 (IPC: Inter-Process Communication)
+
+## 시그널 (Signal)
+- 시그널은 프로세스 간 동기화 및 이벤트 전달을 위해 커널 또는 프로세스 간에 전송하는 비동기 신호입니다.
+- 소프트웨어 인터럽트(Software Interrupt)라고도 부릅니다.
+- 쉘에서는 `kill -<SIGNAL_NUMBER> <PROCESS_ID>` 명령으로 특정 프로세스 ID에 시그널을 전달할 수 있습니다.
+- 시그널은 총 64번까지 정의되어 있으며, 1~31번이 표준 POSIX 시그널이고, 34~63번은 실시간(Real-Time) 고성능 처리를 위한 시그널입니다 (32, 33번은 미정의).
+- `kill -l` 명령어로 시스템에 정의된 시그널 목록을 확인할 수 있습니다.
+  1. `SIGHUP` (1): 터미널 접속 종료 시 전달되는 신호
+  2. `SIGINT` (2): 인터럽트, 키보드 `Ctrl+C` 입력 시 발생
+  3. `SIGQUIT` (3): 종료 및 코어덤프(Core dump) 생성
+  4. `SIGILL` (4): 유효하지 않은 명령어 실행 (Illegal instruction)
+  5. `SIGTRAP` (5): 디버거 트레이싱 트랩
+  6. `SIGABRT` (6): `abort()` 함수 호출 시 프로세스 비정상 종료
+  7. `SIGBUS` (7): 버스 에러 (잘못된 메모리 접근)
+  8. `SIGFPE` (8): 부동 소수점 산술 예외 (Floating point exception)
+  9. `SIGKILL` (9): 프로세스 강제 종료 (무시 및 catch 불가)
+  10. `SIGUSR1` (10): 사용자 정의 시그널 1
+  11. `SIGSEGV` (11): 세그멘테이션 오류 (유효하지 않은 가상 메모리 참조)
+  12. `SIGUSR2` (12): 사용자 정의 시그널 2
+  13. `SIGPIPE` (13): 읽기 대상이 없는 파이프(Broken pipe)에 쓰기 시도 시 발생
+  14. `SIGALRM` (14): `alarm()` 타이머 만료 시 발생하는 시그널
+  15. `SIGTERM` (15): 정상적인 종료 요청 시그널 (소프트웨어 종료 신호)
+  16. `SIGSTKFLT` (16): 스택 오류 (Stack fault)
+  17. `SIGCHLD` (17): 자식 프로세스가 종료 또는 정지될 때 부모 프로세스에 전달
+  18. `SIGCONT` (18): 정지된 프로세스를 다시 재개(Continue)시키는 신호
+  19. `SIGSTOP` (19): 프로세스 실행 일시 정지 (무시 및 catch 불가)
+  20. `SIGTSTP` (20): 터미널 정지 시그널, 키보드 `Ctrl+Z` 입력 시 발생
+  21. `SIGTTIN` (21): 백그라운드 프로세스가 터미널 입력(read)을 시도할 때 발생
+  22. `SIGTTOU` (22): 백그라운드 프로세스가 터미널 출력(write)을 시도할 때 발생
+  23. `SIGURG` (23): 긴급 소켓 데이터 수신 (Out-Of-Band)
+  24. `SIGXCPU` (24): 설정된 CPU 시간 제한 초과 시 발생
+  25. `SIGXFSZ` (25): 허용된 파일 크기 한도 초과 시 발생
+  26. `SIGVTALRM` (26): 가상 타이머 만료 시그널
+  27. `SIGPROF` (27): 프로파일링 타이머 만료 시그널
+  28. `SIGWINCH` (28): 터미널 윈도우 크기 변경 시 발생
+  29. `SIGIO` / `SIGPOLL` (29): 비동기 I/O 이벤트 발생 가능 상태
+  30. `SIGPWR` / `SIGLOST` (30): 시스템 전원 장애 발생
+  31. `SIGSYS` (31): 잘못된 시스템 콜 호출 시 발생
+
+### C 언어 시그널 라이브러리
+- `<signal.h>`에 정의된 함수를 통해 시그널을 무시(`SIG_IGN`)하거나 핸들러 함수를 등록(`SIG_DFL` 또는 커스텀 핸들러)하여 가로챌 수 있습니다.
+- 별도의 처리가 되지 않은 시그널을 수신하면 기본 동작(대부분 프로세스 종료)이 수행됩니다.
+- `SIGKILL`(9)과 `SIGSTOP`(19) 시그널은 커널 레벨에서 즉시 집행되므로 절대 무시하거나 핸들러로 가로챌 수 없습니다.
+
+1. `int kill(pid_t pid, int sig)`
+   - `pid > 0`: 지정한 프로세스 ID에 시그널 전달
+   - `pid < 0`: 프로세스 그룹 ID(`|pid|`)에 속한 모든 프로세스에 시그널 전달
+   - `pid == 0`: 송신 프로세스와 동일한 프로세스 그룹에 속한 모든 프로세스에 시그널 전달
+
+2. `unsigned int alarm(unsigned int seconds)`
+   - 지정한 초(`seconds`) 이후 `SIGALRM` 시그널이 발생합니다.
+   - 타이머 만료 전 새로 호출하면 이전 타이머를 덮어쓰며, 남은 초를 반환합니다. `alarm(0)`을 호출하면 타이머가 취소됩니다.
+
+- 시그널 집합(Signal Set) 제어 함수 (`sigset_t` 비트 마스크 연산):
+  1. `sigemptyset(sigset_t *set)`: 시그널 집합의 모든 비트를 0으로 비웁니다.
+  2. `sigfillset(sigset_t *set)`: 시그널 집합의 모든 비트를 1로 채웁니다.
+  3. `sigaddset(sigset_t *set, int signum)`: 특정 시그널 번호의 비트만 1로 추가합니다.
+  4. `sigdelset(sigset_t *set, int signum)`: 특정 시그널 번호의 비트를 0으로 제거합니다.
+  5. `sigismember(const sigset_t *set, int signum)`: 특정 시그널이 포함되어 있는지 확인합니다.
+  6. `sigprocmask(int how, const sigset_t *set, sigset_t *oldset)`: 특정 시그널을 블록(Block)하거나 해제합니다.
+     - `SIG_BLOCK`: 지정된 시그널들을 블록 집합에 추가합니다.
+     - `SIG_UNBLOCK`: 지정된 시그널들의 블록 상태를 해제합니다.
+     - `SIG_SETMASK`: 기존 블록 마스크를 새 집합으로 완전히 덮어씁니다.
+- 시그널에 의해 방해받지 않고 보호되어야 하는 코드 구간을 **임계영역(Critical Section)**이라 부릅니다.
+
+## 파이프 (Pipe)
+- 프로세스 간 단방향 통신을 위해 표준 입출력 스트림을 교차 연결하는 기법입니다.
+- 주로 부모-자식 프로세스 간 데이터 전송에 사용되며, 커널 내부에 버퍼링과 흐름 제어(Flow Control)가 기본 제공됩니다.
+
+### C 언어 파이프 라이브러리
+- `int pipe(int pipefd[2])`: 단방향 통신 채널을 생성하고 읽기/쓰기용 파일 디스크립터 2개를 반환합니다.
+  - `pipefd[0]`: 읽기 전용 디스크립터 (`read(pipefd[0], ...)`)
+  - `pipefd[1]`: 쓰기 전용 디스크립터 (`write(pipefd[1], ...)`)
+  - 사용이 끝난 디스크립터는 반드시 `close()`로 닫아주어야 합니다.
+- `pipe()` 생성 후 `fork()`를 호출하면 자식 프로세스가 부모의 파일 디스크립터 테이블을 그대로 복제하므로 부모-자식 간 파이프 통신이 가능해집니다.
+- 쉘의 파이프라인 연산자(`|`) 또한 내부적으로 `pipe()`와 `dup2()` 시스템 콜을 사용하여 앞 명령어의 표준 출력을 뒷 명령어의 표준 입력으로 리다이렉션하여 동작합니다.
+
+```c
+int fd[2];
+pid_t pid;
+pipe(fd);
+pid = fork();
+
+if (pid == 0) {
+    // 자식 프로세스: 표준 입력을 파이프 읽기 채널로 대체
+    close(fd[1]);       // 쓰기 디스크립터 닫기
+    dup2(fd[0], 0);     // fd[0]을 STDIN_FILENO(0)으로 복제
+    close(fd[0]);
+    // 자식 작업 수행...
+} else {
+    // 부모 프로세스: 표준 출력을 파이프 쓰기 채널로 대체
+    close(fd[0]);       // 읽기 디스크립터 닫기
+    dup2(fd[1], 1);     // fd[1]을 STDOUT_FILENO(1)으로 복제
+    close(fd[1]);
+    // 부모 작업 수행...
 }
+```
 
+## 메시지 큐 (Message Queue)
+
+### IPC 네임스페이스
+- 메시지 큐, 공유 메모리, 세마포어는 커널 레벨의 IPC 프레임워크(System V IPC)입니다.
+- 파일 디스크립터 대신 `key_t` 타입의 고유 키(Identifier)를 통해 통신 채널을 식별합니다.
+- 권한은 `struct ipc_perm` 구조체를 통해 파일 시스템과 유사하게 관리됩니다 (실행 권한 제외).
+- 리눅스 쉘 명령어 `ipcs`를 통해 현재 시스템에 할당된 IPC 자원 현황을 확인할 수 있습니다 (`ipcrm`으로 수동 삭제 가능).
+
+```c
 struct msgbuf {
-  long mtype; // message의 타입(자료형이 아니라, 어플리케이션 로직상 구분자), 필수
-  char mtext[]; // data, 필수
-  // 이외 사용자가 재정의하여 추가적인 데이터를 넣어 헤더를 추가할 수 있다.
-}
+    long mtype;       // 메시지 타입 (1 이상의 정수, 애플리케이션 구분자)
+    char mtext[512];  // 메시지 본문 데이터
+};
 ```
 
+### C 언어 메시지 큐 라이브러리
+- `int msgget(key_t key, int msgflg)`: 메시지 큐를 생성하거나 기존 큐의 ID(msqid)를 획득합니다.
+  - `IPC_CREAT | 0666` 형태로 신규 생성 및 권한을 부여합니다.
+- `int msgctl(int msqid, int cmd, struct msqid_ds *buf)`: 메시지 큐 상태 조회(`IPC_STAT`), 설정 변경(`IPC_SET`), 큐 삭제(`IPC_RMID`)를 수행합니다.
+- `int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg)`: 메시지 큐에 메시지를 전송합니다 (`msgsz`는 `mtext`의 바이트 크기).
+- `ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)`: 메시지 큐에서 지정한 타입의 메시지를 수신합니다.
+  - `msgtyp == 0`: 큐의 맨 앞 메시지를 수신합니다.
+  - `msgtyp > 0`: 해당 타입과 일치하는 첫 번째 메시지를 수신합니다.
+  - `msgtyp < 0`: 절댓값보다 작거나 같은 타입 중 가장 작은 타입의 메시지를 수신합니다.
 
-### Message Queue in C Library
-- `int msgget(key_t key, int msgflg)` : message queue를 생성 혹은 불러오는 함수
-  - key는 int 값을 넣어주면 된다. 
-  - 함수 성공시 message queue의 qid를 반환하고, 실패시 -1을 반환한다.
-  - flag에 IPC_CREAT 가 설정되면 신규로 생성된다. 생성시 권한도 설정 가능하다. ex: `IPC_CREAT | 0777`
-- `int messagectl(int msqid, int cmd, struct msqid_ds *buf)` : message queue의 상태값을 조회 또는 수정한다.
-  - cmd 가 `IPC_STAT` 라면 buf에 현재 상태를 받아오고, `IPC_SET` 라면 buf의 값으로 message queue 상태를 설정한다.
-- `int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg)` : message queue에 msgp 데이터를 넣는 함수
-  - msgp는 위에서 언급한 msgbuf 형태를 따라야 한다.
-  - msgsz는 msgp안의 mtext 버퍼 크기를 의미한다. (msgp 전체 구조체 크기가 아님)
-  - msgflg는 blocking 여부(IPC_NOWAIT), size 에러 여부(MSG_NOERROR) 등을 설정 가능하다.
-- `ssize_t msgrcv(int msgqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)` : message queue에서 msgtype에 해당하는 데이터를 msgp에 받아옴
-  - 반환값은 읽어온 사이즈
-  - type은 지정하지 않을 경우, queue의 head에 있는 message를 가져옴. 
-    - type > 0 일 경우, 동일한 타입의 첫번째 메시지를 가져옴
-    - type < 0 일 경우, type의 절댓값과 작거나 같은 타입의 첫번째 메시지를 가져옴
-  - flag는 msgsnd 함수와 유사
+## 세마포어 (Semaphore)
+- 여러 프로세스가 공유 자원에 동시에 접근할 때 동기화를 보장하고 임계 영역(Critical Section)을 보호하기 위한 기법입니다.
+- 뮤텍스(Mutex)가 1개의 자원을 보호하는 데 비해, 세마포어는 복수 개의 자원 카운트를 관리할 수 있습니다.
 
+### C 언어 세마포어 라이브러리
+- `int semget(key_t key, int nsems, int semflg)`: 세마포어 집합을 생성하거나 식별자를 가져옵니다.
+- `int semop(int semid, struct sembuf *sops, size_t nsops)`: 세마포어 원자적 연산을 수행합니다.
+  - P 연산 (자원 획득, `sem_op = -1`): 세마포어 카운트를 1 감소시킵니다. 카운트가 0이면 대기합니다.
+  - V 연산 (자원 반납, `sem_op = +1`): 세마포어 카운트를 1 증가시켜 대기 중인 프로세스를 깨웁니다.
+- `int semctl(int semid, int semnum, int cmd, ...)`: 세마포어 값 조회(`GETVAL`), 초기화(`SETVAL`), 집합 삭제(`IPC_RMID`) 등을 제어합니다.
 
-## Semaphore
-- 다중 리소스에 대해 critical section을 처리하는 방법(mutex는 하나의 리소스를 보호에 사용)
-- `struct semid_ds` 구조체 형태로 관리되며, 보호할 리소스의 정보를 `struct sem *sem_base` 인자에 담아 관리하며, sem_nsems 인자는 semaphore가 관리하는 리소스의 갯수를 나타낸다. 
-### Semaphore in C Library
-- `int semop(int sid, struct sembuf* s_buf, size_t num)` : semaphore을 조작하는 함수
-  - sid : semaphore id, 식별자
-  - s_buf : operation. 동작에 대한 상세 정보를 sembuf* 타입에 기록한 후 인자에 적용한다. 배열 형태로 여러개 적용 가능
-    - s_buf.sem_num: 세마포어 번호
-    - s_buf.sem_op : 세마포어 연산
-    - s_buf.sem_flg : 작동 플래그
-  - num : operation의 갯수
--  `int semctl(int sid, int num, int cmd, union semun arg)` : semaphore 설정을 가져오거나 수정
-   -  sid : semaphore id, 식별자
-   -  num : 세마포어가 관리하는 리소스 중 함수로 접근을 원하는 대상의 index
-   -  cmd : 명령
-      -  GETVAL	세마포어의 현재 값을 구한다.
-      -  GETPID	가장 최근에 접근했던 프로세스의 프로세스 ID를 구한다.
-      -  GETNCNT	세마포어 대기중인 프로세스의 개수
-      -  GETZCNT	세마포어 값이 0 이 되기를 기다리는 프로세스의 개수
-      -  GETALL	세마포어 집합의 모든 세마포어 조회
-      -  SETVAL	세마포어 값을 설정
-      -  SETALL	세마퍼어 집합의 모든 세마포어 값을 설정
-      -  IPC_STAT	세마포어의 상세 정보 확인
-      -  IPC_SET	세마포어의 권한 설정
-      -  IPC_RMID	세마포어 집합 삭제
-   - arg : 조회 명령시에는 해당 값에 정보를 받아오고, 설정 명령시에는 해당 값을 적용
+```c
+// P 연산 (자원 잠금)
+struct sembuf p_op = {0, -1, SEM_UNDO};
+semop(semid, &p_op, 1);
 
+// 임계 영역 (공유 자원 접근)
 
-- p연산 : semaphore에 리소스를 사용하고 있다고 체크하는 연산
-  ```
-  struct sembuf s_buf = {0,};
-  s_buf.sem_num = 0;
-  s_buf.sem_op = -1; // 한개 만큼 사용
-  semop(semid, &s_buf, 1); // 한 개 operation 수행
-  ```
-- v연산 : semaphore에 리소스를 반환했다고 체크하는 연산
-  ```
-  struct sembuf s_buf = {0,};
-  s_buf.sem_num = 0;
-  s_buf.sem_op = 1; // 한개 만큼 사용
-  semop(semid, &s_buf, 1); // 한 개 operation 수행
+// V 연산 (자원 해제)
+struct sembuf v_op = {0, 1, SEM_UNDO};
+semop(semid, &v_op, 1);
+```
 
-  ```
+## 공유 메모리 (Shared Memory)
+- 둘 이상의 프로세스가 물리적 메모리 공간의 특정 영역을 가상 주소 공간에 함께 매핑하여 사용하는 IPC 기법입니다.
+- 커널 공간을 거치지 않고 메모리에 직접 읽고 쓰기 때문에 IPC 기법 중 데이터 전송 속도가 가장 빠릅니다.
+- 자체적인 동기화 기능이 없으므로 데이터 무결성을 위해 세마포어나 뮤텍스를 반드시 병행해야 합니다.
 
-## Shared Memory
-- 프로세스간 공용으로 사용할 수 있는 영역의 메모리를 선언하는 방법
-- race condition을 해결 할 수는 없으므로, semaphore와 함께 사용해야 한다.
-### Shared Mmory in C Library
-- `int shmget(key_t key, size_t size, int shmflg)` : shared memory를 생성하거나 key값으로 identifier를 가져오는 함수
-  - size : shared memory의 크기
-  - 생성 : `shmget(key, sizeof(YOUR_STRUCT), IPC_CREAT)`
-  - 참조 : `shmget(key, sizeof(YOUR_STRUCT), 0)`
-  - YOUR_STRUCT는 메모리 참조시 사용할 포멧
-- `void *shmat(int shmid, const void *shmaddr, int shmflg)` : 가상메모리를 할당하는 작업. attach
-  - shmid : shared memory id, 식별자
-  - shmaddr : 공유 메모리 연결 주소 (보통 NULL로 사용)
-  - 반환값 : shared memory에 접근할 수 있는 포인터
-  - ex) `YOUR_STRUCT *ptr = (YOUR_STRUCT*)shmat(shmid, 0, 0);`
-- `int shmdt(const void *shmaddr)` : 가상메모리를 환원하는 작업. detach
-  - ex) `shmdt(shmid);`
-- `int shmctl(int shmid, int cmd, struct shmid_ds *buf)` : 공유 메모리에 대한 정보를 가져오거나 설정하는 함수
-  - shmid : shared memory id, 식별자
-  - cmd : 제어 명령
-    - IPC_STAT : shared memory 값 받아와 buf에 작성
-    - IPC_SET : buf의 값으로 해당 shared memory 정보 갱신
-    - IPC_RMID : shared memory를 시스템에서 삭제
-  - buf : 조회 명령시에는 해당 값에 정보를 받아오고, 설정 명령시에는 해당 값을 적용
+### C 언어 공유 메모리 라이브러리
+- `int shmget(key_t key, size_t size, int shmflg)`: 공유 메모리 세그먼트를 생성하거나 식별자(shmid)를 반환받습니다.
+  - 생성: `shmget(key, size, IPC_CREAT | 0666)`
+- `void *shmat(int shmid, const void *shmaddr, int shmflg)`: 공유 메모리를 현재 프로세스의 가상 주소 공간에 부착(Attach)합니다.
+  - 반환된 포인터를 구조체 포인터 등으로 캐스팅하여 즉시 메모리에 접근할 수 있습니다.
+- `int shmdt(const void *shmaddr)`: 공유 메모리 매핑을 현재 프로세스에서 분리(Detach)합니다.
+- `int shmctl(int shmid, int cmd, struct shmid_ds *buf)`: 공유 메모리 세그먼트의 상태 조회(`IPC_STAT`) 및 시스템 제거(`IPC_RMID`)를 수행합니다.

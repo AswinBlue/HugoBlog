@@ -1,18 +1,14 @@
 ---
-title: "Process"
+title: "리눅스 프로세스 생명주기(fork/exec) 및 시그널(Signal) 제어 기법"
+description: "프로세스 생성과 종료, 좀비/고아 프로세스 방지, fork와 exec 시스템 콜의 차이, kill 및 trap을 통한 비동기 시그널 핸들링을 상세히 다룹니다."
+slug: "linux-process-lifecycle-fork-exec-signals"
 date: 2023-07-18T20:15:29+09:00
-lastmod: 2023-07-18T20:15:29+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Linux"]
+tags: ["linux", "process", "signals", "system-programming", "multiprocessing"]
+ShowToc: true
+TocOpen: true
 ---
 
 
@@ -74,15 +70,15 @@ draft: false
   - `exit`의 결과값을 처리하는 함수는 `wait` 이다. 부모 프로세스에서 `wait`을 실행하면 그제서야 자식 프로세스는 메모리를 정리하고 완벽하게 종료된다. 
   - (커널 레벨에서 자식은 부모를, 부모는 자식들의 포인터를 갖고 있어 서로 참조할 수 있도록 연결되어 있다.)
 
-#### 좀비 프로세스
+### 좀비 프로세스
 - 부모 프로세스에서 wait를 호출하지 않아 자식 프로세스를 정리해 주지 않으면 `좀비 프로세스`가 생성된다. 
 - 좀비 프로세스는 사용하지 않는 메모리 및 리소스들을 차지하고 있어서 다른 프로세스들의 성능을 저하시킨다.
 
-#### 고아 프로세스
+### 고아 프로세스
 - 자식 프로세스보다 부모 프로세스가 먼저 종료되는 경우, 그 자식 프로세스들은 `고아 프로세스`가 된다. 
 - 고아 프로세스들은 종료 처리를 해줄 부모 프로세스가 없기 때문에 좀비 프로세스가 될 수 있는데, 이를 막기 위해 커널은 고아 프로세스를 주기적으로 찾아 'init' 프로세스의 자식으로 재설정한다. 
 
-#### signal
+### signal
 - wait() 함수를 호출하면 부모 프로세스는 자식 프로세스가 exit를 호출하기를 기다린다. 
 - 이렇게 되면, 부모 프로세스는 다른 동작을 수행하지 못하여 concurrent한 동작 수행이 불가능하다.
 - 부모가 자기 할 일을 수행하다 자식이 종료될 떄 종료 처리를 해 주도록 하려면 `signal` 기능을 사용하면 된다.
@@ -162,10 +158,10 @@ draft: false
    - p옵션이 붙은 함수를 사용하면 환경변수 path를 사용하여 명령어를 실행할 수 있다.
    - ex) `execlp("ls", "ls", "-l", null)`
 
-#### 쉘을 이용한 옵션처리
+### 쉘을 이용한 옵션처리
 - `execlp(command, command, null);` 형태로 실행하지 않고, `execl("/bin/sh", "sh", "-c", command, null);` 형태로 실행하면 'command' 명령을 쉘이 실행하게 되어 옵션을 알아서 처리해 준다.
 
-#### exec로 생성한 프로세스의 속성
+### exec로 생성한 프로세스의 속성
 1. 상속되는 속성
   - 파일 디스크립터
   - 사용자 ID, 그룹 ID, 프로세스 그룹 ID, 세션 ID, 제어 터미널
@@ -178,7 +174,7 @@ draft: false
   - 유효 사용자 ID (파일 속성에서 set_user_ID 비트가 설정된 경우)
   - 유효 그룹 ID (set_group_id 비트가 설정된 경우)
 
-#### reference count
+### reference count
 - exec를 사용하여 프로세스를 호출하면, 그 아래 line들은 실행이 되지 않는다. 
   - 프로세스는 코드 영역 메모리를 참조하고, 메모리는 reference count를 두어 몇개의 프로세스가 해당 메모리를 참조하는지 체크한다.
   - 이때, exec를 사용하면 기존 프로세스는 code 영역을 내버려두고 exec에서 사용할 새로운 코드영역을 참조하게 된다. (+program counter 이동)

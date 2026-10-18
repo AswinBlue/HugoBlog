@@ -1,18 +1,14 @@
 ---
-title: "Assembly_basic"
+title: "x86-64 어셈블리어 기초 문법: 범용 레지스터, 명령어 세트 및 스택 분석"
+description: "RAX, RBX, RSP, RBP 등 64비트 레지스터 구조와 MOV, LEA, PUSH, POP, CALL 등 핵심 어셈블리 명령어 및 함수 호출 규약(Calling Convention)을 총정리합니다."
+slug: "x86-64-assembly-registers-instructions-stack"
 date: 2024-02-21T20:10:48+09:00
-lastmod: 2024-02-21T20:10:48+09:00
-tags: []
-categories: []
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["Assembly"]
+tags: ["assembly", "x86-64", "low-level", "reverse-engineering", "architecture"]
+ShowToc: true
+TocOpen: true
 ---
 
 

@@ -1,19 +1,15 @@
-+++
-title = "Window"
-date = 2022-03-19T08:29:51+09:00
-lastmod = 2022-03-19T08:29:51+09:00
-tags = []
-categories = []
-imgs = []
-cover = ""  # image show on top
-readingTime = true  # show reading time after article date
-toc = true
-comments = false
-justify = false  # text-align: justify;
-single = false  # display as a single page, hide navigation on bottom, like as about page.
-license = ""  # CC License
-draft = false
-+++
+---
+title: "Windows 환경 개발 생산성 향상을 위한 고급 설정 및 쉘 명령어 팁"
+description: "Windows Terminal, PowerShell 유용한 단축키, PATH 환경변수 빠른 편집 및 개발 친화적 윈도우 OS 튜닝 팁을 공유합니다."
+slug: "windows-development-productivity-tips"
+date: 2022-03-19T08:29:51+09:00
+lastmod: 2026-10-18T18:00:00+09:00
+draft: false
+categories: ["DevelopTips"]
+tags: ["windows", "command-line", "os-settings", "productivity"]
+ShowToc: true
+TocOpen: true
+---
 
 #MS Window
 - MS window 사용시 필요한 편이 기능들을 나열

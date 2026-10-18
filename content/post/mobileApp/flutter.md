@@ -1,18 +1,14 @@
 ---
-title: "Flutter"
+title: "Flutter 및 Dart 기반 크로스 플랫폼 모바일 앱 개발 환경 구축과 위젯 라이프사이클"
+description: "구글 Flutter SDK 설치, StatelessWidget과 StatefulWidget의 생명주기, BuildContext 원리 및 모바일 앱 핫 리로드 개발 팁을 정리합니다."
+slug: "flutter-dart-mobile-app-widgets-lifecycle"
 date: 2023-01-19T22:01:38+09:00
-lastmod: 2023-01-19T22:01:38+09:00
-tags: ["flutter",]
-categories: ["dev",]
-imgs:  []
-cover:  ""  # image show on top
-readingTime:  true  # show reading time after article date
-toc:  true
-comments:  false
-justify:  false  # text-align: justify;
-single:  false  # display as a single page, hide navigation on bottom, like as about page.
-license:  "BY-SA"  # CC License, https://creativecommons.org/licenses/?lang=ko
+lastmod: 2026-10-18T18:00:00+09:00
 draft: false
+categories: ["MobileApp"]
+tags: ["flutter", "dart", "mobile-app", "cross-platform", "ui"]
+ShowToc: true
+TocOpen: true
 ---
 
 # 개발환경 및 기본 지식
