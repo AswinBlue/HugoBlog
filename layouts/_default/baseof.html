@@ -36,19 +36,34 @@
 
     <script>
       (function() {
-        const toggleBtn = document.getElementById('mobileSidebarToggle');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const closeBtn = document.getElementById('sidebarCloseBtn');
         const sidebar = document.getElementById('blogSidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
 
-        if (toggleBtn && sidebar && backdrop) {
-          function toggleSidebar() {
-            sidebar.classList.toggle('show');
-            backdrop.classList.toggle('show');
-            document.body.classList.toggle('sidebar-open');
+        function openSidebar() {
+          if (sidebar && backdrop) {
+            sidebar.classList.add('show');
+            backdrop.classList.add('show');
+            document.body.classList.add('sidebar-open');
           }
-          toggleBtn.addEventListener('click', toggleSidebar);
-          backdrop.addEventListener('click', toggleSidebar);
         }
+
+        function closeSidebar() {
+          if (sidebar && backdrop) {
+            sidebar.classList.remove('show');
+            backdrop.classList.remove('show');
+            document.body.classList.remove('sidebar-open');
+          }
+        }
+
+        if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+        if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+        if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') closeSidebar();
+        });
       })();
     </script>
 </body>

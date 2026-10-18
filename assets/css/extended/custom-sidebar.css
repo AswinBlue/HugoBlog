@@ -1,7 +1,8 @@
 /* ==========================================================================
    AswinBlue Hugo Blog - Modern UI/UX Refinement Stylesheet
    - Typography: Pretendard (Korean) & JetBrains Mono (Code)
-   - Layout: Symmetric 3-Panel Flexible Grid Container
+   - Canvas Contrast: Outer Margin Contrast vs Elevated Workspace Cards
+   - Responsive Layout: Symmetric 3-Panel Desktop + Header Hamburger Mobile Drawer
    - Sidebar: Clean Accordion Tree Navigation with Active Highlight
    - Navigation: Premium Card-style Prev / Next Buttons
    - Ads: Seamless Theme-integrated Widgets with Zero CLS
@@ -13,34 +14,112 @@
   --theme-accent: #1284FF;
   --theme-accent-rgb: 18, 132, 255;
   --theme-accent-hover: #006ee6;
+
+  /* Workspace & Canvas Contrast (Light Mode) */
+  --theme: #eef2f6;           /* Subtle cool-slate outer canvas background (여백 영역) */
+  --entry: #ffffff;           /* Crisp elevated content card background (실제 사용 영역) */
+  --primary: #0f172a;         /* High-contrast primary text */
+  --secondary: #64748b;       /* Muted secondary text */
+  --tertiary: #e2e8f0;        /* Hover surface / pills */
+  --content: #1e293b;         /* Reading body text */
+  --border: #e2e8f0;          /* Crisp card framing border */
+  --code-bg: #f8fafc;         /* Code background */
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
 }
 
-/* 1. Global Typography & Spacing */
+.dark {
+  /* Workspace & Canvas Contrast (Dark Mode) */
+  --theme: #0a0e14;           /* Deep dark outer canvas background (여백 영역) */
+  --entry: #151b23;           /* Elevated content card background (실제 사용 영역) */
+  --primary: #f0f6fc;         /* Crisp text */
+  --secondary: #8b949e;       /* Muted text */
+  --tertiary: #21262d;        /* Hover surface */
+  --content: #c9d1d9;         /* Reading body text */
+  --border: #30363d;          /* Dark card border */
+  --code-bg: #161b22;         /* Code background */
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* 1. Global Typography & Canvas Reset */
 body {
   font-family: var(--font-family);
-  letter-spacing: -0.012em;
+  letter-spacing: -0.015em;
   word-break: keep-all;
   overflow-wrap: break-word;
   color: var(--primary);
   background-color: var(--theme);
+  transition: background-color 0.25s ease;
 }
 
-/* 2. Top Navigation Bar Polish */
+/* 2. Top Header Polish & Hamburger Button */
+.header {
+  background: var(--entry);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  backdrop-filter: blur(8px);
+}
+
 .nav {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Mobile Hamburger Button */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background: var(--tertiary);
+  color: var(--theme-accent);
+  border-color: var(--theme-accent);
+}
+
+@media screen and (max-width: 1024px) {
+  .hamburger-btn {
+    display: inline-flex;
+  }
 }
 
 .logo a {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--primary);
 }
 
+#menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 #menu a {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
   padding: 6px 12px;
@@ -60,7 +139,7 @@ body {
   align-items: flex-start;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 20px 24px 60px 24px;
+  padding: 24px 24px 60px 24px;
   gap: 28px;
   position: relative;
   box-sizing: border-box;
@@ -115,7 +194,7 @@ body {
 
 @media screen and (max-width: 1024px) {
   .blog-layout-container {
-    padding: 12px 16px 40px 16px;
+    padding: 16px 16px 40px 16px;
     gap: 0;
   }
 
@@ -127,11 +206,11 @@ body {
     width: 310px;
     height: 100vh;
     max-height: 100vh;
-    background: var(--theme);
+    background: var(--entry);
     border-right: 1px solid var(--border);
     z-index: 1000;
-    padding: 24px 16px;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    padding: 20px 16px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -149,12 +228,15 @@ body {
 .blog-sidebar {
   background: var(--entry);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+  border-radius: 16px;
+  padding: 16px 14px;
+  box-shadow: var(--card-shadow);
 }
 
 .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding-bottom: 12px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--border);
@@ -172,6 +254,31 @@ body {
 
 .sidebar-icon {
   color: var(--theme-accent);
+}
+
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: var(--tertiary);
+  color: var(--primary);
+}
+
+@media screen and (max-width: 1024px) {
+  .sidebar-close-btn {
+    display: inline-flex;
+  }
 }
 
 .sidebar-content {
@@ -308,32 +415,7 @@ body {
   opacity: 1;
 }
 
-/* 5. Mobile Sidebar Toggle & Backdrop */
-.mobile-sidebar-toggle {
-  display: none;
-  position: fixed;
-  bottom: 24px;
-  left: 20px;
-  z-index: 990;
-  background: var(--theme-accent);
-  color: #ffffff;
-  border: none;
-  border-radius: 30px;
-  padding: 10px 18px;
-  font-size: 13.5px;
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(var(--theme-accent-rgb), 0.35);
-  cursor: pointer;
-  align-items: center;
-  gap: 7px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.mobile-sidebar-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(var(--theme-accent-rgb), 0.45);
-}
-
+/* 5. Mobile Backdrop Overlay */
 .sidebar-backdrop {
   display: none;
   position: fixed;
@@ -347,10 +429,6 @@ body {
 }
 
 @media screen and (max-width: 1024px) {
-  .mobile-sidebar-toggle {
-    display: inline-flex;
-  }
-
   .sidebar-backdrop {
     display: block;
   }
@@ -365,10 +443,10 @@ body {
 .side-ad-widget {
   background: var(--entry);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 12px 8px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--card-shadow);
   min-height: 280px;
   display: flex;
   flex-direction: column;
@@ -392,104 +470,22 @@ body {
   align-items: center;
 }
 
-/* 7. Post Bottom Navigation Cards (.post-nav-wrapper) */
-.post-nav-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin: 44px 0 32px 0;
-}
-
-@media screen and (max-width: 640px) {
-  .post-nav-wrapper {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.nav-card {
+/* 7. Post Single Card Workspace Styling */
+.post-single {
   background: var(--entry);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-decoration: none;
-  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s, border-color 0.22s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border-radius: 16px;
+  padding: 40px 48px;
+  box-shadow: var(--card-shadow);
 }
 
-.nav-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--theme-accent);
-  box-shadow: 0 8px 24px rgba(var(--theme-accent-rgb), 0.1);
-}
-
-.nav-card.prev-card {
-  text-align: left;
-  align-items: flex-start;
-}
-
-.nav-card.next-card {
-  text-align: right;
-  align-items: flex-end;
-}
-
-.nav-subtext {
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: var(--secondary);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.15s ease;
-}
-
-.nav-card:hover .nav-subtext {
-  color: var(--theme-accent);
-}
-
-.nav-arrow {
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-
-.prev-card:hover .nav-arrow {
-  transform: translateX(-4px);
-}
-
-.next-card:hover .nav-arrow {
-  transform: translateX(4px);
-}
-
-.nav-title {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.45;
-  color: var(--primary);
-  word-break: keep-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.nav-card-placeholder {
-  display: block;
-}
-
-@media screen and (max-width: 640px) {
-  .nav-card-placeholder {
-    display: none;
+@media screen and (max-width: 768px) {
+  .post-single {
+    padding: 24px 18px;
+    border-radius: 12px;
   }
 }
 
-/* 8. Post Single Typography & Content Aesthetics */
 .post-header {
   margin-bottom: 28px;
 }
@@ -596,7 +592,7 @@ body {
 .post-content blockquote {
   margin: 1.8rem 0;
   padding: 14px 20px;
-  background: var(--entry);
+  background: var(--theme);
   border-left: 4px solid var(--theme-accent);
   border-radius: 0 10px 10px 0;
   color: var(--secondary);
@@ -605,11 +601,10 @@ body {
 /* Table of Contents (.toc) */
 .toc {
   margin: 24px 0 36px 0;
-  background: var(--entry);
+  background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px 18px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
 .toc summary {
@@ -640,14 +635,120 @@ body {
   font-weight: 600;
 }
 
+/* 8. Post Bottom Navigation Cards (.post-nav-wrapper) */
+.post-nav-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 44px 0 32px 0;
+}
+
+@media screen and (max-width: 640px) {
+  .post-nav-wrapper {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.nav-card {
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s, border-color 0.22s;
+}
+
+.nav-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--theme-accent);
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgba(var(--theme-accent-rgb), 0.12);
+}
+
+.nav-card.prev-card {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.nav-card.next-card {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.nav-subtext {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--secondary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+
+.nav-card:hover .nav-subtext {
+  color: var(--theme-accent);
+}
+
+.nav-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.prev-card:hover .nav-arrow {
+  transform: translateX(-4px);
+}
+
+.next-card:hover .nav-arrow {
+  transform: translateX(4px);
+}
+
+.nav-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--primary);
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nav-card-placeholder {
+  display: block;
+}
+
+@media screen and (max-width: 640px) {
+  .nav-card-placeholder {
+    display: none;
+  }
+}
+
 /* 9. Home & List Page Post Cards */
+.home-info {
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  box-shadow: var(--card-shadow);
+}
+
 .post-entry {
   background: var(--entry);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 24px 28px;
+  border-radius: 16px;
+  padding: 24px 30px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--card-shadow);
   transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s, border-color 0.22s;
 }
 
@@ -697,7 +798,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 24px;
   padding: 0 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--card-shadow);
   text-decoration: none;
   transition: all 0.2s ease;
 }
