@@ -1,14 +1,19 @@
 ---
-title: "CMake 기본 문법과 크로스 플랫폼 빌드 스크립트 작성 가이드"
-description: "CMakeLists.txt를 활용하여 C/C++ 프로젝트를 플랫폼 독립적으로 빌드하고 외부 라이브러리 종속성을 연결하는 핵심 작성법을 설명합니다."
-slug: "cmake-basics-and-cross-platform-build"
-date: 2021-08-12T10:41:00+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
-categories: ["C++"]
-tags: ["cmake", "c++", "build-system", "cross-platform"]
+title: "CMake 기본 사용법과 CMakeLists.txt 핵심 문법 가이드"
+date: 2021-08-12 10:41:00+09:00
+lastmod: 2026-10-18 18:00:00+09:00
+description: "C/C++ 대규모 프로젝트 빌드 자동화를 위한 CMake 기본 개념과 빌드 디렉터리 구성, add_executable, add_subdirectory, message, add_definitions 등 CMakeLists.txt 핵심 명령어 문법을 정리합니다."
+slug: "cmake-basics-and-syntax-guide"
+categories:
+  - "C++"
+tags:
+  - "c++"
+  - "cmake"
+  - "build-system"
+  - "makefile"
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
 ## CMake 개요 및 빌드 절차

@@ -1,8 +1,8 @@
 ---
 title: "C++ 고성능 JSON 라이브러리 RapidJSON 특징 및 장점"
-date: 2021-08-12T10:41:00+09:00
-lastmod: 2021-08-12T10:41:00+09:00
-description: "C++ 환경에서 고성능 JSON 파싱과 직렬화를 위해 널리 사용되는 텐센트의 RapidJSON 라이브러리 주요 특징, 헤더 온리 구성의 편의성 및 파싱 속도 장점을 정리합니다."
+date: 2021-08-12 10:41:00+09:00
+lastmod: 2021-08-12 10:41:00+09:00
+description: "C++ 환경에서 초고속 JSON 데이터 파싱과 직렬화를 구현하기 위해 널리 사용되는 텐센트의 오픈소스 RapidJSON 라이브러리 핵심 특징, 헤더 온리 구성의 편의성 및 벤치마크 파싱 속도 장점을 상세히 정리합니다."
 slug: "cpp-rapidjson-library-overview"
 categories:
   - "C++"

@@ -1,190 +1,101 @@
 ---
-title: "x86-64 리버스 엔지니어링: 바이너리 정적/동적 분석 및 스택 프레임 분석"
-description: "컴파일된 ELF 바이너리를 Ghidra, IDA, GDB로 역공학 분석하고 C언어 소스코드로 디컴파일 및 제어 흐름을 복원하는 핵심 방법론을 다룹니다."
-slug: "x86-64-reverse-engineering-binary-analysis"
+title: "x86-64 리버스 엔지니어링: 정적·동적 바이너리 분석과 IDA 및 Ghidra 활용법"
+description: "바이너리 역공학을 위한 정적 및 동적 분석 방법론과 대표적인 디컴파일러 도구인 IDA Pro와 Ghidra의 필수 단축키, 화면 구성, 윈도우 API 패턴 분석, 바이너리 패치 및 스크립트 자동화 기법을 체계적으로 정리합니다."
+slug: "x86-64-reverse-engineering-ida-ghidra-guide"
 date: 2024-05-12T14:42:07+09:00
 lastmod: 2026-10-18T18:00:00+09:00
 draft: false
 categories: ["Security"]
-tags: ["reverse-engineering", "binary-analysis", "assembly", "security", "gdb"]
+tags: ["reverse-engineering", "ida-pro", "ghidra", "security", "binary-analysis"]
 ShowToc: true
 TocOpen: true
 ---
 
-# Reverse Engineering
+# x86-64 리버스 엔지니어링 기초
 
-- software 를 분석하여 소스코드를 역으로 생성 해 내는 기법
+## 소프트웨어 역공학 개요
+리버스 엔지니어링(Reverse Engineering)은 완성된 실행 바이너리를 기계어 및 디스어셈블리 수준에서 분석하여 프로그램의 설계 구조, 알고리즘, 취약점을 역으로 파악하는 기술입니다.
 
-## software 분석 방법
-### Static analysis
-- 프로그램을 실행시키지 않고 수행하는 분석이다.
-- 프로그램의 전체 구조를 파악하기 쉬우며, 환경적 제약 사항에 자유롭고, 악성 코드의 위협으로부터 안전하다.
-- 난독화 적용시 분석이 어려워 진다는 단점이 있다.
+### 정적 분석 (Static Analysis)
+- 대상 프로그램을 직접 실행시키지 않고 바이너리 구조와 코드 흐름을 분석하는 기법입니다.
+- **장점**: 전체적인 프로그램 제어 흐름(CFG)을 조망하기 쉽고, 악성코드 실행 위험 없이 안전하며 환경 구성에 구애받지 않습니다.
+- **한계**: 패커(Packer)나 난독화(Obfuscation) 기법이 적용된 경우 순수 정적 분석만으로는 내부 로직 규명이 어렵습니다.
 
-- 정적분석에 사용되는 툴로는 `IDA` 가 있다.
-  - `IDA` 는 프리웨어로 https://hex-rays.com/ida-free/ 에서 다운 가능하다.
-### Dynamic analysis
-- 프로그램을 실행시키며 수행하는 분석이다.
-- 프로그램의 개략적인 동작을 빠르게 확인 할 수 있다.
-- 정적 분석과 반대로 프로그램 실행에 필요한 환경 구성이 어려울 수 있다.
-- 안티 디버깅 기법 적용된 프로그램은 디버깅이 불가능하다.
+### 동적 분석 (Dynamic Analysis)
+- 디버거(GDB, x64dbg)를 통해 프로그램을 실제 실행시키면서 레지스터와 메모리 변화를 관찰하는 기법입니다.
+- **장점**: 런타임에 메모리에 복호화되는 실제 문자열과 분기 결과를 실시간으로 빠르게 확인할 수 있습니다.
+- **한계**: 안티 디버깅(Anti-Debugging) 장치가 적용되어 있거나 특정 입력 조건이 갖춰지지 않으면 원하는 코드 경로에 진입하기 어렵습니다.
 
+## IDA Pro 핵심 기능 및 분석 기법
+Hex-Rays 사의 IDA Pro는 세계적인 표준 상용 역공학 도구로, 강력한 디스어셈블러와 Hex-Rays C 디컴파일러(F5)를 내장하고 있습니다.
 
-# IDA
-- 리버스 엔지니어링 툴
- 
-## 단축어
-1. shift + F12
-   - 문자열 검색, String 탭으로 이동
-2. `x`
-   - 상호참조 확인, 변수 또는 함수가 사용되는 곳의 위치를 확인
-3. F5
-   - 어셈블리를 C 언어 형태로 변환
-4. `g`
-   - 특정 주소 혹은 라인으로 이동
-   - 디컴파일 된 함수 이름 위에 커서를 놓고 g 를 누르면 어셈블리 상 함수 라인을 확인할 수 있다.
-   - 함수 이름을 적어도 함수 위치로 이동된다.
-5. ESC
-   - 이전 커서 위치로 이동
-6. Ctrl + Enter
-   - 다음 커서 위치로 이동
-7. `n`
-   - 변수 이름 바꾸기
-8. `Y`
-   - 변수 타입 설정
-   - 함수 매개변수 변경, 함수 매개변수 타입 변경
-9. F2
-   - 어셈블리 혹은 C 언어 라인에서는 break point(중단점) 설정
-   - stack 또는 hex View 에서는 값 변경
-10. F9
-   - 실행 (run)
-   - 프로그램을 실행시켜 동적 분석을 수행할 수 있다.
-11. F8
-   - 한 단계 실행 (next)
-12. F7
-   - 함수 내부로 진입 (step int)
-13. Ctrl + F2 
-   - 디버깅 중단
-14. `r`
-   - hex 데이터를 문자로 변환
-15. Shift + E
-   - 선택한 값을 원하는 형태로 변환하여 추출(export)
-   - hex 데이터를 문자열로 추출할 때 유용하다.
-## 화면
-1. IDA View
-   - 어셈블리 코드, 디컴파일 결과, Hex-View, 구조체 목록 등 필요에 따른 화면 표시
-2. Stack of main
-   - main 함수의 stack
-3. String
-   - 코드 내 검색되는 모든 문자열 표시 화면
-   - 문자열 더블클릭 시 assembly code view로 이동
- 
-4. Functions
-   - 코드 내 인식되는 함수들 표기
-   - Ctrl + F 로 검색 가능
-5. Graph overview
-   - `IDA View` 가 그래프로 표시된 경우, 전체 그래프 중 `IDA View` 에 표시된 화면 표기
+### 필수 단축키 정리
+- `F5`: 선택한 함수의 어셈블리 코드를 사람이 읽기 쉬운 C 의사코드(Pseudocode)로 역컴파일
+- `x` (Cross-Reference): 상호 참조 검색. 특정 함수나 전역 변수를 호출/참조하는 모든 위치 목록을 표시
+- `Shift + F12`: 바이너리에 포함된 모든 정적 문자열(String Window)을 인덱싱하여 검색
+- `g`: 특정 가상 메모리 주소 또는 함수 이름으로 즉시 점프
+- `ESC`: 이전 커서 위치로 히스토리 스택 복귀
+- `Ctrl + Enter`: 앞으로 이동 (이전 점프 취소)
+- `n`: 함수, 레이블 또는 변수 이름을 가독성 있게 변경 (Rename)
+- `Y`: 변수 또는 함수의 데이터 타입/시그니처를 재정의 (Set Type)
+- `F2`: 브레이크포인트(중단점) 설정 또는 Hex View에서 바이트 수정
+- `F9`: 동적 디버거 실행 (Run)
+- `F8`: 함수 내부로 들어가지 않고 다음 명령어로 건너뜀 (Step Over)
+- `F7`: 함수 내부로 진입 (Step Into)
+- `Ctrl + F2`: 디버깅 세션 즉시 강제 종료
+- `r`: 16진수 상수 값을 ASCII 문자로 변환하여 표시
+- `Shift + E`: 선택한 블록의 헥스 바이트 데이터를 원하는 포맷(C 배열 등)으로 내보내기 (Export Data)
 
- 
-## 함수 분석
-- 윈도우 API 공식 함수는 이름을 붙여주고, 직접 만든 함수는 "SUB_1234" 와 같이 이름을 임의로 짓는다.
-- `_stdio_common_vfprintf()` : printf 함수 출력시 호출되는 함수이다. 
-- `_stdio_common_vfscanf()` : scanf 함수  출력시 호출되는 함수이다.
-- `__ROL1__(TARGET, NUM)` : TARGET (숫자)을 좌측으로 NUM 번 shift 시키고, 8bit 비트 위로 밀려난 좌측 인자들을 오른쪽 빈자리에 다시 집어넣는 함수
-  - reversing code
-    ```
-	def rol1(v, s):
-        v = (v << s) | (v >> (8 - s))  # bit shift & push back
-	    return v & 0xff  # 8bit 영역만 사용
-    ```
-- `__popcnt(NUM)` : NUM 을 2진수로 변경했을 때 1의 갯수를 반환
-  - reversing code
-    ```
-	def popcnt(v):
-        return bin(v).count('1')
-	```
-- `__ROR1__(TARGET, NUM)` : TARGET (숫자)을 우측으로 NUM 번 shift 시키고, 8bit 비트 위로 밀려난 우측 인자들을 왼쪽 빈자리에 다시 집어넣는 함수
-  - reversing code
-    ```
-    def ror(value, count) :
-        tmp1 = value >> count
-        tmp2 = value << (8 - count)
-        return((tmp1 + tmp2) % 2**8)
-    ```
-- `MEMORY[]` : 메모리 주소에 담긴 값을 나타냄
-  - `MEMORY[0xDEADBEEF000]` 은 0xDEADBEEF000 번지 주소의 값을 반환함
-### WinAPI 관련 함수
-- API 관련 문서는 [MSDN 링크](https://learn.microsoft.com/en-us/windows/win32/api/) 에서 찾아볼 수 있다.
-- `__stdcall WinMain` : GUI 실행시 가장 먼저 호출되는 함수
-- `RegisterClassExW(v11)` : 윈도우 클래스 등록하는 함수
-  - 인자로 들어가는 "v11" 변수는 윈도우 클래스이다.
-  - `lpfnWndProc` : 윈도우의 메시지 콜백 함수로, 개발자가 의도한 윈도우의 business logic은 주로 이 함수 안에서 정의되어 있다.
- 
-## 함수 수정
-- assembly 코드 화면에서 메뉴 -> edit -> patch program -> assemble 메뉴를 클릭하면 해당 라인의 어셈블리를 변경할 수 있다.
-- 변경 이후에는 다시 메뉴 -> edit -> -> patch program -> apply patch to input file 을 선택하면 패치가 적용된다.
- 
----
- 
-# Ghidra
-- NASA에서 사용하는 리버스 엔지니어링 툴로, 오픈소스로 공개되어 있다.
-- jdk를 사용하고 [github](https://github.com/NationalSecurityAgency/ghidra/releases?page=2) 에서 다운로드 가능하다.
-- 다양한 도구들을 내장하고 있으며, GUI도 지원이 가능하다.
- 
-## 구성요소
-1. Code Browser
-   - Ghidra 에 내장된 도구로, 다음 기능이 가능하다. 
-     - 디스어셈블: 분석 대상 프로그램의 기계어를 역으로 어셈블하여 어셈블리 언어 형태의 코드로 보여줍니다.
-     - 디컴파일: 디스어셈블 결과를 C언어 형태로 디컴파일하여 사람이 이해하기 쉬운 코드로 변환하여 보여줍니다.
-     - 코드 자동 분석: 프로그램 내에 존재하는 함수들을 자동으로 식별하고, 변수의 타입을 추론합니다.
-     - 코드 시각화: 제어 흐름 그래프(Control Flow Graph)로 코드의 흐름을 시각적으로 표현하여 코드의 복잡한 구조를 비교적 쉽게 파악할 수 있습니다.
-     - 스크립팅: 사용자가 자신의 요구에 맞게 분석 프로세스를 스크립트로 작성하고 실행할 수 있습니다.
-     - 심볼 정보 수정
-     - 주석 기능
-     - 프로그램 흐름 시각화(Graph View)
-   - [단축키 참조](https://ghidra-sre.org/CheatSheet.html)
-   
-   1. 디컴파일 창(Decompile)
-      - C언어 형태로 디컴파일된 코드를 볼 수 있습니다. 디스어셈블 리스팅(2번 윈도우)에서 어셈블리 명령어를 클릭하면 해당 부분을 디컴파일하여 디컴파일 윈도우에서 보여줍니다.
-      - 함수를 자동으로 추정하여 아래 정보를 추출 해 냄 (추정한 정보이기 때문에 부정확할 수 있음, pointer 타입이 long 타입으로 지정될 수 있다)
-	    - 함수 호출 규약
-		- 반환 타입
-		- 함수 이름
-		- 파라미터 타입과 이름
-      - 함수 이름에 마우스 우클릭 -> `Edit Function Signature` 을 선택하여 함수 정보를 수정할 수 있음
-	  - 변수에 우클릭 -> `Rename Variable` 선택하여 변수 이름 수정 가능
-	  - 변수에 오클릭 -> `Retype Variable` 선택하여 변수 타입 수정 가능
-	  - 공간에 우클릭 -> Comments -> `Set Pre Comment` 로 주석 작성 가능
-	  - 공간에 우클릭 -> `Bookmark`로 북마크 설정 가능
-	    - 메뉴 -> Windows -> Bookmark 로 새로운 창 띄워서 설정한 bookmark list 확인 가능
-   2. 디스어셈블 리스팅(Listing)
-      - 디스어셈블된 코드를 볼 수 있습니다. 디컴파일 창(1번 윈도우)에서 원하는 부분을 클릭하면 해당 부분을 디스어셈블 리스팅에서 보여줍니다.
-   3. 심볼 트리(Symbol Tree)
-      - 프로그램에 존재하는 심볼들(함수 이름)을 볼 수 있습니다. 원하는 심볼을 더블클릭하면 디스어셈블 리스팅이 해당 위치로 이동합니다.
-   4. 프로그램 트리(Program Trees)
-      - 프로그램을 계층 구조로 쪼개어 보여줍니다. 예를 들어서 리눅스 실행 파일 포맷인 ELF 프로그램의 경우, 내부적으로 .text, .data, .rodata와 같은 섹션으로 나누어져 있습니다. 프로그램 트리에서 특정 섹션을 클릭하면, 디스어셈블 리스팅이 해당하는 섹션의 위치로 이동합니다.
-   5. 데이터 타입 매니저(Data Type Manager)
-      - 데이터 타입을 관리할 수 있는 창입니다. 라이브러리에 정의된 타입을 불러오거나 분석을 통해 알아낸 구조체를 관리할 수 있습니다. 
-      - 복잡한 프로그램을 분석하는 과정에서 구조체를 수동으로 식별하여 관리하는 작업에 사용
-      - 구조체 추가
-        - 프로그램 이름이 적힌 폴더에 우클릭 -> New -> Structure 선택
-   6. 콘솔(Console)
-      - Ghidra 스크립트의 실행 결과가 출력.
-	  - 스크립팅 기능으로 자동화 가능
-   7. Byte viewer 
-     - 메뉴 -> Window -> bytes:~~~ 선택하여 바이너리를 byte 로 읽은 내용 확인
-   8. 함수 호출관계 그래프
-     - 메뉴 -> Window -> `Function Call Graph` 선택하여 함수간 링킹 관계 표시 (정적 링킹은 동적링킹에 비해 복잡하게 표시될 수 있음)
-   9. 함수 그래프
-     - 메뉴 -> Window -> `Function Graph` 로 어셈블리 코드상 함수 호출 구조를 확인
-## 사용법
-1. 문자열 검색 : 메뉴 -> search -> For String
-2. 주소 역참조 : disassem 화면에서 주소에 마우스 우클릭 -> references -> show reference to address
+### 핵심 뷰(View) 인터페이스
+- **IDA View**: 어셈블리 코드 리스팅 화면으로, 스페이스바(`Space`)를 눌러 텍스트 뷰와 그래프 뷰(CFG 블록 다이어그램)를 전환할 수 있습니다.
+- **Functions Window**: 식별된 모든 함수 심볼 목록을 표시합니다 (`Ctrl + F`로 검색).
+- **Strings Window**: 감지된 문자열 목록을 보여주며, 더블 클릭 시 해당 문자열이 위치한 `.rodata` 또는 `.data` 섹션으로 이동합니다.
+- **Stack of Function**: 함수의 로컬 변수 오프셋과 스택 프레임 레이아웃을 시각화합니다.
 
+### 역난독화 및 윈도우 API 패턴
+디컴파일 결과에 자주 등장하는 내부 런타임 매크로를 파이썬 코드로 치환하여 역산할 수 있습니다.
 
-# Ghidra
-- 오픈소스 리버싱 툴
+- **비트 회전 연산 (ROL / ROR)**:
+  ```python
+  # 8비트 좌측 순환 시프트 (ROL1)
+  def rol1(v, s):
+      return ((v << s) | (v >> (8 - s))) & 0xFF
 
-## Script
-- 스크립트를 활용하여 반복적인 작업을 자동화 할 수 있다.
-- `Script Manager` 를 활용하여 
+  # 8비트 우측 순환 시프트 (ROR1)
+  def ror1(v, s):
+      return ((v >> s) | (v << (8 - s))) & 0xFF
+  ```
+- **1의 개수 카운트 (__popcnt)**:
+  ```python
+  def popcnt(v):
+      return bin(v).count('1')
+  ```
+- **윈도우 GUI 실행 패턴**:
+  - `WinMain`: GUI 애플리케이션의 최초 진입점
+  - `RegisterClassExW`: 윈도우 클래스를 등록하며, 구조체의 `lpfnWndProc` 멤버가 실제 윈도우 메시지 이벤트를 처리하는 핵심 비즈니스 로직 함수입니다.
+
+### 바이너리 패치 (Patch Program)
+- 어셈블리 명령어를 수정하여 분기 조건을 강제로 변경(`jnz` -> `jmp` 등)할 수 있습니다.
+- IDA 메뉴: `Edit` -> `Patch program` -> `Assemble`에서 명령어를 직접 입력하여 수정합니다.
+- 파일에 영구 반영: `Edit` -> `Patch program` -> `Apply patches to input file`을 선택하여 원본 바이너리에 수정 사항을 기록합니다.
+
+## Ghidra 오픈소스 디컴파일러 활용
+미국 국가안보국(NSA)에서 공개한 오픈소스 소프트웨어 역공학 프레임워크로, Java 기반으로 동작하며 다양한 아키텍처(x86, ARM, MIPS, RISC-V 등)의 고성능 C 디컴파일러를 무료로 제공합니다.
+
+### Code Browser 핵심 구성 요소
+- **디컴파일러 창 (Decompile Window)**: C 언어 형태로 실시간 복원된 코드를 출력하며 변수 선택 시 어셈블리와 양방향 동기화 하이라이팅을 지원합니다.
+- **디스어셈블 리스팅 (Listing Window)**: 바이트코드와 어셈블리 명령어, 주석을 표시합니다.
+- **심볼 트리 (Symbol Tree)**: 임포트(Import)된 외부 라이브러리 함수, 익스포트(Export) 함수, 로컬 레이블을 계층형 트리로 관리합니다.
+- **프로그램 트리 (Program Trees)**: `.text`, `.data`, `.rdata` 등 바이너리의 섹션 메모리 맵 구조를 탐색합니다.
+- **데이터 타입 매니저 (Data Type Manager)**: C 구조체(`struct`)나 열거형을 직접 정의하고 분석 창에 적용할 수 있습니다.
+- **함수 호출 관계 그래프 (Function Call Graph)**: 프로그램 전체의 호출 관계망을 시각적으로 탐색합니다.
+
+### 함수 시그니처 및 데이터 타입 수정
+Ghidra에서 추론된 변수 타입이 부정확한 경우 직관적인 GUI로 정정할 수 있습니다.
+- 함수 이름 우클릭 -> `Edit Function Signature`: 반환 타입, 호출 규약(`__stdcall`, `__cdecl`, `__fastcall`), 파라미터 타입 및 이름을 재정의합니다.
+- 변수 이름 우클릭 -> `Rename Variable` (`L` 키): 변수명을 직관적인 의미로 변경합니다.
+- 변수 우클릭 -> `Retype Variable` (`Ctrl + L` 키): `char *`, `int`, 사용자 정의 구조체 포인터 등으로 올바른 타입을 지정합니다.
+
+### Ghidra 스크립트 기반 자동화
+- Ghidra는 Java 및 Python(Jython) 기반의 강력한 스크립팅 API를 내장하고 있습니다.
+- `Window` -> `Script Manager`를 통해 반복적인 패턴 탐색, XOR 복호화 루틴, 심볼 자동 복구 스크립트를 작성하고 일괄 실행할 수 있습니다.

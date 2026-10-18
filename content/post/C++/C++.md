@@ -1,14 +1,20 @@
 ---
-title: "C++ 핵심 문법과 객체 지향 프로그래밍(OOP) 기초 가이드"
-description: "C++ 언어의 기본 문법부터 클래스 설계, 생성자와 소멸자, 상속과 다형성, 가상 함수 테이블(vtable)까지 객체 지향 프로그래밍의 핵심 개념을 정리합니다."
-slug: "cpp-syntax-and-oop-fundamentals"
-date: 2021-08-12T10:41:00+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
-categories: ["C++"]
-tags: ["c++", "oop", "cpp-basics", "programming"]
+title: "C++ 핵심 기초 문법 및 표준 입출력 최적화 가이드"
+date: 2021-08-12 10:41:00+09:00
+lastmod: 2026-10-18 18:00:00+09:00
+description: "C++ 프로그래밍의 기초가 되는 전처리기 매크로 문법과 조건부 컴파일, cin과 cout 속도 최적화 방법, 그리고 printf와 scanf를 비롯한 표준 라이브러리 입출력 포맷 스트링 제어 기법을 상세히 정리합니다."
+slug: "cpp-basics-and-io-optimization"
+categories:
+  - "C++"
+tags:
+  - "c++"
+  - "cpp-macro"
+  - "io-optimization"
+  - "format-string"
+  - "standard-library"
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
 ## 전처리기 매크로 문법

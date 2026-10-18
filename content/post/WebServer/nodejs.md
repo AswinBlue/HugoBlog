@@ -1,311 +1,216 @@
 ---
 title: "Node.js 비동기 이벤트 루프 아키텍처와 Express 웹 서버 구축 가이드"
-description: "단일 스레드 논블로킹 I/O와 이벤트 루프의 동작 원리, npm 패키지 관리, Express 미들웨어 체인 및 RESTful API 엔드포인트 구현을 다룹니다."
+description: "V8 엔진 기반 Node.js의 논블로킹 I/O 동작 원리부터 npm 패키지 관리, Express 라우터와 미들웨어(세션, 정적 파일, 바디 파서), MySQL 데이터베이스 연동 및 EJS 템플릿 렌더링까지 총정리합니다."
 slug: "nodejs-event-loop-and-express-server-guide"
 date: 2020-07-20T20:40:05+09:00
 lastmod: 2026-10-18T18:00:00+09:00
 draft: false
 categories: ["WebServer"]
-tags: ["nodejs", "express", "backend", "javascript", "rest-api"]
+tags: ["nodejs", "express", "backend", "javascript", "rest-api", "mysql"]
 ShowToc: true
 TocOpen: true
 ---
 
-# Node.js
+Node.js는 Chrome V8 자바스크립트 엔진으로 빌드된 비동기 이벤트 기반(Event-driven) 논블로킹 I/O 런타임 환경입니다. 브라우저 환경에 종속되어 있던 자바스크립트를 고성능 서버 사이드 애플리케이션 개발에 활용할 수 있도록 지원하며, 경량화된 구조와 높은 동시 처리 성능으로 마이크로서비스 및 실시간 API 서버 개발에 널리 사용됩니다.
 
-## 기본 명령
-- `npm init` : 패키지 생성
-- `npm install` : 라이브러리 설치
-  - `-P` : package.json에 저장, 기본옵션
-  - `-O` : optionalDependencies에 저장
-  - `-D`, `--no-save` : 기록없이 다운로드
-  - `-g` : 글로벌 설치, 모든 프로젝트에 적용
-  - `MODULE_NAME@VERSION` : 버전 설정, latest는 가장 최근 버전을 의미
-- `node main.js` : 실행(main.js)
-- `npx <package_name>` : 설치하지 않고 일회만 실행
-- `node main.js` : 패키지 실행 (main.js파일)
-- `npm audit` : 의존성 문제가 발생했을 때, 
-  - `npm audit fix` : 의존성 문제를 자동으로 해결하는 명령어, 일부 해결을 할 수는 있지만 package.json 파일을 수정할 수 있으므로 주의. --fix 옵션을 넣어서 강제로 수정할 수도 있지만, 오히려 되던 기능이 안 될 수도 있으므로 추천하지 않는다. 
-- `npm cache clean` : 캐싱된 데이터를 정리할 수 있다. --force 옵션을 넣어 강제로 처리 가능
+이 글에서는 Node.js의 기본 명령어 및 `package.json` 설정, Express 웹 프레임워크의 미들웨어 파이프라인, 모듈형 라우터 분리, MySQL 데이터베이스 연동, 그리고 EJS 템플릿 엔진을 활용한 렌더링 구조를 체계적으로 정리합니다.
 
-## 구조
-- `main.js` : nodejs 실행시 실행할 메인 파일
-- `package.json` : root 경로에 존재하며, npm 프로젝트를 관리하는 파일
-- `/node_modules` : 프로젝트에서 사용되는 모듈들이 저장되는 파일이다. npm install 명령 사용시 모듈들이 다운받아지는 경로이다. 
+---
 
-### package.json
-- nodejs 설정을 담고있는 파일로, 참조할 내용이 많아 아래에 따로 정리한다.
+## 1. Node.js 런타임 개요 및 npm 패키지 관리
 
-  - `"//" : "comment"` : 주석을 넣는 방법, json key를 //로 하고, value에 comment를 작성한다.
-  - `scripts` : `npm run SCRIPT`(SCRIPT는 원하는 명령) 명령으로 특정 command를 수행하게 할 수 있음
-    - script 명령은 os별로 명령이 상이할 수 있다. 이때는 다음과 같이 설정하여 각 os별로 다르게 동작할 수 있도록 한다. (npm run test 명령시 자동으로 수행해주는것 같지는 않음)  
-    - os에 따라 명령어가 다를 수 있으므로, `cross-env` 모듈을 설치해서 사용하면 문제를 간단히 해결할 수 있다. ex) `cross-env NODE_ENV=production`
+Node.js 생태계의 패키지 관리자인 npm(Node Package Manager)을 사용하여 프로젝트의 의존성을 선언하고 스크립트를 자동화합니다.
 
-    ```
-    "scripts": {
-      "test": "run-script-os",
-      "test:darwin:linux": "export NODE_ENV=test && mocha",
-      "test:win32": "SET NODE_ENV=test&& mocha"
-    }
-    ```
+### 1.1. 필수 npm 명령어 모음
+```bash
+# 프로젝트 초기화 (package.json 자동 생성)
+npm init -y
 
-  - `devDependencies` : 내부에 필요한 모듈들. `npm install -D` 명령어로 dependency를 추가 가능하다.  
+# 패키지 설치 옵션
+npm install <package>          # 프로덕션 의존성 등록 (dependencies)
+npm install -D <package>       # 개발 전용 의존성 등록 (devDependencies)
+npm install -g <package>       # OS 전역 바이너리 설치
+npx <package>                  # 로컬 설치 없이 1회성 도구 실행
 
-  ```
-  {
-    "name": "rankingserver",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-      "//" : "this line is a comment",
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "build:postcss": "NODE_ENV=production postcss src/main/resources/static/css/tailwind.css -o target/classes/static/css/tailwind.css",
-      "watch:postcss": "NODE_ENV=development postcss src/main/resources/static/css/tailwind.css -o src/main/resources/static/css/tailwind.css -w"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/AswinBlue/RankServer.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-      "url": "https://github.com/AswinBlue/RankServer/issues"
-    },
-    "homepage": "https://github.com/AswinBlue/RankServer#readme",
-    "devDependencies": {
-      "autoprefixer": "^10.4.7",
-      "postcss": "^8.4.14",
-      "postcss-cli": "^9.1.0",
-      "tailwindcss": "^3.0.24"
-    }
+# 의존성 보안 진단 및 캐시 관리
+npm audit                      # 패키지 보안 취약점 점검
+npm cache clean --force        # npm 로컬 캐시 초기화
+```
+
+### 1.2. `package.json` 파일의 핵심 구조
+프로젝트 메타데이터, 의존성 라이브러리 목록, 실행 스크립트(`scripts`)를 JSON 형식으로 정의합니다.
+
+```json
+{
+  "name": "express-web-server",
+  "version": "1.0.0",
+  "description": "Express 백엔드 웹 서버",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "test": "cross-env NODE_ENV=test mocha"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "express-session": "^1.18.0",
+    "mysql": "^2.18.1",
+    "ejs": "^3.1.9"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.0"
   }
-  ```
+}
+```
 
-### 모듈 사용
+---
 
-``var express = require('express');``
+## 2. Express 웹 프레임워크와 미들웨어 파이프라인
+
+Express는 Node.js 환경에서 가장 표준적으로 사용되는 미니멀 웹 프레임워크로, 미들웨어 체인(Middleware Chain)을 통해 요청과 응답을 유연하게 제어합니다.
+
+### 2.1. 메인 서버 진입점 (`main.js`)
+정적 파일 제공, 세션 관리, 바디 파서 등록 및 라우터를 마운트합니다.
+
+```javascript
+const express = require('express');
+const session = require('express-session');
+const path = require('path');
 
-``var session = require('express-session');``
+const app = express();
+const PORT = process.env.PORT || 80;
 
-``var bodyParser = require('body-parser');``
+// 1. 바디 파서 미들웨어 (URL-encoded 폼 데이터 및 JSON 페이로드 처리)
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-``var app = express();``
-
-### static 설정
-
-``app.use('/static', express.static(__dirname + '/static'));``
-- '/static' 이라는 경로로 '현재경로/static' 폴더를 연결시킴, 즉 '/static/file' 을 호출하면 '현재경로/static/file' 이 호출됨
-
-### session 설정
-
-``app.use(session({`` -> session 사용 설정
-
-``    secret:"SECRET_CODE",`` -> 세션을 암호화 할 시드 설정
-
-``    resave:false,``
-
-``    saveUninitialized:true``
-
-``}));``
-
-### body parser
-
-``app.use(bodyParser.urlencoded({extended: false}));``
-- html의 body의 내용을 express의 js파일에서 불러와 사용할 수 있도록 하는 모듈
-
-### routing
-
-``r_edit = require('./route/edit.js');`` -> '/edit' 경로로 요청이 오면  './route/edit.js' 파일로 연결, 라우팅 처리함
-
-``app.use('/edit', r_edit);``
-
-``r_login = require('./route/login.js');``
-
-``app.use('/login', r_login);``
-
-``r_default = require('./route/default.js');``
-
-``app.use('/', r_default);``
-
-
-### ejs
-
-``app.set('views', './views');`` -> './view' 경로를 view로 사용, view 폴더 안에는 html파일들을 넣으면 됨
-
-``app.set('view engine', 'html');`` -> view 를 html로 구성함
-
-``app.engine('.html', require('ejs').renderFile);``
-
-
-### Server
-
-``var server = app.listen(80, function() {`` -> 80번 포트로 서버 오픈
-
-``    var host = server.address().address`` -> 호스팅한 서버의 주소
-
-``    var port = server.address().port`` -> 호스팅한 서버의 포트
-
-``    console.log("App listening at http://%s:%s", host, port)`` -> 로그
-
-``});``
-
-
-## edit.js
-- main 파일에서 라우팅을 위해 r_edit 변수에 연결시켜 사용하는 파일, ./route 폴더에 정리되어 있다.
-
-``var express = require('express');`` -> express 모듈 사용
-
-``var router = express.Router();`` -> express의 routing 모듈 사용
-
-### 함수 사용
-
-``function stringToInt(x, base) {`` -> js 파일 안에서도 함수 정의, 사용 가능
-
-``  const parsed = parseInt(x, base);`` -> string을 int로 변환
-
-``  if (isNaN(parsed)) { return 0; }`` -> string이 '' 인 경우, NAN을 반환하는데, NAN을 0으로 치환
-
-``  return parsed;`` -> 치환한 결과를 반환
-
-``}``
-
-
-### routing 설정
-
-``router.post('/:category/:product', function(req, res, next) {``
-- post 명령으로 / ... / ... 주소로 명령이 내려올 경우 function을 수행한다.
-- main.js에서 r_edit을 'SERVER_ADDRESS/edit' 주소로 왔을 때 실행하도록 매핑해 놓았으므로, 'SERVER_ADDRESS/edit/AAA/BBB' 주소로 명령이 내려오면 해당 함수가 동작한다.
-- AAA 자리에 들어가는 값은 req.params.category 로 참조 가능하며, BBB는 req.params.product로 참조 가능하다.
-
-
-``router.get('/:TLV', function(req, res, next) {`` -> get 명령은 router.get으로 설정 가능하다.
-
-
-``module.exports = router;`` -> 마지막에 router를 exports 해야 적용이 된다.
-
-
-### session 설정
-``    if (req.session.user) {``
-
-- main.js에서 session을 사용하였으므로 req.session으로 session에 담긴 변수들을 참조 가능하다.
-- req.session.user 값이 있으면 아래 내용을 수행한다는 코드이다.
-- 값을 집어넣을 때에도 ``req.session.val = 1`` 과 같이 사용 가능하다.
-
-### DB 사용
-
-``       var mysql = require('mysql');`` -> mysql 모듈을 사용한다.
-
-``        var db_config = require('../config/db_config.json');`` -> config 폴더 안에 db 접속에 필요한 내용을 저장해 놓았다. js 파일과 해당 내용을 분리하여 보안을 강화시킬 수 있다. db_config.json파일은 json 데이터를 담고 있다.
-
-``        var connection = mysql.createConnection({`` -> mysql 연결 설정
-
-``            host : db_config.host,`` -> db_config_json 파일의 key를 참조하여 value를 대입한다.
-
-``            user : db_config.user,``
-
-``            password : db_config.password,``
-
-``            database : db_config.database`` -> 사용할 DB 이름
-
-``        connection.connect();`` -> 연결을 수행한다.
-
-``        });``
-
-``            connection.query('UPDATE mytable SET name = ?, description = ?, price = ? where number = ?',[inputs.name, inputs.description, inputs.price, req.params.category], function (error, results, fields) {`` -> 연결된 DB에 query를 날린다.  error는 오류정보, results는 DB 결과(row)를 array형태로 반환한다.
-- query 안에 query를 넣으면 오류가 난다. 완료 후 다음 query를 진행하도록 하자.
-
-``                console.log(this.sql);`` -> 함수 안에서 this.sql을 호출하면 query 내용을 참조할 수 있다.
-
-``                if (error) {`` -> 에러가 발생한 경우
-
-``                    console.log(error);``
-
-``                    res.status(500).json({"Error": "DB Error"});`` -> 결과 response에 status 500을 주고, json 메시지를 함께 던진다.(화면에는 Json 메시지가 출력 됨)
-
-``                }``
-
-``            });``
-
-``        connection.end();``-> DB 사용을 끝내고 연결을 해제한다.
-
-
-``    connection.query("SELECT * FROM user WHERE User=? AND authentication_string=PASSWORD(?)", [id, pswd], function (error, results, fields) {``
-- PASSWORD() 함수는 mysql의 user DB에서 사용자의 비밀번호를 인코딩하여 authentication_string 컬럼에 해당하는 값으로 만드는 함수이다. 비밀번호를 넣으면 authentication_string값을 반환한다.
-
-
-### html 페이지 연결
-- routing 함수에서 받은 요청에 대해 redirect를 할 수도 있고, render로 파일을 열 수도 있다.
-
-``res.redirect('/edit/' + req.params.TLV);`` -> 설정한 주소로 페이지를 리다이렉트 한다.
-
-``res.render('login.html', {url: target});`` -> url이란 키로 target 이라는 변수에 담긴 data를 login.html에 전달한다. html 파일에서는 url 이란 변수로 target값을 사용 가능하다.
-
-### html 페이지 연동
-- html 페이지에서 form에 넣어서 보낸 내용은 bodyParser 모듈로 파싱하면 'req.body.변수이름' 으로 참조 가능하다.
-
-``           var inputs = {`` -> 내용을 받아 json 형태로 저장
-
-``                "relation": req.body.relation,`` -> html파일의 form 태그의 input 태그중 name="relation"인 태그의 value 값을 참조
-
-``                "number": req.body.name}``
-
-
-## index.html
-- ejs모듈을 사용하여 설정한 대로 view 폴더 내에 생성한다.
-- static 설정을 마쳤기 때문에 js 파일이나 css 파일들은 미리 설정해둔 '/static' 폴더 내에서 참조 가능하다.
-
-``       <script type="text/javascript" src="/static/edit_func.js"></script>`` -> static 파일 호출 방법
-
-- html 안에서 nodejs 문법을 사용하려면 <% %> 안에서 사용하면 된다. 변수 값을 바로 반환하려면 <%= %> 를 사용한다.
-
-``            <% var ptr = 10 %>``  -> 변수 ptr 선언
-
-``            <% dataList.forEach(function(item, index) { %>``-> dataList의 항목들에 대해 수행, dataList는 routing function(route/index.js 안의 routing 함수)에서 ``res.render('index.html', {dataList: data});`` 로 전해준 데이터이다.
-
-``                <% if (dataList[ptr].number != item.number) { %>`` -> if 함수 사용 가능, if문이 false라면 아래 내용은 출력되지 않음
-
-``                <tr id="lineTr">``
-
-``                    <td><a href="edit/<%=item.number%>"><%= item.number %></a></td>``
-
-``                    <td><%= item.name %></td>``
-
-``                    <td><%= item.description %></td>``
-
-``                    <td><%= item.superSet %></td>``
-
-``                <% ptr = index %>``
-
-``                <% } else { %>``
-
-``                <tr>``
-
-``                    <td></td>``
-
-``                    <td></td>``
-
-``                    <td></td>``
-
-``                    <td></td>``
-
-``                <% } %>``
-
-``                    <td><%= item.relation %></td>`` -> item.relation의 값을 반환, 즉 해당 값의 내용이 <td></td> 안에 출력된다.
-
-``                    <td><%= item.etc %></td>``
-
-``                    <td><%= item.bit %></td>``
-
-``                    <td><%= item.byte %></td>``
-
-``                    <td><%= item.value %></td>``
-
-``                    <td><%= item.meaning %></td>``
-
-``                    <td><%= item.history %></td>``
-
-``                </tr>``
-
-``            <% }); %>``
+// 2. 정적 파일 디렉터리 매핑
+app.use('/static', express.static(path.join(__dirname, 'static')));
+
+// 3. 세션 미들웨어 설정
+app.use(session({
+  secret: 'my-super-secret-key', // 암호화 서명 시드
+  resave: false,                 // 세션 데이터 변경 시에만 재저장
+  saveUninitialized: false,      // 초기화되지 않은 빈 세션 저장 방지
+  cookie: { secure: false, httpOnly: true, maxAge: 3600000 } // 1시간 유지
+}));
+
+// 4. 템플릿 엔진 설정 (EJS)
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// 5. 모듈형 라우터 등록
+const editRouter = require('./route/edit');
+app.use('/edit', editRouter);
+
+// 6. HTTP 서버 구동
+app.listen(PORT, () => {
+  console.log(`Express 서버가 포트 ${PORT}에서 정상 구동 중입니다.`);
+});
+```
+
+---
+
+## 3. 모듈형 라우팅과 파라미터 제어 (`route/edit.js`)
+
+대규모 애플리케이션에서는 URL 엔드포인트별로 라우터를 파일 단위로 분리(`express.Router()`)하여 유지보수성을 극대화합니다.
+
+```javascript
+const express = require('express');
+const router = express.Router();
+const mysql = require('mysql');
+const dbConfig = require('../config/db_config.json');
+
+// MySQL 커넥션 풀 또는 단일 커넥션 생성
+const connection = mysql.createConnection(dbConfig);
+connection.connect();
+
+// 동적 경로 파라미터 (Path Parameter: /edit/:category/:product)
+router.post('/:category/:product', (req, res) => {
+  const { category, product } = req.params;
+  const { name, description, price } = req.body;
+
+  // 세션 권한 검증
+  if (!req.session.user) {
+    return res.status(401).json({ error: "로그인이 필요한 서비스입니다." });
+  }
+
+  // SQL Injection을 방어하기 위한 파라미터화된 쿼리(? 바인딩)
+  const sql = 'UPDATE products SET name = ?, description = ?, price = ? WHERE category = ? AND id = ?';
+  const values = [name, description, price, category, product];
+
+  connection.query(sql, values, (err, results) => {
+    if (err) {
+      console.error("데이터베이스 쿼리 오류:", err);
+      return res.status(500).json({ error: "DB 업데이트 실패" });
+    }
+    // 성공 시 상세 조회 페이지로 리다이렉트
+    res.redirect(`/edit/${category}`);
+  });
+});
+
+module.exports = router;
+```
+
+---
+
+## 4. 데이터베이스 연동 보안과 SQL Injection 방어
+
+데이터베이스 연결 설정은 소스코드에 하드코딩하지 않고 별도의 JSON 파일이나 환경변수(`.env`)로 분리해야 합니다.
+
+### 4.1. `config/db_config.json` 설정
+```json
+{
+  "host": "localhost",
+  "user": "app_user",
+  "password": "StrongPassword123!",
+  "database": "production_db",
+  "port": 3306
+}
+```
+
+### 4.2. 파라미터 바인딩 원칙
+SQL 인젝션 공격을 차단하기 위해 사용자 입력값을 직접 문자열 결합(`+`)하지 않고, 드라이버가 제공하는 플레이스홀더(`?`)를 사용하여 파라미터를 자동 이스케이프해야 합니다.
+
+---
+
+## 5. EJS 템플릿 엔진을 활용한 동적 화면 렌더링
+
+EJS(Embedded JavaScript)는 HTML 마크업 내에서 자바스크립트 제어문과 변수를 바인딩할 수 있는 템플릿 엔진입니다.
+
+```html
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 관리 대시보드</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>등록 상품 목록</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>상품번호</th>
+        <th>상품명</th>
+        <th>설명</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 서버 라우터에서 전달받은 dataList 배열 순회 -->
+      <% dataList.forEach(item => { %>
+        <tr>
+          <!-- <%= %> 구문은 특수문자를 안전하게 HTML 이스케이프하여 출력함 -->
+          <td><a href="/edit/<%= item.number %>"><%= item.number %></a></td>
+          <td><%= item.name %></td>
+          <td><%= item.description %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>
+```
+라우터에서 `res.render('index', { dataList: rows })` 형태로 데이터를 전달하면 EJS 엔진이 서버 사이드에서 HTML을 조합하여 클라이언트로 완성된 문서를 응답합니다.

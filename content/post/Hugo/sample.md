@@ -1,89 +1,95 @@
 ---
-title: "Hugo 마크다운 포스트 서식 및 Shortcode 문법 샘플 가이드"
-description: "PaperMod 테마에서 지원하는 코드 블록 하이라이팅, 접기(collapse), 테이블, 이미지 캡션 및 인아티클 광고 Shortcode 작성 문법 샘플입니다."
-slug: "hugo-markdown-syntax-and-shortcodes-sample"
-date: 2019-03-11
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
-categories: ["DevOps"]
-tags: ["hugo", "markdown", "shortcodes", "blogging"]
+title: "Hugo 마크다운 문법 및 HTML 서식 완벽 가이드"
+date: "2019-03-11T00:00:00+09:00"
+lastmod: "2019-03-11T00:00:00+09:00"
+description: "Hugo 정적 블로그에서 지원하는 마크다운(Markdown) 기본 문법과 HTML 요소 서식, 코드 하이라이트, KaTeX 수식 및 Mermaid 다이어그램 렌더링 가이드입니다."
+slug: "hugo-markdown-syntax-formatting-guide"
+categories: ["Hugo"]
+tags: ["hugo", "markdown", "syntax", "katex", "mermaid", "blog-theme"]
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
-This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.
+# Hugo 마크다운 및 HTML 서식 가이드
+
+Hugo 정적 사이트 생성기에서 지원하는 기본 마크다운(Markdown) 문법과 HTML 요소 렌더링, CSS 스타일 서식을 안내하는 샘플 문서입니다.
+
 <!--more-->
 
-## Headings
+## 마크다운 제목 수준 (Headings)
 
-The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
-# H1
-## H2
-### H3
-### H4
-- **H5**:
-- **H6**:
+HTML의 `<h1>`부터 `<h6>`까지 6단계 제목 요소를 표현할 수 있습니다:
 
-``
-The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
-# H1
-## H2
-### H3
-### H4
-- **H5**:
-- **H6**:
-``
+```markdown
+  # H1 Heading
+  ## H2 Heading
+  ### H3 Heading
+  #### H4 Heading
+  ##### H5 Heading
+  ###### H6 Heading
+```
 
-## Paragraph
+- **H1**: 최상위 문서 제목 (`#`)
+- **H2**: 주요 대분류 섹션 (`##`)
+- **H3**: 소분류 하위 섹션 (`###`)
+- **H4 ~ H6**: 세부 항목 (본 문서 스타일 규칙에서는 본문 가독성을 위해 H3 이하 볼드 불릿 항목 권장)
 
-Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.
+---
 
-Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.
+## 본문 단락 (Paragraph)
 
-``
-Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.
+일반 본문 텍스트 단락은 빈 줄(Enter 2회)을 기준으로 구분됩니다.
+
+Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur.
 
 Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.
 
-``
-## Blockquotes
+---
 
-The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with in-line changes such as annotations and abbreviations.
+## 인용문 (Blockquotes)
 
-### Blockquote without attribution
+외부 인용문이나 주석, 알림 문구를 표기할 때 `>` 기호를 사용합니다.
+
+### 인용문 기본 서식
 
 > Tiam, ad mint andaepu dandae nostion secatur sequo quae.
 > **Note** that you can use *Markdown syntax* within a blockquote.
 
-### Blockquote with attribution
+### 출처가 포함된 인용문
 
-> Don't communicate by sharing memory, share memory by communicating.</p>
+> Don't communicate by sharing memory, share memory by communicating.
 > — <cite>Rob Pike[^1]</cite>
-
 
 [^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
 
-## Tables
+---
 
-Tables aren't part of the core Markdown spec, but Hugo supports supports them out-of-the-box.
+## 표 서식 (Tables)
 
- Name | Age
-------|------
-  Bob | 27
-Alice | 23
+파이프(`|`)와 하이픈(`-`) 기호를 사용하여 직관적인 표를 구성할 수 있습니다.
 
-### Inline Markdown within tables
+| Name | Age | Department |
+|:-----|:---:|-----------:|
+| Bob  | 27  | Engineering|
+| Alice| 23  | Design     |
 
-| Inline&nbsp;&nbsp;&nbsp;     | Markdown&nbsp;&nbsp;&nbsp;  | In&nbsp;&nbsp;&nbsp;                | Table      |
-| ---------- | --------- | ----------------- | ---------- |
-| *italics*  | **bold**  | ~~strikethrough~~&nbsp;&nbsp;&nbsp; | `code`     |
+### 표 내부 인라인 서식
 
-## Code Blocks
+| Inline Formatting | Markdown Syntax | Rendered Result |
+|:------------------|:----------------|:----------------|
+| *Italics*         | `*italics*`     | 기울임꼴        |
+| **Bold**          | `**bold**`      | 굵은 글씨       |
+| ~~Strikethrough~~ | `~~strike~~`    | 취소선          |
+| `Inline Code`     | `` `code` ``    | 인라인 코드     |
 
-### Code block with backticks
+---
 
-```
-html
+## 코드 블록 (Code Blocks)
+
+### 백틱 코드 블록 (Fenced Code Block)
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,7 +101,8 @@ html
 </body>
 </html>
 ```
-### Code block indented with four spaces
+
+### 들여쓰기 코드 블록
 
     <!DOCTYPE html>
     <html lang="en">
@@ -108,7 +115,8 @@ html
     </body>
     </html>
 
-### Code block with Hugo's internal highlight shortcode
+### Hugo 내장 Highlight 숏코드
+
 {{< highlight html >}}
 <!DOCTYPE html>
 <html lang="en">
@@ -122,184 +130,93 @@ html
 </html>
 {{< /highlight >}}
 
-## List Types
+---
 
-### Ordered List
+## 목록 서식 (List Types)
+
+### 순서가 있는 목록 (Ordered List)
 
 1. First item
 2. Second item
 3. Third item
 
-### Unordered List
+### 순서가 없는 목록 (Unordered List)
 
 * List item
 * Another item
 * And another item
 
-### Nested list
+### 중첩 목록 (Nested List)
 
-* Item
-1. First Sub-item
-2. Second Sub-item
+* Item A
+  1. Sub-item 1
+  2. Sub-item 2
+* Item B
 
-## Other Elements — abbr, sub, sup, kbd, mark
+---
 
-<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
+## 인라인 HTML 요소 (Other Elements)
 
-H<sub>2</sub>O
+- 약어(Abbreviation): <abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
+- 아래 첨자(Subscript): H<sub>2</sub>O
+- 위 첨자(Superscript): X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
+- 키보드 입력(Keyboard): <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Delete</kbd>
+- 하이라이트(Mark): <mark>salamanders</mark> are nocturnal creatures.
 
-X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
+---
 
-Press <kbd><kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd></kbd> to end the session.
+## StackEdit 연동 및 활용
 
-Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
+StackEdit은 브라우저 기반의 오픈소스 마크다운 에디터로, 로컬 및 클라우드 동기화를 지원합니다.
 
+### 파일 관리 (Files)
+- **파일 및 폴더 생성**: 좌측 상단 탐색기 메뉴를 통해 신규 파일 생성 및 폴더 계층 관리 지원
+- **다른 파일로 전환**: 파일 트리 뷰를 클릭하여 작업 파일 간 전환
+- **파일 이름 변경 및 삭제**: 휴지통(Trash) 보관 및 자동 만료 기능 지원
+- **파일 내보내기 (Export)**: 일반 마크다운, HTML(Handlebars 템플릿), PDF 포맷으로 로컬 디스크 내보내기 지원
 
+### 클라우드 동기화 (Synchronization)
+- **Google Drive, Dropbox, GitHub 연동**: 작업 영역 전체 또는 단일 파일을 외부 클라우드 저장소와 주기적으로 동기화하여 다중 기기 간 연속 작업 가능
+- **충돌 해결**: 원격 저장소와 로컬 수정본 간의 머지(Merge) 및 충돌 해결 알고리즘 탑재
 
+### 온라인 배포 및 발행 (Publication)
+- **블로그 플랫폼 직접 발행**: Blogger, WordPress, GitHub Pages, Gist 등으로 마크다운 또는 변환된 HTML 직접 배포
+- **발행 업데이트**: 원본 문서 수정 시 `Publish now` 기능을 통해 원격 게시글 즉시 갱신
 
+---
 
+## 마크다운 확장 기능 (Markdown Extensions)
 
+### SmartyPants 타이포그래피
+ASCII 문장 부호를 웹 타이포그래피 엔티티로 자동 변환합니다:
+- 따옴표: `"Isn't this fun?"` -> "Isn't this fun?"
+- 대시: `--` (en-dash: –), `---` (em-dash: —)
 
+### KaTeX 수식 렌더링
+LaTeX 수학 수식을 고속으로 렌더링합니다:
 
+인라인 수식: $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$
 
-
-
-# Welcome to StackEdit!
-
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
-
-
-# Files
-
-StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
-
-## Create files and folders
-
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
-
-## Switch to another file
-
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
-
-## Rename a file
-
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
-
-## Delete a file
-
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
-
-## Export a file
-
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
-
-
-# Synchronization
-
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
-
-There are two types of synchronization and they can complement each other:
-
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
-
-	- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-		> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
-
-## Open a file
-
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
-
-## Save a file
-
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
-
-## Synchronize a file
-
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
-
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
-
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
-
-## Manage file synchronization
-
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
-
-
-# Publication
-
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
-
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
-
-## Publish a File
-
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
-
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
-
-## Update a publication
-
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
-
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
-
-## Manage file publication
-
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
-
-
-# Markdown extensions
-
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
-
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
-
-
-## SmartyPants
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
-
-
-## KaTeX
-
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
+블록 수식:
 $$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
+\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt
 $$
 
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
+### UML 다이어그램 (Mermaid)
 
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
+시퀀스 다이어그램 (Sequence Diagram):
 ```mermaid
 sequenceDiagram
 Alice ->> Bob: Hello Bob, how are you?
 Bob-->>John: How about you John?
 Bob--x Alice: I am good thanks!
 Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
+Note right of John: Bob thinks a long<br/>long time...
 Bob-->Alice: Checking with John...
 Alice->John: Yes... John, how are you?
 ```
 
-And this will produce a flow chart:
-
+플로우차트 (Flowchart):
 ```mermaid
 graph LR
 A[Square Rect] -- Link text --> B((Circle))

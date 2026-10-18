@@ -1,39 +1,55 @@
 ---
-title: "Python BeautifulSoup 및 Selenium 웹 스크래핑 크롤러 구축 가이드"
-description: "정적 HTML 파싱을 위한 BeautifulSoup4와 자바스크립트 동적 렌더링 수집을 위한 Selenium 웹 드라이버 활용법 및 차단 우회 팁을 정리합니다."
-slug: "python-web-scraping-beautifulsoup-selenium-crawler"
+title: "웹 스크래핑 핵심 가이드: XPath 문법, 정규표현식, User-Agent 차단 우회"
 date: 2021-08-23T19:00:44+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
+lastmod: 2021-08-23T19:00:44+09:00
+description: "효율적인 웹 데이터 수집을 위한 XPath 경로 탐색 문법, 데이터 정제를 위한 정규표현식(Regex) 핵심 패턴, 그리고 봇 차단 방지를 위한 User-Agent 헤더 설정 팁을 정리합니다."
+slug: "web-scraping-xpath-regex-user-agent-guide"
 categories: ["DevelopTips"]
-tags: ["python", "web-scraping", "beautifulsoup", "selenium", "crawler"]
+tags: ["web-scraping", "xpath", "regex", "python", "crawler", "development-tips"]
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
-# Web Scrapping
-## x-path
-- ``/a/b/c/d/e/f/g/...`` 와 같이 특정 경로를 가진 개체를 가리키는 방법이다.
-- ``//*[@id="abcd"]``
-  - // 는 모든 경로에서 찾겠다는 의미
-  - * 는 모든 태그에 대해 찾겠다는 의미. *대신 TAG를 넣으면 'TAG' 라는 이름의 태그를 가진 항목에서만 검색함
-  - @id="abcd" 는 id라는 속성이 abcd 인 항목을 찾겠다는 의미
-  - 브라우저에서 자동으로 해줒기 때문에 보통은 걱정할 필요가 없다.
+# 웹 스크래핑 핵심 가이드
 
-## 정규식
-- \. : 하나의 문자
-- \^ : 문자열의 시작
-- \$ : 문자열의 끝
-- \* : 모든 문자
-- \# : 하나의 숫자
+웹 페이지에서 필요한 정보를 수집하고 가공하기 위한 핵심 파싱 기법과 네트워크 헤더 설정 팁입니다.
 
-[정규식 참조 link](https://www.w3schools.com/python/python_regex.asp)
+## 1. XPath 기초 경로 문법
+XPath(XML Path Language)는 HTML/XML 문서의 노드 트리를 탐색하기 위한 경로 표기 언어입니다:
+- `/a/b/c`: 절대 경로를 따라 특정 부모-자식 구조의 노드를 탐색
+- `//*[@id="abcd"]`:
+  - `//`: 루트뿐 아니라 문서 전체의 모든 하위 경로에서 재귀적으로 탐색
+  - `*`: 모든 태그 대상 (특정 태그만 탐색할 경우 `//div[@id="abcd"]`와 같이 태그명 명시)
+  - `[@id="abcd"]`: 속성(attribute) 중 `id` 값이 "abcd"인 노드를 필터링
+- 브라우저 개발자 도구(F12)에서 요소를 우클릭한 후 `Copy > Copy XPath`를 통해 손쉽게 경로를 획득할 수 있습니다.
 
+## 2. 웹 데이터 추출을 위한 정규표현식 (Regex)
+HTML 파싱 후 텍스트 문자열 내에서 특정 패턴을 추출하거나 정제할 때 정규표현식을 활용합니다:
+- `.`: 임의의 단일 문자 1개
+- `^`: 문자열의 시작 위치
+- `$`: 문자열의 끝 위치
+- `*`: 앞의 문자가 0회 이상 반복
+- `+`: 앞의 문자가 1회 이상 반복
+- `\d`: 임의의 숫자 1개 (`[0-9]`)
+- `\s`: 공백 문자 (스페이스, 탭, 줄바꿈)
+- `[a-zA-Z]`: 알파벳 문자 매칭
 
-## Useragent
-- 특정 페이지에서는 request 헤더를 확인하여 매크로 접속을 막는 경우가 있다.
-- 서버에서는 useragent 정보를 확인하여 접속하는 웹 브라우저, 기기 등의 정보를 확인할 수 있다.
+[Python Regex W3Schools 가이드](https://www.w3schools.com/python/python_regex.asp)를 참고하여 패턴을 조합할 수 있습니다.
 
-## 참조
-https://www.youtube.com/watch?v=yQ20jZwDjTE
-https://www.w3schools.com/python/python_regex.asp
+## 3. 크롤링 차단 우회를 위한 User-Agent 설정
+대부분의 웹 서버는 자동화된 봇(Bot)이나 스크래퍼의 접근을 차단하기 위해 HTTP Request Header의 `User-Agent` 값을 검증합니다:
+- 기본 Python 라이브러리(`urllib`, `requests`)는 `python-requests/2.x`와 같은 식별자를 전달하므로 403 Forbidden 응답을 받을 수 있습니다.
+- 실제 사용자가 사용하는 일반 웹 브라우저(Chrome, Edge 등)의 헤더 문자열을 수집하여 요청에 주입해야 합니다:
+  ```python
+  import requests
+
+  headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  }
+  response = requests.get('https://target-site.com', headers=headers)
+  ```
+
+## 4. 참고 자료
+- [BeautifulSoup 공식 문서](https://beautiful-soup-4.readthedocs.io/en/latest/)
+- [Python re 정규표현식 문서](https://docs.python.org/ko/3/library/re.html)

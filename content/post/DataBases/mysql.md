@@ -1,6 +1,6 @@
 ---
 title: "MySQL 관계형 데이터베이스 기초: DDL, DML 쿼리 작성 및 계정 권한 관리"
-description: "데이터베이스/테이블 생성, SELECT/INSERT/UPDATE/DELETE 핵심 질의문, 외래키 제약조건, 사용자 계정 생성과 GRANT 권한 부여 방법을 정리합니다."
+description: "오픈소스 RDBMS인 MySQL의 기본 접속부터 데이터베이스 및 테이블 정의(DDL), CRUD 데이터 조작(DML), 조인(JOIN)과 서브쿼리, 스토리지 엔진(InnoDB vs MyISAM) 및 사용자 권한(GRANT) 관리를 총정리합니다."
 slug: "mysql-rdbms-basics-sql-queries-permissions"
 date: 2020-07-02T20:29:29+09:00
 lastmod: 2026-10-18T18:00:00+09:00
@@ -11,289 +11,181 @@ ShowToc: true
 TocOpen: true
 ---
 
-# mysql
+MySQL은 전 세계에서 가장 널리 사용되는 오픈소스 관계형 데이터베이스 관리 시스템(RDBMS)입니다. 구조화된 2차원 테이블(Table) 형태로 데이터를 관리하며, 표준 SQL(Structured Query Language)을 통해 ACID 트랜잭션과 엄격한 데이터 무결성을 보장합니다.
 
-## 명령어
-문법 참조 : [http://tcpschool.com/mysql/mysql_basic_syntax](http://tcpschool.com/mysql/mysql_basic_syntax)
-
-- 명령어에서 대소문자는 상관없다.
-- mysql에서 주석은 `#`을 사용한다.
-- 한줄 주속은 `--` 을 사용한다.
-  - `--` 뒤에 공백 없이 바로 문자나 문자가 아닌 문자가 올 경우, SQL 엔진에 따라 주석으로 인식되지 않을 수도 있어서, 일반적으로 `-- `(띄어쓰기 포함) 또는 `-- -` 같이 공백이나 의미 없는 문자를 추가해서 주석임을 명확히 해준다. 이건 DBMS에 따라 차이가 있지만, 일부 엔진(MySQL 등)은 `--` 뒤에 공백이 있어야 주석으로 인식한다. 
-
-### 실행 및 로그인
-1. `mysql`
-  - mysql 실행, 기본으로 설정된 user로 로그인됨
-2. `mysql -u 아이디 -p`
-  - `-u`: 특정 아이디로 로그인
-  - `-p`: 로그인시 비밀번호 입력하도록
-
-### 데이터베이스 관리
-1. DB 생성
-   - UTF8 로 문자열 저장하기
-   `CREATE DATABASE 데이터베이스_이름 default CHARACTER SET UTF8`
-1. DB 목록확인
-  `show databases`
-1. DB 선택
-  `use DB_NAME`  
-1. 종료
-  `EXIT`
-1. 로그인 & 데이터베이스 선택
- `$ mysql -p DB_NAME -u USER_NAME`
-    - 사용자 이름과 USER_NAME으로 DB_NAME 데이터베이스 실행
-    - USER_NAME이 비어있으면 현재 로그인한 계정과 동일한 이름으로 로그인 시도
-    - -u DB_NAME 옵션은 로그인 후 `$use DB_NAME` 과 같은 효과
-
-
-### 테이블 생성 및 관리 (DDL)
-1. TABLE_NAME 테이블의 스키마 확인
-`desc TABLE_NAME`
-
-2. CREATE : 테이블 생성
-   ```
-   CREATE  TABLE 테이블이름 (
-      id  INT  NOT  NULL AUTO_INCREMENT,
-      항목1 VARCHAR(255) NOT  NULL DEFAULT 'FOO',
-      항목2 DATE  NOT  NULL,
-      항목3 DECIMAL(10 , 2 ) NULL,
-      PRIMARY KEY (id)
-    ) ENGINE-;
-   ```
-  - `NOT NULL`: 필수항목
-  - `AUTO_INCREMENT`: 수동으로 설정 가능하지만, 따로 설정하지 않으면 테이블 내 해당 컬럼에서 가장 큰 값에 1을 증가하여 자동으로 설정됨.
-  - `VARCHAR(#)`: 캐릭터형 #bit
-  - `DEFAULT` : 기본값, 따로 설정안할시 기본값은 NULL이 됨.
-  - `ENGINE`: 데이터 저장 구조
-    - MyISAM
-      - row level locking이 아닌 table level locking을 사용하기에, 한 테이블에 많은 접근이 이루어지면 속도가 느려짐
-      - select count(*) from TABLE 속도가 빠름
-    - InnoDB
-      - 풀 텍스트 인덱스를 지원하지 않고 속도가 약간 느림
-      - 트랜잭션을 지원함
-    [참조](https://chiccoder.tistory.com/24)
-
-3. DESC: 테이블 구조 확인
-`DESC 테이블`
-`DESCRIBE 테이블`
-
-# 데이터 조작 및 검색 (DML)
-
-1. SELECT : 테이블 검색
-`SELECT 필드 [,필드2 ...] FROM 테이블 [WHERE 조건] [ORDER BY 필드]`
-    - 필드를 ','로 다중 선택
-    - `WHERE` 문으로 특정 조건에 해당하는 레코드만 추출
-      - `LIKE` : 뒤에 와일드 카드 사용
-      - `_` : 와일드카드로, '한 자리의 어떤 문자'를 의미한다.
-      - `%` : 와일드카드로, 정규식의 *과 같은 의미이다.
-      - `NOT` : 부정의 의미, !과 동일
-      - `<>` : !=와 같은 의미
-    - `ORDER BY` 문으로 검색 결과를 필드에 맞게 정렬
-
-2. DELETE : 데이터 삭제
-`DELETE FROM 테이블 [WHERE 조건]`
-  - 조건을 생략하면 테이블의 모든 데이터 삭제
-
-3. ALTER: 테이블 변경
-   - [참조](https://nexthops.tistory.com/2)
-   - 컬럼 추가
-     - ` ALTER TABLE 테이블이름 ADD COLUMN 컬럼이름 데이터형`
-   - 컬럼 타입 변경
-     - ` ALTER TABLE 테이블이름 MODIFY COLUMN 컬럼이름 데이터형`
-   - 컬럼 이름 변경
-     - ` ALTER TABLE 테이블이름 CHANGE COLUMN 기존이름 새이름 데이터형`
-   - 컬럼 삭제
-     - ` ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름`
-   - Primary Key 설정
-     - ` ALTER TABLE 테이블이름 ADD PRIMARY KEY (설정할컬럼1, 설정할컬럼2, ...)`
-   - Primary key 삭제
-     - ` ALTER TABLE 테이블이름 DROP PRIMARY KEY`
-   - 테이블명 변경
-     - ` ALTER TABLE 테이블이름 RENAME 새테이블이름`
-   - DB구조 변경
-     - ` ALTER TABLE 테이블 engine=InnoDB;`
-
-4. UNION : 검색 결과 병합
-   - `SELECT * FROM UserTable UNION SELECT "DreamHack", "DreamHack PW;`
-   - 두 select 구문의 column 의 갯수와 타입이 일치해야 한다. 그렇지 않으면 오류가 발생한다.
-5. DROP : 테이블 삭제
-   - ` DROP DATABASE 데이터베이스`
-   - ` DROP TABLE 테이블`
-
-6. INSERT : 행 추가
-   - 원하는 필드만 설정, 설정 안한부분은 default값이 들어감
-     - ` INSERT INTO 테이블(필드1, 필드2, ... ) VALUES (데이터1, 데이터2, ... )`
-   - 모든 필드를 설정할땐 컬럼 이름을 생략 가능
-     - ` INSERT INTO 테이블 VALUES (데이터1, 데이터2, ... )`
-
-7. JOIN : 테이블 융합
-   - 내부Join
-     - `SELECT 테이블1.*, 테이블2.* FROM 테이블1, 테이블2 WHERE 조건`
-     - `SELECT 테이블1.*, 테이블2.* FROM 테이블1 INNER JOIN 테이블2 ON 조건`
-
-   - 외부Join
-     - LEFT Join
-       - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
-       - 조건이 맞지 않으면 테이블2의 필드 값이 모두 null 상태로 표시된다.
-     - RIGHT Join
-       - `SELECT * FROM 테이블1 LEFT JOIN 테이블2 ON 조건`
-       - 조건이 맞지 않으면 테이블1의 필드값이 모두 null 상태로 표시된다.
-
-8. Sub Query
-   - select 구문 결과 뒤에 `()` 를 사용해서 추가 쿼리를 집어넣는 형태를 의미한다.
-   - ex) `SELECt 1,2,3, (SELECT 4);` 
-   - from 절에서 사용하는 sub query는 특히 `Inline View` 라 칭하며, Multi Row, Multi Column 결과를 반환할 수 있다.
-     ```
-      mysql> SELECT * FROM (SELECT *, 1234 FROM users) as u;
-        /*
-        +----------+------+
-        | username | 1234 |
-        +----------+------+
-        | admin    | 1234 |
-        | guest    | 1234 |
-        +----------+------+
-        2 rows in set (0.00 sec)
-        */
-
-     ``` 
-   - where 절에서 sub query를 사용하면 다중 행이 반환된다.
-    ```
-    mysql> SELECT * FROM users WHERE username IN (SELECT "admin" UNION SELECT "guest");
-    /*
-    +----------+----------+
-    | username | password |
-    +----------+----------+
-    | admin    | admin    |
-    | guest    | guest    |
-    +----------+----------+
-    2 rows in set (0.00 sec)
-    */
-
-    ```
-  - insert 구문에서도 sub query를 활용할 수 있다.
-    ```
-    INSERT 
-    INTO board (title, boardcontent)
-    VALUES ('title 1', (select upw from users where uid='admin'));
-    // 기존 db에서 uid='admin' 에 해당하는 upw 값을 그대로 가져와 삽입
-    ```
-   
-9. UPDATE
-   - 기존에 저장된 값을 변경하는 명령
-   - `UPDATE` 테이블 이름 `SET` 컬럼 이름 = 값 `WHERE` 레코드 선택 조건;
-     - ex) `UPDATE board SET boardcontent = "update content 2" WHERE title = 'title 1';`
-
-### 접근권한 관리 (DCL)
- 1. GRANT : 데이터베이스에 권한 부여
-    - ` GRANT ALL PRIVILEGES ON my_db.* TO new_user@localhost IDENTIFIED BY 'pswd'; `
-       - `ALL PRIVILEGES` : 모든 권한
-       - `my_db.*` : my_db의 모든 테이블
-       - `new_user` : 사용권한을 받을 유저(없을시 자동생성),
-       - `@localhost` : 로컬환경에서만 접속 가능
-       - `IDENTIFIED BY 'pswd'` : new_user의 비밀번호를 pswd로 설정
-    - `flush privileges` 권한 즉시 적용
-
-### 기타 명령어
-   1. 현재 사용자 정보 확인
-   `select user()`
-   1. 현재 DB 정보 확인
-   `select databases()`
-   1. CSV파일 DB에 적용
-   `LOAD DATA LOCAL INFILE '`**FILE_NAME**`' INTO TABLE `**TABLE_NAME**` FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';`
-     - FILE_NAME 파일을 TABLE_NAME 테이블에 넣는다.
-   필드는 ','로 구분되어 있고, 줄바꿈은 '\n'로 구분되어 있고, '"'로 싸인 내용은 한 덩어리로 인식한다.
-
-   1. 경고문 확인
-   ` SHOW WARNINGS\G `
-
------
-
-## 데이터 타입
-
-1. 문자형 데이터타입
-
-데이터 타입 | 설명
----|---
-CHAR(n) | 고정 길이 데이터 타입(최대 255byte)- 지정된 길이보다 짦은 데이터 입력될 시 나머지 공간 공백으로 채워진다.
-VARCHAR(n) | 가변 길이 데이터 타입(최대 65535byte)- 지정된 길이보다 짦은 데이터 입력될 시 나머지 공간은 채우지 않는다.
-TINYTEXT(n) | 문자열 데이터 타입(최대 255byte)
-TEXT(n) | 문자열 데이터 타입(최대 65535byte)
-MEDIUMTEXT(n) | 문자열 데이터 타입(최대 16777215byte)
-LONGTEXT(n) | 문자열 데이터 타입(최대 4294967295byte)
- ---
-
-2. 숫자형 데이터 타입
-
-
-데이터 타입 | 설명
----|---
-TINYINT(n) | 정수형 데이터 타입(1byte) -128 ~ +127 또는 0 ~ 255수 표현 가능하다.
-SMALLINT(n) | 정수형 데이터 타입(2byte) -32768 ~ 32767 또는 0 ~ 65536수 표현 가능하다.
-MEDIUMINT(n) | 정수형 데이터 타입(3byte) -8388608 ~ +8388607 또는 0 ~ 16777215수 표현 가능하다.
-INT(n) | 정수형 데이터 타입(4byte) -2147483648 ~ +2147483647 또는 0 ~ 4294967295수 표현 가능하다.
-BIGINT(n) | 정수형 데이터 타입(8byte) - 무제한 수 표현 가능하다.
-FLOAT(길이,소수) | 부동 소수형 데이터 타입(4byte) -고정 소수점을 사용 형태이다.
-DECIMAL(길이,소수) | 고정 소수형 데이터 타입고정(길이+1byte) -소수점을 사용 형태이다.
-DOUBLE(길이,소수) | 부동 소수형 데이터 타입(8byte) -DOUBLE을 문자열로 저장한다.
----
-
-3. 날짜형 데이터 타입
-
-데이터 타입 | 설명
----|---
-DATE | 날짜(년도, 월, 일) 형태의 기간 표현 데이터 타입(3byte)
-TIME | 시간(시, 분, 초) 형태의 기간 표현 데이터 타입(3byte)
-DATETIME | 날짜와 시간 형태의 기간 표현 데이터 타입(8byte)
-TIMESTAMP | 날짜와 시간 형태의 기간 표현 데이터 타입(4byte) -시스템 변경 시 자동으로 그 날짜와 시간이 저장된다.
-YEAR | 년도 표현 데이터 타입(1byte)
----
-
-4. 이진 데이터 타입
-
-데이터 타입 | 설명
----|---
-BINARY(n) & BYTE(n) | CHAR의 형태의 이진 데이터 타입 (최대 255byte)
-VARBINARY(n) | VARCHAR의 형태의 이진 데이터 타입 (최대 65535byte)
-TINYBLOB(n) | 이진 데이터 타입 (최대 255byte)
-BLOB(n) | 이진 데이터 타입 (최대 65535byte)
-MEDIUMBLOB(n) | 이진 데이터 타입 (최대 16777215byte)
-LONGBLOB(n) | 이진 데이터 타입 (최대 4294967295byte)
+이 글에서는 MySQL의 콘솔 접속 및 데이터베이스 생성부터 DDL(테이블 정의), DML(데이터 조작/조인/서브쿼리), DCL(사용자 권한 관리), 그리고 스토리지 엔진별 특징을 체계적으로 정리합니다.
 
 ---
 
-## C++연동 SDK
-- mysql cpp connector 라 불리는, C++ 코드로 mysql을 사용할 수 있는 SDK가 제공된다.
-- mysql과 mysqlx가 있는데, 전자는 RDB, 후자는 NoSQL이다.
-- 표준 docmument
-https://dev.mysql.com/doc/connector-cpp/8.0/en/connector-cpp-installation-source-distribution.html
-- guthub
-https://github.com/mysql/mysql-connector-cpp
+## 1. MySQL 접속 및 데이터베이스 기본 관리
 
+MySQL은 기본적으로 3306 포트를 통해 통신하며, 대소문자를 구분하지 않는 표준 SQL 문법을 지원합니다. 주석은 `-- `(반드시 공백 포함) 또는 `#`을 사용합니다.
+
+### 1.1. CLI 로그인 및 데이터베이스 생성/선택
+```bash
+# 특정 계정으로 비밀번호 프롬프트와 함께 로그인
+mysql -u root -p
+
+# 특정 데이터베이스를 바로 지정하여 접속
+mysql -u app_user -p my_database
+```
+
+```sql
+-- UTF-8(utf8mb4 권장) 인코딩으로 데이터베이스 생성 (이모지 지원)
+CREATE DATABASE my_database DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 데이터베이스 목록 조회 및 활성화
+SHOW DATABASES;
+USE my_database;
+```
+
+### 1.2. 스토리지 엔진 비교 (InnoDB vs MyISAM)
+- **InnoDB (기본 권장)**:
+  - 트랜잭션(ACID) 및 외래키(Foreign Key) 제약 조건을 지원합니다.
+  - 행 레벨 락(Row-level Locking)을 사용하여 동시성 처리가 뛰어나며 대규모 웹 서비스에 표준으로 사용됩니다.
+- **MyISAM**:
+  - 트랜잭션을 지원하지 않고 테이블 레벨 락(Table-level Locking)을 사용합니다.
+  - 쓰기 작업이 빈번한 환경에서는 성능이 저하되나, 단순 읽기(SELECT COUNT) 위주의 경량 통계 테이블에 과거 주로 쓰였습니다.
 
 ---
 
-## 참조
-[데이터베이스 정규화 1NF, 2NF, 3NF, BCNF :: Deep Play](https://3months.tistory.com/193)
+## 2. 데이터 정의 언어 (DDL: Data Definition Language)
 
-[[MySQL] csv 파일을 직접 MySQL 테이블로 Import 하는 방법 (대용량 파일 import 팁) 주경야근](https://moonlighting.tistory.com/140)
+DDL은 데이터베이스와 테이블 스키마의 구조를 생성, 변경, 삭제하는 명령어입니다.
 
-[Import CSV File Into MySQL Table](https://www.mysqltutorial.org/import-csv-file-mysql-table/)
+### 2.1. 테이블 생성 (`CREATE TABLE`) 및 제약 조건
+```sql
+CREATE TABLE users (
+  id INT NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  registered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+```
+- `AUTO_INCREMENT`: 레코드 삽입 시 자동으로 1씩 증가하는 고유 ID 부여.
+- `PRIMARY KEY`: 레코드를 유일하게 식별하는 기본키(중복 불가, NOT NULL).
+- `DEFAULT`: 값이 명시되지 않았을 때 삽입될 기본값.
 
-[DB - 데이터 타입/MYSQL](http://www.incodom.kr/DB_-_%EB%8D%B0%EC%9D%B4%ED%84%B0_%ED%83%80%EC%9E%85/MYSQL)
+### 2.2. 테이블 스키마 수정 (`ALTER TABLE`) 및 삭제 (`DROP`)
+```sql
+-- 컬럼 추가
+ALTER TABLE users ADD COLUMN phone VARCHAR(20) NULL;
 
-[[MySQL] Warnings 발생 했을 때 경고 내용 보기 - Blog Goooood.net](http://blog.devez.net/277)
+-- 컬럼 타입 변경
+ALTER TABLE users MODIFY COLUMN username VARCHAR(100) NOT NULL;
 
-[How to import CSV into mysql if values contains comma - Stack Overflow](https://stackoverflow.com/questions/31599622/how-to-import-csv-into-mysql-if-values-contains-comma)
+-- 컬럼 이름 변경
+ALTER TABLE users CHANGE COLUMN phone mobile_phone VARCHAR(20) NULL;
 
-[[SQL] 테이블 합치기 (JOIN / UNION) : 네이버 블로그](https://blog.naver.com/PostView.nhn?blogId=horajjan&logNo=220465143567&parentCategoryNo=&categoryNo=10&viewDate=&isShowPopularPosts=true&from=search)
+-- 컬럼 삭제
+ALTER TABLE users DROP COLUMN status;
 
-[MySQL 계정 생성 관리 및 권한설정 :: 비실이의 개발공간](https://2dubbing.tistory.com/13)
+-- 테이블 및 데이터베이스 영구 삭제
+DROP TABLE IF EXISTS old_users;
+DROP DATABASE IF EXISTS test_db;
+```
 
-[[MySQL] ERROR 1044 (42000.. : 네이버블로그](https://blog.naver.com/maestrois/220486269515)
+---
 
-[php - How can I make a key pair primary? - Stack Overflow](https://stackoverflow.com/questions/8376420/how-can-i-make-a-key-pair-primary)
+## 3. 데이터 조작 언어 (DML: Data Manipulation Language)
 
-[MySQL 계정 변경 및 간단한 사용법 : 네이버 블로그](https://m.blog.naver.com/PostView.nhn?blogId=athena1028&logNo=20060725715&proxyReferer=https:%2F%2Fwww.google.com%2F)
+DML은 테이블에 저장된 데이터를 삽입, 조회, 갱신, 삭제(CRUD)하는 명령어입니다.
 
-[MySQL 소개 및 기본 사용법 - 생활코딩](https://opentutorials.org/course/2136/12020)
+### 3.1. CRUD 핵심 질의문
+```sql
+-- 1. 데이터 삽입 (INSERT)
+INSERT INTO users (username, email) VALUES ('홍길동', 'hong@example.com');
 
-[(MySQL) 1장 시작하기. (DB 생성, 테이블 생성, SELECT) - 미래학자](https://futurists.tistory.com/11)
+-- 2. 조건부 데이터 조회 (SELECT)
+SELECT id, username, email FROM users
+WHERE email LIKE '%@example.com' AND status = 'ACTIVE'
+ORDER BY id DESC LIMIT 10;
+
+-- 3. 데이터 수정 (UPDATE - 반드시 WHERE 조건 명시)
+UPDATE users SET username = '김철수' WHERE id = 1;
+
+-- 4. 데이터 삭제 (DELETE - 반드시 WHERE 조건 명시)
+DELETE FROM users WHERE id = 1;
+```
+
+### 3.2. 테이블 결합(JOIN)과 집합 연산자(UNION)
+- **INNER JOIN**: 양쪽 테이블 모두에 조건이 일치하는 레코드만 결합하여 조회합니다.
+  ```sql
+  SELECT u.username, o.order_number, o.amount
+  FROM users u
+  INNER JOIN orders o ON u.id = o.user_id;
+  ```
+- **LEFT OUTER JOIN**: 좌측 테이블 전체를 유지하며, 우측 테이블에 매칭 데이터가 없으면 NULL로 채웁니다.
+  ```sql
+  SELECT u.username, o.order_number
+  FROM users u
+  LEFT JOIN orders o ON u.id = o.user_id;
+  ```
+- **UNION**: 두 `SELECT` 쿼리의 결과 집합을 하나로 병합합니다. (컬럼 개수와 타입이 일치해야 함)
+  ```sql
+  SELECT username, 'ADMIN' AS role FROM admin_users
+  UNION
+  SELECT username, 'STAFF' AS role FROM staff_users;
+  ```
+
+### 3.3. 서브쿼리(Subquery)와 인라인 뷰(Inline View)
+쿼리 내부에 중첩된 또 다른 SELECT 쿼리를 활용하여 동적 필터링을 수행합니다.
+
+```sql
+-- WHERE 절 서브쿼리 (특정 사용자의 주문 목록)
+SELECT * FROM orders WHERE user_id IN (SELECT id FROM users WHERE status = 'VIP');
+
+-- FROM 절 인라인 뷰 (파생 테이블)
+SELECT u.username, u.point
+FROM (SELECT id, username, point FROM users WHERE point > 1000) AS u;
+```
+
+---
+
+## 4. 데이터 제어 언어 (DCL) 및 사용자 권한 관리
+
+데이터베이스에 대한 접근 권한을 관리하여 보안성을 유지합니다.
+
+### 4.1. 사용자 계정 생성과 권한 부여 (`GRANT`)
+```sql
+-- 1. 로컬 및 외부 접속 사용자 생성
+CREATE USER 'service_user'@'localhost' IDENTIFIED BY 'SecurePass123!';
+CREATE USER 'service_user'@'%' IDENTIFIED BY 'SecurePass123!';
+
+-- 2. 특정 데이터베이스에 대한 DML/DDL 권한 부여
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON my_database.* TO 'service_user'@'localhost';
+
+-- 3. 권한 즉시 반영
+FLUSH PRIVILEGES;
+
+-- 4. 부여된 권한 확인
+SHOW GRANTS FOR 'service_user'@'localhost';
+```
+
+### 4.2. 대용량 CSV 파일 고속 임포트 (`LOAD DATA INFILE`)
+외부 CSV 대용량 데이터를 테이블로 초고속 적재할 때 사용합니다.
+
+```sql
+LOAD DATA LOCAL INFILE '/path/to/data.csv'
+INTO TABLE users
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS; -- 헤더 컬럼 1줄 제외
+```
+
+---
+
+## 5. MySQL 주요 데이터 타입 요약
+
+| 분류 | 데이터 타입 | 스토리지 크기 | 설명 및 권장 용도 |
+|---|---|---|---|
+| **문자형** | `VARCHAR(n)` | 가변 (최대 65,535 바이트) | 실제 문자열 길이만큼만 저장되는 표준 텍스트 |
+| **문자형** | `CHAR(n)` | 고정 (최대 255 바이트) | 우편번호, 주민번호 등 고정 길이 식별자 |
+| **문자형** | `TEXT` / `LONGTEXT` | 최대 64KB / 4GB | 긴 게시글 본문 및 비정형 대용량 텍스트 |
+| **정수형** | `INT` / `BIGINT` | 4 바이트 / 8 바이트 | 일반 수치 ID 및 대규모 식별자(PK) |
+| **실수형** | `DECIMAL(M, D)` | 고정 소수점 | 통화, 금융 등 오차 없는 정확한 소수 계산 |
+| **날짜형** | `DATETIME` | 8 바이트 | 시간대 무관 고정 일시 (`1000-01-01` ~ `9999-12-31`) |
+| **날짜형** | `TIMESTAMP` | 4 바이트 | UTC 기준 자동 변환 일시 (생성/수정 타임스탬프) |

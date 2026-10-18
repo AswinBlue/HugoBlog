@@ -1,14 +1,20 @@
 ---
-title: "C++ STL 핵심 컨테이너와 알고리즘 라이브러리 활용 가이드"
-description: "vector, list, deque, map, set 등 C++ 표준 템플릿 라이브러리(STL)의 핵심 자료구조 동작 원리와 효율적인 알고리즘 활용법을 정리합니다."
+title: "C++ STL 핵심 컨테이너 및 알고리즘 완벽 가이드"
+date: 2022-04-12 19:17:21+09:00
+lastmod: 2026-10-18 18:00:00+09:00
+description: "C++ 표준 템플릿 라이브러리(STL)의 핵심 자료구조인 map, unordered_map(hash map), priority_queue(heap), tuple의 기본 사용법과 stable_sort 정렬 알고리즘 활용법을 상세히 정리합니다."
 slug: "cpp-stl-containers-and-algorithms"
-date: 2022-04-12T19:17:21+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
-categories: ["C++"]
-tags: ["c++", "stl", "data-structures", "vector", "algorithm"]
+categories:
+  - "C++"
+tags:
+  - "c++"
+  - "stl"
+  - "data-structures"
+  - "priority-queue"
+  - "algorithms"
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
 ## STL 핵심 자료구조

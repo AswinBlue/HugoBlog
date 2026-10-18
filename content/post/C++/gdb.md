@@ -1,8 +1,8 @@
 ---
 title: "GDB 디버거 기본 사용법과 핵심 명령어 총정리"
-date: 2021-08-23T18:49:15+09:00
-lastmod: 2021-08-23T18:49:15+09:00
-description: "리눅스 환경에서 C/C++ 프로그램 디버깅을 위한 GNU Debugger(GDB)의 핵심 개념, coredump 분석, 중단점 설정, 메모리 및 레지스터 검사 명령어와 TUI 모드 활용법을 정리합니다."
+date: 2021-08-23 18:49:15+09:00
+lastmod: 2021-08-23 18:49:15+09:00
+description: "리눅스 환경에서 C/C++ 프로그램 디버깅을 위한 GNU Debugger(GDB)의 핵심 개념, coredump 분석 기법, 중단점 설정, 메모리 및 레지스터 검사 명령어와 TUI 텍스트 모드 인터페이스 활용법을 상세히 정리합니다."
 slug: "gdb-debugger-basics-and-commands"
 categories:
   - "C++"

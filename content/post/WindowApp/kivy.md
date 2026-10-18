@@ -1,6 +1,6 @@
 ---
 title: "Python Kivy 프레임워크를 활용한 크로스 플랫폼 GUI 앱 개발 기초"
-description: "파이썬으로 윈도우, 안드로이드, iOS용 GUI 앱을 제작하는 Kivy의 위젯 레이아웃 시스템, 이벤트 바인딩, KV 언어 문법 및 빌드 절차를 다룹니다."
+description: "파이썬 기반 크로스 플랫폼 GUI 프레임워크인 Kivy의 핵심 아키텍처, KV 언어 선언 문법, 다양한 레이아웃(BoxLayout, GridLayout, StackLayout)과 위젯 배치, 크기/위치 힌트(size_hint, pos_hint) 활용법을 정리합니다."
 slug: "python-kivy-cross-platform-gui-app-development"
 date: 2021-09-09T18:43:28+09:00
 lastmod: 2026-10-18T18:00:00+09:00
@@ -11,288 +11,151 @@ ShowToc: true
 TocOpen: true
 ---
 
-#kivy
+Kivy는 Windows, macOS, Linux 데스크톱뿐만 아니라 Android, iOS 등 모바일 운영체제까지 단일 파이썬 코드베이스로 지원하는 오픈소스 크로스 플랫폼 GUI 프레임워크입니다. 멀티터치 인터페이스를 기본 지원하며, 고성능 그래픽 파이프라인(OpenGL ES 2)을 바탕으로 게임이나 반응형 터치 애플리케이션 개발에 적합합니다.
 
-## Basic concepts
-1. Widget
-- 어플리케이션을 구성하는 객체
-- widget은 다른 widget을 tree형태로 포함 가능하며 버튼, 라벨 등상호작용 가능한 객체 또는 Widget의 집합
-- 위치는 좌표로 표현되는데 좌표는 좌측하단이 (0,0)이다.
+이 글에서는 Kivy의 기본 위젯 트리 아키텍처, 전용 UI 선언 언어인 KV 언어 문법, 주요 레이아웃(BoxLayout, GridLayout 등), 그리고 위젯의 크기/위치 제어 속성을 정리합니다.
 
-2. Layout
-- 화면 구성을 설정한 요소
-- widget 혹은 layout을 포함 가능하다.
+---
 
-3. structure
-- main.py에 python으로 내용을 작성한다.
-```
-class TheLabApp(App):
-pass
-TheLabApp().run()
-```
-- main.py에서 선언한 class 'TheLabApp' 에서 App을 뺀 TheLab을 따서 main.py와 같은 경로에 'TheLab.kv'파일을 생성한다.
-```
-/
-|-main.py
-|-TheLab.kv
-```
-- .py파일에서 원하는 layout class를 상속받아 객체를 구성할 수도 있고, .kv파일에서 바로 작성할 수도 있다.
-- 단, .kv파일에서 객체를 생성하려면 .py파일에 정의된 class를 사용해야 한다.
-- `<EXAMPLE@BoxLayout>` 와 같이 .py파일의 class 선언을 생략하고 default 객체를 사용하는 방법도 있다.
+## 1. Kivy 프레임워크 개요 및 기본 아키텍처
 
-```
-///////// .py /////////
-class Box(BoxLayout):
-  pass
-///////// .kv /////////
-<Box>: # .py에서 정의된 Box객체를 사용 가능
-  GridLayout:  # 이후부터는 kivy에서 제공하는 객체들 사용 가능
-    label:
-      text:"lb"
+Kivy 애플리케이션은 화면을 구성하는 시각적 요소인 **위젯(Widget)**들의 계층적 트리 구조로 동작합니다.
 
-<Box2@BoxLayout>: # .py파일에서 아무것도 하지 않는 객체를 선언하기 싫을 때 사용
-///////////////////////
-```
- - ex) class 안에서 속성 설정 :`self.orientation = "vertical"`
- - ex) kv파일에서 속성 설정 : `orientation: "vertical"`
-- `<NAME>`형태로 선언한 객체는 다른 객체에서 사용할수 있게 된다.
+### 1.1. 위젯 트리와 좌표계 시스템
+- **좌표계 기준**: 일반적인 웹(좌측 상단 0,0)과 달리 Kivy는 화면의 **좌측 하단이 원점 `(0, 0)`**입니다. x축은 오른쪽으로 갈수록, y축은 위로 올라갈수록 증가합니다.
+- **역할 분담**: 비즈니스 로직과 이벤트 처리는 파이썬(`.py`) 코드로 구현하고, 화면 UI 레이아웃과 스타일은 직관적인 KV 템플릿(`.kv`) 파일로 분리하여 관리합니다.
 
-```
-<Box>:
-  ...
-<Box2>:
-  Button:
-    ...
-  Box:  # 사용자 정의 객체
-    ...
-```
-> - .kv파일은 아래와 같이 구성된다.
-> - 화면을 구성하는 내용들의 속성을 정의하고 배치할 수 있다.
-> ```
- MainWidget:         # 화면에 표기할 객체(widget, layout, ...)
- <MainWidget>:       # widget 정의
-   Button:           # widget 내부 항목 선언, kivy에서 지원하는 객체의 종류
-     text:"A"
-   Button:
-     text:"B"
-> ```
-> - .py파일에서도 화면을 구성할 수 있다.
-> ```
-class LayoutExample(BoxLayout): # BoxLayout은 기본적으로 가로로 구성된다.
-  def __init__(self, **kargs):  
-      super().__init__(**kargs)
-        b1 = Button(text="A") # 객체를 생성
-        b2 = Button(text="B")
-        self.add_widget(b1)   # 객체를 layout에 추가
-        self.add_widget(b2)
-> ```
------
-## Usage
+### 1.2. Python 메인 코드와 KV 언어 파일 네이밍 규칙
+Kivy는 App 클래스 이름에서 `App`을 제외한 소문자(또는 원본 이름)와 일치하는 `.kv` 파일을 자동으로 찾아 로드합니다.
 
-### layout
-1. BoxLayout
- - 가로 혹은 세로로 차곡차곡 쌓아가는 레이아웃
-2. AnchorLayout
- - 화면의 각 모서리, 꼭지점, 정중앙 총 9개의 위치를 지정할 수 있는 레이아웃
-3. GridLayout
- - n행m열의 그리드를 나누고, 내용을 채우는 레이아웃
-4. StackLayout
- - n행m열의 표에 좌측상단부터 차곡차곡 쌓아가는 레이아웃. BoxLayout의 2차원형태
-5. ScrollView
- - 상하 또는 좌우로 스크롤이 가능한 화면
-6. PageLayout
- - 디스플레이간 slide를 통해 이동이 가능한 레이아웃
-7. FloatLayout
-8. RelativeLayout
-9. ScatterLayout
-
-### Commons
-- `size_hint` : 레이아웃 내 객체의 비율 설정
- - layout 안의 객체는 size 조절이 불가능하다. (`size:` 설정 해도 적용 안됨) `size_hint` 값이 default로 설정되어있기 때문이다.
- - `size_hint`값이 적용된 객체는 화면 크기에 따라 객체 크기도 함께 변경된다.
- - `size_hint`값은 default 1,1로 설정되어있다.
- - `size_hint: None, None`으로 설정한다면 `size:` 값을 설정할 수 있다. (화면 크기에 상관없이 고정된 크기를 가질 수 있게 된다.)
- ex)
- - `spacing:"10dp"` : layout내부 요소간 간격 설정
-
-### BoxLayout
-- `orientation: "vertical"`: 세로정렬(가로 : "horizontal")
-```
-<BoxLayoutSample>:
-    orientation: "vertical"
-    Button:
-    # 배정받은 크기에 대해 가로비율 50%, 세로비율 60%로 설정.
-        text: "b1"
-        size_hint: .5, .6
-```
-
-### AnchorLayout
-- `ahcnor_x:"center"`: x축 정렬 위치, `left, right, center` 가능, default `center`
-- `ahcnor_y:"center"`: y축 정렬 위치, `top, bottom, center` 가능, default `center`
-- 객체를 순서대로 쌓는것이 아니라 지정한 자리에 그대로 넣는것이므로, 이전 객체는 이후에 나오는 객체에 덮어씌워질 수 있음
-
-```
-<AnchorExample>:
-    Button:
-        text:"btn"
-        size_hint: .2, .2
-        pos_hint:{"X":.1, "Y": .1}
-    Button:
-        text:"btn2"
-        size_hint: .1, .1
-        pos_hint:{"X":.5, "Y": .5}
-
-```
-
-### GridLayout
-- `rows`: Grid의 행 개수를 선언한다. default 1
-- `cols`: Grid의 열 개수를 선언한다. default 1
-- `size_hint`로 내부 요소의 비율을 조절하고 싶을 때, 같은 행/열에 속한 값들도 모두 같은 값으로 설정해야 적용이 된다.
-- 설정한 Grid를 초과하는 객체를 선언하면 Widget에서 객체를 생성한것으로 취급된다.
-```
-<GridExample@GridLayout>:
-    rows: 2
-    cols: 3
-    Button: # 0,0
-        text: "btn"
-        size_hint: .5, 1  # 비율 조정
-    Button: # 0,1
-        text: "btn"
-        size_hint: None, 1
-        width:"100dp" # 고정된 크기
-    Button: # 0,2
-        text: "btn"
-    Button: # 1,0
-        text: "btn"
-        size_hint: .5, 1
-    Button: # 1,1
-        text: "btn"
-        size_hint: None, 1
-        width:"100dp" # 고정된 크기
-    Button: # 1,2
-        text: "btn"
-    Button: # out of bound
-        text: "btn"
-        pos:100, 200
-```
-
-### StackLayout
-- 내부 객체들을 가로 한줄로 나열한다. 한 줄에 있는 객체들의 비율이 100%를 넘어가면 다음줄부터 객체를 채워넣는다.
-- 가로 혹은 세로는 가장 큰 크기의 객체에 맞춰져 grid형식으로 정렬된다.
-```
-<StackExample>:
-Button:
-    text:"btn"
-    size_hint: .3, .3
-Button:
-    text:"btn"
-    size_hint: .3, .4
-Button:
-    text:"btn"
-    size_hint: .3, .5
-Button:                 # 가로비율이 1을 넘어가기때문에 줄바뀜됨
-    text:"btn"
-    size_hint: .3, .5
-Button:
-    text:"btn"
-    size_hint: .4, .5
-Button:
-    text:"btn"
-    size_hint: .3, .5
-Button:                 # 세로 비율상으로 1을 넘어가기 때문에 화면 밖으로 나가서 보이지 않음
-    text:"btn"
-    size_hint: .3, .5
-```
-- 고정된 크기로 wiwdget을 추가하면 화면 크기가 변함에 따라 widget의 행,열이 변경된다.    
-- class로 설정을 할 수도 있다. 이때 class의 __init__에 설정한 내용이 .kv파일에서 설정한 내용보다 우선하여 적용된다.
-
-```
-class StackExample(StackLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for i in range(0, 10):
-            size = dp(100)  # dp로 크기 선언법
-            b = Button(text=str(i + 1), size_hint=(None, None), size=(size, size))  # 버튼 세팅
-            self.add_widget(b)  # layout에 widget 추가
-```
-
------
-### Widgets
-- 기본크기 100 X 100, 기본위치 (0,0) 이다.
-
-### Commons
-- `pos_hint`: 정렬 위치
-  - `size_hint`등으로 비율을 조절하면 기본적으로 좌측 상단으로 정렬이 된다.
-  - 이때, 다른 방향으로 정렬을 하려면 `pos_hint:{"x":.5, "y":.5}`와 같이 설정 가능하다.
-  - `pos_hint:` 다음에는 dictionary가 와야하며, 두 개의 항목이 들어간다.
-  - 첫번째 인자는 "x", "center_x", "right" 중 하나를 사용하며,
-  - 두번째 인자는 "y", "center_y", "top" 중 하나를 사용한다.
-
-```
-pos_hint:{"x":.5} # 좌측부분을 50%위치로 설정
-pos_hint:{"center_x":.5} # 중앙을 50%위치로 설정
-pos_hint:{"right":.5} # 우측부분을 50%위치로 설정
-```
-
-### Button
-- 텍스트, 크기, 위치를 지정한 버튼
-- 아래쪽에 있는 내용이 나중에 그려져 이전 내용을 덮어씌운다.
-
-```
-MainWidget:
-
-<MainWidget>:
-# 고정 크기를 가진 버튼
-  Button:
-    text: "Hello"
-    size: 400, 200
-    pos: 100, 200
-# 기기 화면 크기에 따른 크기와 위치를 가진 버튼
-  Button:
-    text: "hello2"
-    size: "400dp", "200dp"
-    pos: "100dp", "200dp"
-```
-
-### lalbel
-- 텍스트, 크기, 위치, 글자색을 지정한 레이블
-
-```
-MainWidget:
-
-<MainWidget>:
-  Label:
-    text: "Hello"
-    size: "100dp", "80dp"
-    pos: "100dp"
-    color: 1, 2, 3, 1 # r, g, b, a
-```
------
-## 기타
-- .kv파일에서 동일한 이름의 객체를 여러개 정의하면, 하나의 정의로 보고 내용을 이어붙인다.
-
-```
-<BoxLayoutSample>   # layout 정의
-    Button:
-        text:"A"
-        size_hint: ".1"
-  ...
-
-<BoxLayoutSample>   # 동일한 이름의 layout 정의
-  Button:
-      text:"B"      #버튼 B는 버튼 A 다음에 생성됨
-      size_hint: ".1"
-```
-
-- .py 에서 class를 선언하고, .kv파일에서 해당 class를 사용한다면, .py의 __init__() 함수가 먼저 호출된 후 .kv파일에서 세팅한 내용이 적용된다.
-
-
-## 참조
-[유튜브 강의](https://youtu.be/l8Imtec4ReQ?list=PLXb1UadfFv1Ff9h4zrbkAaNzPHSc-fb4w)
-import:
-```
+```python
+# main.py
 from kivy.app import App
-from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.widget import Widget
+
+class MainWidget(BoxLayout):
+    pass
+
+class TheLabApp(App):
+    def build(self):
+        return MainWidget()
+
+if __name__ == "__main__":
+    TheLabApp().run()
 ```
+`TheLabApp` 클래스는 동일한 디렉터리에 위치한 `TheLab.kv` 파일을 자동으로 바인딩합니다.
+
+---
+
+## 2. Kivy 핵심 레이아웃(Layout) 종류와 특성
+
+레이아웃은 자식 위젯들의 위치와 크기를 자동으로 계산하고 배치하는 특수 컨테이너 위젯입니다.
+
+### 2.1. BoxLayout (선형 박스 정렬)
+자식 요소들을 가로(`horizontal`, 기본값) 또는 세로(`vertical`) 방향으로 순차 적재합니다.
+
+```yaml
+# TheLab.kv
+<MainWidget>:
+    orientation: "vertical"
+    spacing: "10dp" # 위젯 간 간격
+    Button:
+        text: "버튼 1"
+        size_hint: 1, 0.5 # 가로 100%, 세로 50%
+    Button:
+        text: "버튼 2"
+        size_hint: 1, 0.5
+```
+
+### 2.2. AnchorLayout (9방향 고정 배치)
+화면의 모서리, 꼭짓점, 정중앙 등 9가지 기준점에 자식 위젯을 도킹할 때 사용합니다.
+- `anchor_x`: `"left"`, `"center"`, `"right"` (기본값: center)
+- `anchor_y`: `"top"`, `"center"`, `"bottom"` (기본값: center)
+
+```yaml
+<AnchorExample@AnchorLayout>:
+    anchor_x: "right"
+    anchor_y: "bottom"
+    Button:
+        text: "우하단 플로팅 버튼"
+        size_hint: None, None
+        size: "120dp", "60dp"
+```
+
+### 2.3. GridLayout (격자 행렬 배치)
+지정된 행(`rows`)과 열(`cols`)의 격자 칸에 위젯을 순서대로 채워 넣습니다.
+- `rows`, `cols` 중 최소 하나를 명시해야 합니다.
+- 특정 칸의 크기를 조정하려면 해당 행/열의 다른 위젯들과 비율이 일치해야 왜곡 없이 렌더링됩니다.
+
+```yaml
+<GridExample@GridLayout>:
+    cols: 3
+    rows: 2
+    Button:
+        text: "1행 1열"
+    Button:
+        text: "1행 2열"
+    Button:
+        text: "1행 3열"
+    Button:
+        text: "2행 1열"
+    Button:
+        text: "2행 2열"
+    Button:
+        text: "2행 3열"
+```
+
+### 2.4. StackLayout (가변 줄바꿈 배치)
+한 행에 위젯들을 가로로 나열하다가 너비가 100%를 초과하면 자동으로 다음 행으로 개행하여 배치하는 흐름형 레이아웃입니다.
+
+---
+
+## 3. 위젯 크기 및 위치 제어 속성 (`size_hint`, `pos_hint`)
+
+Kivy 레이아웃 내부의 자식 위젯은 기본적으로 레이아웃의 제어를 받으므로 단순 `size`나 `pos` 속성은 무시될 수 있습니다.
+
+### 3.1. 상대 비율 제어 (`size_hint`)와 고정 크기 (`dp`)
+- **`size_hint` (기본값 `(1, 1)`)**: 부모 레이아웃 공간 대비 가로/세로 비율(0.0 ~ 1.0)을 지정합니다. 창 크기가 변경되면 위젯 크기도 유동적으로 반응합니다.
+- **고정 크기 지정**: 화면 비율이 아닌 픽셀 단위 고정 크기를 적용하려면 반드시 `size_hint: None, None`을 선언한 뒤 `size: "width", "height"`를 부여해야 합니다.
+- **디바이스 독립 픽셀 (`dp`)**: 해상도가 다른 다양한 모바일 기기에서 동일한 물리적 크기를 유지하기 위해 `dp` 단위를 사용합니다.
+
+```yaml
+Button:
+    text: "고정 크기 버튼"
+    size_hint: None, None
+    size: "150dp", "50dp"
+```
+
+### 3.2. 상대 위치 제어 (`pos_hint`)
+부모 컨테이너 내에서 위젯의 기준점 위치를 백분율 딕셔너리로 지정합니다.
+- x축 키: `"x"` (좌측 기준), `"center_x"` (중앙 기준), `"right"` (우측 기준)
+- y축 키: `"y"` (하단 기준), `"center_y"` (중앙 기준), `"top"` (상단 기준)
+
+```yaml
+Button:
+    text: "화면 정중앙 배치"
+    size_hint: 0.3, 0.2
+    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+```
+
+---
+
+## 4. 핵심 위젯(Widget)과 파이썬 클래스 연동
+
+### 4.1. Button 및 Label 위젯 선언
+KV 언어에서는 위젯의 텍스트, 폰트 크기, 배경색, RGBA 텍스트 색상을 직관적으로 선언할 수 있습니다.
+
+```yaml
+<CustomWidget@BoxLayout>:
+    orientation: "vertical"
+    Label:
+        text: "환영합니다!"
+        font_size: "24sp" # 텍스트는 sp 단위 권장
+        color: 0.2, 0.6, 1.0, 1.0 # R, G, B, A (0~1 범위)
+    Button:
+        text: "확인"
+        on_press: root.on_button_click() # 상위 클래스 메서드 호출
+```
+
+### 4.2. Python 클래스와 생성자 실행 순서
+Python 클래스에서 `__init__` 메서드가 실행된 이후 KV 파일에 정의된 속성들이 적용됩니다. 따라서 초기 동적 위젯 생성은 Python `__init__`에서 수행하고, 정적 디자인과 계층 배치는 KV 파일에 정의하는 것이 모범 사례입니다.

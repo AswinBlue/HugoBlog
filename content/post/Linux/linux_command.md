@@ -1,144 +1,109 @@
 ---
-title: "실무에서 자주 쓰는 리눅스 필수 명령어 및 파일 시스템 탐색 가이드"
-description: "ls, find, grep, awk, sed, tar, xargs 등 서버 운영 및 개발 생산성을 극대화하는 리눅스 핵심 쉘 명령어 활용법과 파이프라인 예제를 다룹니다."
-slug: "essential-linux-commands-and-shell-tips"
+title: "실무 리눅스 필수 명령어 가이드: sed·tr 텍스트 조작, tar 압축, ELF 바이너리 분석 및 리다이렉션"
+description: "리눅스 서버 운영 및 개발 생산성을 높여주는 필수 명령어부터 sed와 tr을 활용한 텍스트 스트리밍 치환, tar 압축 아카이브 관리, readelf와 objdump를 이용한 바이너리 분석, 입출력 리다이렉션 기법까지 예제 중심으로 정리합니다."
+slug: "essential-linux-commands-text-binary-guide"
 date: 2021-08-12T10:41:00+09:00
 lastmod: 2026-10-18T18:00:00+09:00
 draft: false
 categories: ["Linux"]
-tags: ["linux", "bash", "cli", "command-line", "sysadmin"]
+tags: ["linux", "bash", "cli", "sed", "shell"]
 ShowToc: true
 TocOpen: true
 ---
-# Linux Command
-- 리눅스에서 사용되는 명령어들을 정리한다.
-- 자주 사용되는 모듈의 명령어도 포함한다.
-- 리눅스에서 명령어는 `/usr/bin/` 폴더에 저장되며, 내부에 저장된 파일들은 각 유저들에게 실행권한이 있다.
-- 유저 개인의 명령어를 따로 설정 및 관리하려면 `~/.bashrc` 파일에서 특정 디리렉터리를 PATH에 추가하여 사용할 수 있다. 
-  - 기본적으로 `~/bin/` 경로가 PATH에 추가되어 있다.
-  - `export PATH=$PATH:추가할경로[:추가할경로2:추가할경로3:...]` 명령어를 `~/.bashrc` 에 추가하면 경로를 추가할 수 있다.
-    - ex) 
-      ```
-      # in .bashrc file
-      PATH=$PATH:/home/user/bashrc  # 기존의 PATH에 /home/user/.bashrc 추가
-      # 현재 PATH는 .bashrc 포함
-      PATH=$PATH:/home/user/dir1:/home/user/dir2  # 기존의 PATH에 dir1, dir2 추가
-      # 현재 PATH는 .bashrc, dir1, dir2 포함
 
-      export PATH  # PATH를 적용
-      ```
-    - 적용 후 `source ~/.bashrc` 명령어로 .bashrc를 재적용 해 주면 설정이 완료된다. 
-  - 리눅스 쉘에서 위 쉘코드를 바로 입력해도 적용은 가능하지만, 이 경우 재부팅시 설정이 초기화된다.
+# 리눅스 필수 명령어 가이드
 
-## 리눅스 기본
-### 리눅스 설정 관련
-- `stty -a`: 시그널 단축키들의 값 확인
-- `strace FILE_NAME`: 실행파일이 실행되는 상세 과정을 라인별로 보여준다.
-- `getconf`  리눅스의 시스템 변수 값을 확인하는 명령어
-  - `getconf -a`: 모든 시스템 변수를 반환한다.
-  - `getconf LONG_BIT`: 시스템이 x64라면 64를, x86이라면 32를 반환한다.
-- `ldd FILE_NAME` : FILE_NAME 을 실행하는데 필요한 라이브러리 의존성을 확인한다. 
+## 환경 변수와 PATH 관리
+- 리눅스 기본 시스템 명령어들은 `/usr/bin/`, `/bin/`, `/usr/local/bin/` 디렉터리에 위치하며 일반 사용자에게 실행 권한이 부여되어 있습니다.
+- 사용자 전용 스크립트나 커스텀 바이너리를 전역에서 실행하려면 `~/.bashrc` 파일에서 `PATH` 환경 변수에 해당 디렉터리를 등록합니다.
+  ```bash
+  # ~/.bashrc 파일 하단에 추가
+  export PATH=$PATH:$HOME/bin:/custom/path
 
-### 파일 시스템 조작
-- `mkdir` : 디렉터리를 생성하는 명령여
-  - parent 디렉터리가 존재하지 않는다면 `mkdir -p` 명령어로 한 번에 생성 가능 (ex: `mkdir -R A/B/C/D`)
+  # 설정 즉시 적용
+  source ~/.bashrc
+  ```
 
-## 문자열 조작
-### sed
-- 기본적인 기능은 ed에서 따 왔으며, 이 기능들은 모두 sed에 적용이 된다.
-- ed는 대화형 편집기이며, sed는 스트리밍 편집기
-- \n 을 개행문자로 사용하는 스트리밍 에디터
+## 시스템 진단 및 파일 시스템 기본 명령
+- `stty -a`: 터미널 특수 제어 문자(시그널 인터럽트 단축키 등)의 매핑 값을 확인합니다.
+- `strace <실행파일>`: 실행 바이너리가 호출하는 시스템 콜과 시그널을 라인 단위로 추적하여 런타임 문제를 진단합니다.
+- `getconf`: 운영체제의 시스템 환경 변수 및 하드웨어 구성 값을 조회합니다.
+  - `getconf LONG_BIT`: 시스템 아키텍처가 64비트인지(64) 32비트인지(32) 반환합니다.
+- `ldd <실행파일>`: 동적 링크 바이너리가 의존하는 공유 라이브러리(`*.so`) 목록과 로딩 경로를 확인합니다.
+- `mkdir -p <디렉터리경로>`: 상위 부모 디렉터리가 존재하지 않더라도 계층 전체를 한 번에 생성합니다 (예: `mkdir -p A/B/C/D`).
 
-`sed [-e script][-f script-file][file...]`
-1. 찾기/출력
-   - `sed -n '/abd/p' list.txt : list.txt` : 파일을 한줄씩 읽으면서(-n : 읽은 것을 출력하지 않음) abd 문자를 찾으면 그 줄을 출력(p)한다.
+## 텍스트 스트림 조작
 
-2. 치환
-   - `sed 's/addrass/address/' list.txt` : list.txt파일에서 addrass를 address로 바꾼다. 단, 원본파일을 바꾸지 않고 출력을 바꿔서 한다.
-   - `sed 's/□□*/□/' list.txt` : ( *표시: □ 는 공백 문자를 표시한다. ) 위의 구문은 한개이상의 공백문자열을 하나의 공백으로 바꾼다.
+### sed 스트림 편집기
+- `sed`(Stream Editor)는 텍스트 스트림을 한 줄씩 읽어 들여 정규표현식 기반으로 검색, 치환, 삭제를 수행하는 비대화형 편집기입니다.
+- 기본 구문: `sed [옵션] '스크립트' [대상파일]`
 
-3. 삭제
-   - `sed '/TD/d' list.txt` : TD 문자가 포함된 줄을 삭제하여 출력한다.
-   - `sed '/Src/!d' list.txt` : Src 문자가 있는 줄만 지우지 않는다.
-   - `sed '1,2d' list.txt` : 처음 1줄, 2줄을 지운다.
-   - `sed '/^$/d list.txt` : 공백라인을 삭제하는 명령이다
+1. **검색 및 특정 행 출력**
+   - `sed -n '/pattern/p' file.txt`: 패턴과 일치하는 줄만 선별하여 출력합니다 (`-n`은 기본 자동 출력을 억제).
+2. **문자열 치환**
+   - `sed 's/old/new/' file.txt`: 각 줄에서 처음 나타난 `old`를 `new`로 치환하여 출력합니다 (원본 파일 유지).
+   - `sed -i 's/old/new/g' file.txt`: 파일 내 모든 `old`를 `new`로 전역(`g`) 치환하고 원본 파일에 직접 저장합니다 (`-i`).
+   - `sed 's/  */ /g' file.txt`: 연속된 두 개 이상의 공백을 단일 공백으로 치환합니다.
+3. **행 삭제**
+   - `sed '/TARGET/d' file.txt`: `TARGET` 문자열이 포함된 줄을 제외하고 출력합니다.
+   - `sed '/TARGET/!d' file.txt`: `TARGET` 문자열이 포함된 줄만 남기고 나머지는 삭제합니다.
+   - `sed '1,2d' file.txt`: 1행부터 2행까지 삭제합니다.
+   - `sed '/^$/d' file.txt`: 모든 빈 줄(공백 라인)을 삭제합니다.
 
-### tr
-- `tr -s STRING1 STRING2` : 특정 STRING1 의 문자를 STRING2 의 문자로 치환한다.
-  - STRING1[0] 은 STRING[0] 으로, STRING1[1] 은 STRING[1] 로, ... 치환된다.
-    - ex) `tr -s ' ;' '\n'` : 문자열에서 ' ;' 를 '\n' 문자로 치환한다. 
-    - ex) `tr -s '123' 'abc'` : 문자열에서 1을 a로, 2를 b로, 3을 c로 치환한다.
-  - 정규식도 사용 가능하다.
-    - ex) `tr -s '1-3' 'a-c'` : 문자열에서 1을 a로, 2를 b로, 3을 c로 치환한다.
-- `tr -c STRING1 STRING2` : STRING1에 포함된 문자를 제외하고 STRING2의 마지막 문자로 치환한다.
-  - ex) `tr -c '123' 'abc'` : 1,2,3을 제외한(\n포함) 모든 문자를 c로 변환한다.
-- `tr -d STRING1 ` : STRING1에 포함된 문자를 제거한다.
-  - ex) `tr -d '123'` 문자열에 포함된 1,2,3을 모두 제거한다.
+### tr 문자 치환 및 삭제
+- `tr`은 표준 입력으로부터 문자를 읽어 특정 문자를 변환하거나 제거합니다.
+- 문자 1:1 치환: `tr '123' 'abc'` (1은 a로, 2는 b로, 3은 c로 변환)
+- 연속된 중복 문자 압축: `tr -s ' '` (연속된 공백을 단일 공백으로 압축)
+- 문자 세트 제외 후 치환: `tr -c '0-9\n' ' '` (숫자와 개행을 제외한 모든 문자를 공백으로 치환)
+- 특정 문자 삭제: `tr -d '\r'` (Windows 개행 문자 `\r` 제거)
 
+## 아카이브 및 압축 관리
 
-## 압축
-- `tar -xvf <FILE_NAME>` : tar 파일 압축 해제
-- `tar -cvf <RESULT_FILE> <SOURCE_FILE>` : tar 파일 압축
-- `tar -zxvf <FILE_NAME>` : tar.gz 파일 압축 해제
-- `tar -zcvf <RESULT_FILE> <SOURCE_FILE>` : tar.gz 파일 압축
-- `$ dpkg -x <SOURCE_PATH> <DESTINATION_PATH>` : .deb 파일 압축 해제
+### tar 및 deb 압축 해제
+- `tar -cvf <아카이브.tar> <대상디렉터리>`: 파일을 tar 아카이브로 묶습니다.
+- `tar -xvf <아카이브.tar>`: tar 아카이브를 현재 디렉터리에 해제합니다.
+- `tar -zcvf <압축파일.tar.gz> <대상디렉터리>`: tar 아카이브 묶기 및 gzip 압축을 동시에 수행합니다.
+- `tar -zxvf <압축파일.tar.gz>`: gzip 압축된 tar.gz 아카이브를 해제합니다.
+- `dpkg -x <패키지.deb> <추출경로>`: deb 패키지 파일을 설치하지 않고 지정 디렉터리에 내부 파일만 압축 해제합니다.
 
+### tar 압축 관련 트러블슈팅
+- `.tar.xz` 형식 파일 해제 시 다음과 같은 오류가 발생할 수 있습니다.
+  ```text
+  tar (child): xz: Cannot exec: No such file or directory
+  ```
+- 해결 방법: `sudo apt-get install xz-utils` 패키지를 설치하여 xz 디컴프레서를 시스템에 갖추어야 합니다.
 
-### 에러와 해결
-1. tar (child): xz: Cannot exec: No such file or directory
- - `sudo apt-get install xz-utils` 명령으로 모듈을 설치 해 주어야 한다.
-```
-tar (child): xz: Cannot exec: No such file or directory
-tar (child): Error is not recoverable: exiting now
-tar: Child returned status 2
-tar: Error is not recoverable: exiting now
-```
+## 바이너리 및 파일 속성 분석
 
-이때 확장자가 gz로 되어있는 경우에는 옵션에 'z'를 추가해준다. (tar -zxvf, tar-zcvf)
+### 파일 기본 정보 조회 (file, wc, xxd)
+- `wc <파일>`: 파일의 행 수, 단어 수, 바이트 수를 순서대로 출력합니다 (`wc -l`, `wc -c`).
+- `xxd <바이너리파일>`: 바이너리 파일의 16진수 헥스덤프(Hexdump)와 ASCII 텍스트를 나란히 출력합니다.
+- `file <파일명>`: 파일의 매직 넘버(Magic Number)를 검사하여 ELF 바이너리, 쉘 스크립트, 텍스트, 심볼릭 링크 등의 실제 포맷을 판별합니다.
+  ```bash
+  $ file /bin/ls
+  /bin/ls: ELF 64-bit LSB shared object, x86-64, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2
+  ```
 
+### ELF 바이너리 분석 (readelf, objdump)
+- `readelf -h <바이너리>`: ELF 헤더 정보(아키텍처, 엔트리 포인트 주소 등)를 출력합니다.
+- `readelf -s <바이너리>`: 바이너리에 정의된 함수 및 변수 심볼 테이블(Symbol Table)을 출력합니다.
+- `readelf -S <바이너리>`: `.text`, `.data`, `.bss`, `.rodata` 등 섹션 헤더 배치 및 플래그를 출력합니다.
+- `objdump -d <바이너리>`: 기계어 코드 영역(`.text`)을 디스어셈블하여 x86-64 어셈블리어 코드로 출력합니다.
+- `objdump -h <바이너리>`: 섹션의 가상 메모리 주소(VMA), 로드 메모리 주소(LMA), 크기 및 파일 오프셋을 확인합니다.
 
-## 파일 관리 / 접근
-- `wc FILE_NAME` : 파일의 라인, 단어, 글자 수를 출력 (단어는 공백문자(줄바꿈, 공백, 탭) 으로 구분된 글자 집합)
-- `wc -c FILE_NAME`: 파일 크기를 byte단위로 출력
-- `xxd FILE_NAME`: binary파일의 hexdump 출력
-- `file FILE_NAME`: 파일이 어떤 종류의 유형의 파일이며(C language, text, executable, ...), 어떤 속성을 갖고 있는지를 확인할 수 있다. 대상 파일의 유형을
-  - ex) 
-    ```
-    $ file /bin/ls    
-    /bin/ls: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=9567f9a28e66f4d7ec4baf31cfbf68d0410f0ae6, stripped
+## 입출력 리다이렉션과 파이프라인
+- 명령어 실행 시 발생하는 표준 스트림(`stdin`: 0, `stdout`: 1, `stderr`: 2)의 방향을 제어합니다.
+- `CMD > file`: 표준 출력을 파일에 새로 저장합니다 (기존 내용 덮어쓰기).
+- `CMD >> file`: 표준 출력을 파일 끝에 추가(Append)합니다.
+- `CMD 2> error.log`: 표준 에러만 선별하여 `error.log` 파일에 저장합니다.
+- `CMD > file 2>&1`: 표준 출력과 표준 에러를 동일한 파일에 한 번에 기록합니다.
+- `CMD > /dev/null 2>&1`: 모든 출력과 에러를 버려 콘솔 출력을 완전히 차단합니다.
+- `CMD1 | CMD2`: `CMD1`의 표준 출력을 `CMD2`의 표준 입력으로 파이프라이닝합니다.
 
-    $ file /etc/passwd
-    /etc/passwd: ASCII text
-
-    $  file /bin/python
-    /bin/python: symbolic link to `python3'
-    ```
-- `readelf FILE_NAME`: ELF 파일의 meta data를 확인한다. 
-  - ELF란 Executable and Linkable Format을 의미한다. (*.o 형태의 파일이다)
-  - `readelf -h` ELF 파일의 헤더 확인
-  - `readelf -s` ELF 파일 내부 symbol 정보들을 출력한다. 함수 주소, 이름 및 속성들을 확인할 수 있다.
-  - `readelf -S` ELF 파일 내부 Section 정보들을 출력한다. 
-    - `objdump -h` 명령과 동일한 결과를 출력한다.
-- `objdump -S FILE_NAME`: object file을 어셈블리 형태로 주소별로 출력 해주는 명령이다. 
-- `objdump -h FILE_NAME`: object file의 section 헤더정보를 확인하는 명령어이다. section의 크기, VMA(Virtual Memory Address), LMA(Load Memory Address), file offset 등의 정보를 확인할 수 있다.
-  - `readelf -S` 명령과 동일한 결과를 출력한다.
-- `objdump -d FILE_NAME`: object file 내용을 어셈블리어 형태로 출력한다.
-
-
-### 리다이렉션
-- 명령어 실행 시 발생하는 출력을 표준 출력/표준 에러가 아닌 다른 방향으로 전환하는 기법이다.
-- `CMD1 > FILE_NAME`: 표준 출력을 리다이렉션, CMD1의 결과를 FILE_NAME에 저장한다.
-  - `CMD1 1> FILE_NAME` 명령과 동일하다. 즉, `1>` 은 `>`로 대체 가능하다.
-- `CMD1 2> FILE_NAME`: 표준 에러를 리다이렉션, CMD1에서 발생한 에러를 FILE_NAME에 저장한다.
-- `CMD1 >> FILE_NAME`: 표준 출력을 리다이렉션, CMD1의 결과를 FILE_NAME에 저장하되, 기존 파일 뒤부터 이어서 쓴다.
-- `CMD1 2> FILE_NAME_1 1> FILE_NAME_2`: CMD1의 표준에러와 표준출력을 FILE_NAME_1 과 FILE_NAME_2에 나누어 기록한다.
-- `CMD1 > /dev/null`: 출력할 내용을 버린다. `dev/null` 로 리다이렉트 된 내용은 모두 버려진다.
-
-## Metacharacter
-- 리눅스 상에서 특정 역할을 수행하는 문자를 `Metacharacter`(메타문자) 라 한다.
-- `$`: 쉘 환경변수 (`echo $PATH`: PATH 라는 환경변수를 화면에 출력)
-- `&&`: 이전 명령 이후 다음 명령 수행(`mkdir A && cd A`: A 라는 디렉터리 생성 후 A 디렉터리로 이동)
-- `;`: 명령어 구분자 (`mkdir A; cd A`: A 라는 디렉터리 생성, A 디렉터리로 이동)
-- `|`: 명령어 파이프라이닝 (`find . -name hello | grep world`: 'hello' 라는 이름의 파일을 찾고, 출력된 항목들 중 'world' 가 포함된 라인만 다시 추출)
-- `*`: 와일드카드 (`find . -name hello*`: 'hello*' 정규식에 일치하는 파일 찾기)
-- 
+## 쉘 메타문자 (Metacharacters)
+- `$`: 환경 변수 또는 쉘 매개변수 참조 (`echo $PATH`)
+- `&&`: 논리 AND 연산자로, 앞선 명령어가 성공(종료 코드 0)할 때만 다음 명령어를 실행합니다 (`make && make install`).
+- `||`: 논리 OR 연산자로, 앞선 명령어가 실패(종료 코드 비정상)했을 때만 다음 명령어를 실행합니다.
+- `;`: 단순 명령어 순차 구분자로 앞 명령어의 성공/실패와 무관하게 연이어 실행합니다.
+- `|`: 파이프 연산자
+- `*`: 와일드카드 문자 (`ls *.txt`)

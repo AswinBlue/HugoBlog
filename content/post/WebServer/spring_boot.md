@@ -1,527 +1,238 @@
 ---
 title: "Spring Boot 실전 프로젝트: Gradle 빌드, REST API 구축 및 배포 가이드"
-description: "스프링 부트의 자동 구성(Auto-Configuration), Starter 의존성, Gradle 빌드 도구, JPA 리포지토리 연동 및 프로덕션 JAR 배포 절차를 총정리합니다."
+description: "스프링 부트(Spring Boot)의 자동 구성(Auto-Configuration) 원리와 application.yml 설정, Gradle 멀티태스크 빌드, Spring Data JPA와 H2 연동, RESTful 컨트롤러 및 스케줄러 구현을 총정리합니다."
 slug: "spring-boot-gradle-rest-api-production-guide"
 date: 2022-05-30T19:20:23+09:00
 lastmod: 2026-10-18T18:00:00+09:00
 draft: false
 categories: ["WebServer"]
-tags: ["spring-boot", "java", "gradle", "rest-api", "backend"]
+tags: ["spring-boot", "java", "gradle", "jpa", "rest-api", "h2-database"]
 ShowToc: true
 TocOpen: true
 ---
 
-# Spring Boot
-  - Spring boot는 서버 생성을 위한 도구로, spring 프레임워크에 편의성을 향상시킨 프레임워크이다.  
-  - Java, Kitlin, Groovy 등의 언어로 구현이 가능하다.
+Spring Boot는 기존 Spring 프레임워크의 복잡한 XML 및 수동 빈(Bean) 설정을 획기적으로 단순화한 차세대 자바 백엔드 프레임워크입니다. 의존성 관리의 표준화(Starters), 자동 구성(Auto-Configuration), 그리고 내장 톰캣(Embedded Tomcat) 서버를 통해 `java -jar` 명령어 하나로 단독 실행 가능한 상용 수준의 웹 서비스를 빠르게 제작할 수 있습니다.
 
-## 개발환경
-1. java 기반으로 동작하기에 jdk 설치가 필요하다.
-    - (22년 기준) 11버전 이상을 다운받는것을 추천한다.
-1. IDE
-    - vs code를 사용한다면 확장패키지로 'Java Extension Pack' 과 'Spring Boot Extension Pack' 을 설치한다.   
-    - java 개발을 위한 eclips나 intelliJ를 사용해도 된다.  
-1. spring 프로젝트 생성
-    - `start.spring.io` 페이지에 들어가면 프로젝트를 생성할 수 있는 UI가 구성되어 있다. 원하는대로 설정 후 다운로드를 받아서 사용하면 된다.
-1. gradle 설치
-    - `https://gradle.org/releases/` 주소에서 gradle 파일을 다운받는다.
-    - 이후 path 설정을 마친 후, 프로젝트 root directory에서 `gradle wrapper` 명령을 수행해 gradlew파일을 생성한다.
+이 글에서는 Spring Boot 개발 환경 구축부터 `application.yml` 프로파일 설정, Gradle 빌드 파이프라인, Spring Data JPA를 통한 영속성 계층 구현, 그리고 빈 등록 및 배치 스케줄러 구현까지 실무 핵심 전반을 다룹니다.
 
-### 기본 설정
-1. 포트 설정
-    - `application.properties` (혹은 yml)파일을 열고, `server.port = 8080` 와 같이 기입하면 동작 포트를 8080으로 설정할 수 있다.
-1. devtools 설정
-  - 정적 파일들을 갱신했을 때, 서버 재실행 없이 explorer만 reload 해 주면 변경점이 반영될 수 있도록 한다.
-  
-  - 이 외에 DB, 포트, mvc, thymleaf 등 각종 설정이 포함된 yml 파일 예시는 다음과 같다.
-      
-        ```
-        # web 서버 동작 설정
-        server:
-          # 포트 설정
-          port: 8080
-        # spring boot 설정
-        spring:
-           config:
-             activate:
-               on-profile: deploy
-          # h2 database 설정
-          h2:
-            console:
-              enabled: true
-          # jpa 설정
-          jpa:
-            database: h2
-            generate-ddl: off
-          datasource:
-            driver-class-name: org.h2.Driver
-            url: jdbc:h2:mem:testdb;MODE=MySQL;
-            username: SA
-            password:
-            initialization-mode: always
-            schema: classpath:schema-h2.sql
-            data: classpath:data-h2.sql
-          # spring의 MVC 모델 설정
-          mvc:
-            # view로 사용할 static resources의 위치 및 파일 확장자 설정
-            # thymeleaf가 view역할을 하기 때문에 본 프로젝트에서는 mvc 모듈 내용 활용 안됨
-            view:
-              prefix: /myApp/
-              suffix: .jsp
-      
-          # thymeleaf 설정, MVC에서 view를 담당
-          thymeleaef:
-            cache: false
-            mode: HTML
-            encoding: UTF-8
-            prefix: file:src/main/resources/templates/
-          # web 서버 동작시 설정
-          web:
-            resources:
-              # resource 위치, html파일에서 참조시 연결될 root 디렉터리
-              static-locations: file:src/main/resources/static/
-              cache:
-                period: 0
-      
-          # devtools 설정, apply static resources instantly
-          devtools:
-            livereload:
-              enabled: true
-      
-        # SLF4J 설정, 로그 시스템
-        logging:
-          file:
-            name: ${user.dir}/log/test.log  # Log file path
-            max-history: 7 # delete period
-            max-size: 10MB  # max size of single log file
-          level:  # set log level to each package
-            com.aswinblue.RankServer : debug
-          pattern:
-            console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
-            file: "%d %p %c{1.} [%t] %m%n"
-        ```
+---
 
-1. 빌드 설정
-    - gradle 프로젝트는 `./gradlew build` 명령으로 프로젝트를 빌드한다.
-    - 이때 `build.gralde` 파일 설정으로 하위 프로젝트의 빌드까지 함께 정의할 수 있다.
-    - gradle 파일이 수정되면 `./gradlew build` 명령을 새로 돌려서 업데이트 해 준다.
-    - 아래는 React 프로젝트의 빌드 세팅이다.   
-  
-      ```
-      /*********************
-       * 기본 설정 및 dependency
-       *********************/
-      plugins {
-      	id 'org.springframework.boot' version '2.7.1'
-      	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-      	id 'java'
-      }
-      
-      group = 'com.aswinblue'
-      version = '0.0.1-SNAPSHOT'
-      sourceCompatibility = '18'
-      
-      repositories {
-      	mavenCentral()
-      }
-      
-      dependencies {
-      	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-      	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-      	implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'com.h2database:h2'
-      	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        implementation 'org.springframework.boot:spring-boot-devtools' //devtools
-      }
-      
-      tasks.named('test') {
-      	useJUnitPlatform()
-      }
-      
-      /*********************
-       * React 설정
-       *********************/
-      def reactDir = "$projectDir/src/main/webapp"; // react 프로젝트 경로 설정
-      sourceSets{
-        main{
-            resources{
-                srcDirs = ["$projectDir/src/main/resources"]
-            }
-        }
-      }
-      
-      // 최초로 수행할 task 지정
-      processResources{
-        dependsOn "copyReactBuildFiles"
-      }
-      
-      // $reactDir 위치에서 `npm audit fix` 명령 실행
-      task installReact(type:Exec){
-        workingDir "$reactDir"
-        inputs.dir "$reactDir"
-        group = BasePlugin.BUILD_GROUP
-      
-        if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-            commandLine "npm.cmd", "audit", "fix"
-            commandLine 'npm.cmd', 'install'
-        }else{
-            commandLine "npm", "audit", "fix"
-            commandLine 'npm', 'install'
-        }
-      }
-      
-      // installReact task를 호출
-      // $reactDir 위치에서 `npm run-script build` 실행
-      // react 프로젝트의 `package.json` 파일에 적힌 build 스크립트가 실행됨.
-      task buildReact(type:Exec){
-        dependsOn "installReact"
-        workingDir "$reactDir"
-        inputs.dir "$reactDir"
-        group = BasePlugin.BUILD_GROUP
-      
-        if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-            commandLine "npm.cmd", "run-script", "build"
-        }else{
-            commandLine "npm", "run-script", "build"
-        }
-      }
-      
-      // buildReact task를 호출
-      // 앞서 지정한 $reactDir 경로의 /build 위치에서 생성된 데이터를 $projectDir/src/main/resources/static 로 복사
-      task copyReactBuildFiles(type:Copy) {
-        dependsOn "buildReact"
-        from "$reactDir/build"
-        into "$projectDir/src/main/resources/static"
-      }
-      ```
-    - 각종 설정을 해주는 batch 파일 예시이다.
-      ```
-      gradle wrapper
-      gradlew build
-      @REM package.json에 script 작성 필요
-      npm run build:postcss
-      ```
+## 1. Spring Boot 개요 및 개발 환경 구축
 
-1. 폴더 설정
-  - `resources` : html, css 등 화면 구성을 위한 파일들의 root 디렉터리
-    - `resources/static` : html파일에서 href로 참조하면 아래 디렉터리를 root로 경로 설정 가능
-    - `resources/template` : mustache 파일에서 root 디렉터리로 사용
+### 1.1. Spring Initializr 및 JDK 환경 구성
+- **JDK 설치**: Java 17 또는 21 LTS 버전을 권장합니다.
+- **프로젝트 생성**: [Spring Initializr](https://start.spring.io)에서 Project(Gradle), Language(Java), Spring Boot 최신 안정 버전을 선택하고 필요한 스타터(Spring Web, Spring Data JPA, H2 Database, Lombok, DevTools)를 추가하여 다운로드합니다.
 
-## 웹 서비스 개발
-1. tomcat
-    - spring boot에서 web 패키지를 설치하면 tomcat을 사용하여 web server를 동작시킨다.
-    - localhost:8080으로 default 주소가 처리되어 있고, `application.yml` 파일에서 아래와 같이 수정 가능하다.   
-      ```
-      server:
-        port : 8081
-      ```
+### 1.2. Gradle 래퍼(gradlew)와 프론트엔드 연동 빌드
+Gradle Wrapper(`gradlew`)를 사용하면 협업자 간에 빌드 도구 버전 차이로 인한 오류를 방지할 수 있습니다. `build.gradle`에 태스크를 정의하여 React 정적 빌드 산출물을 스프링의 `resources/static`으로 자동 복사하도록 파이프라인을 구성할 수 있습니다.
 
-### MVC 모델
-- model, view, control 을 나누어 개발하는 형태를 MVC 모델이라고 한다.
+```groovy
+plugins {
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+}
 
-### View template
-- view template 은 controller와 model을 합친 개념으로, 화면을 구성하는 역할을 한다.  
-- mustache 패키지를 설치하여 view template를 만들 수 있다.  
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
 
-1. jsp 활용
-    - Spring boot에는 jsp가 잘 어울리지 않는다고 한다. 대신 Thymleaf, mustache 등을 사용하는걸 권장한다?  
-    - jsp를 사용하여 model을 구성할 수도 있다.
-    - jsp는 사용하기 전 `application.properties`(혹은 yml) 파일의 수정이 필요하다. 아래 내용을 추가한다.   
-  
-      ```
-      spring.mvc.view.prefix=/myApp/
-      spring.mvc.view.suffix=.jsp
-      ```
-  
-    - 위 내용을 적용하면 `src/main/webapp/myApp/` 경로 내부에서 jsp파일을 찾게 된다. 'webapp' 폴더는 default로 필요하다.
+repositories {
+    mavenCentral()
+}
 
-1. mustache 활용
-    - 앞서 말헀듯 mustache는 view template용 패키지로 controller와 model을 관장한다.
-    - controller는 기본 패키지 경로 하위에 배치한다.
-    - controller는 다음과 같이 구성한다.
-  
-      ```
-      package com.example.firstproject.controller;
-      import org.springframework.stereotype.Controller;
-      import org.springframework.web.bind.annotation.GetMapping;
-      import org.springframework.ui.Model;
-    
-      @Controller  // controller를 정의하는 annotation
-      public class FirstController {
-          @GetMapping("/index")  // 연결될 url을 지정하는 annotation, /index 로 연결하면
-          public String mainPage(Model model)  // model 을 통해 가변 인자 control
-          {
-              model.addAttribute("title", "hello world"); // title 이름으로 hello world 라는 문자열을 설정
-              return "mainPage";  // mainPage.mustache 파일과 연동
-          }
-      }
-      ```
-  
-    - model(.mustache .html 등)은 `resources/templates` 파일 경로 하위에 배치하고, 확장자를 `.mustache`로 지정한다.  
-    - html 파일은 사실 view에 가깝지만, mustache 파일은 view에 변수를 적용하여 model에 해당한다.
-    - model은 다음과 같이 구성한다.
-  
-      ```
-      <body>
-        <h1>{{title}}</h1>  <!-- controller에서 정의한 title이 {{title}}에 치환됨 -->
-      </body>
-      ```
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    runtimeOnly 'com.h2database:h2'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
 
-  1. Layout
-      - model을 만들 때는 layout에 따라 화면에 보여지는 형태를 구성할 수 있다.
-      - layout을 template화 하여 사용 가능하다. 재사용 되는 부분을 모듈화 하여 파일로 분리하고, 이를 다른 파일에서 불러올 수 있다.
-      - `{{>FILE_NAME}}` 형태로 다른 파일을 호출해 올 수 있다.
+// React 프론트엔드 빌드 결과물을 스프링 리소스 경로로 복사하는 커스텀 태스크 예시
+def reactDir = "$projectDir/src/main/webapp"
 
-### Controller
-- Controller는 request를 받아 어떤 화면을 보여줄지 결정하는 routing 로직을 담당하게 된다. 
-- controller class는 `@Controller` annotation을 붙여서 선언하며 routing 함수로는 `@GetMapping`, `@RequestMapping` annotation을 사용하여 정의한다.
-
-1. 에러 화면
-    - 에러 화면도 controller에 의해 유도되며 BasicErrorController가 이를 담당한다.
-    - `application.yml` 파일에서 따로 설정을 하지 않았다면 `server.error.path=/error` 가 기본이다.
-  
-### JPA
-- spring은 mysql, postgress, M2 등 여러 DB를 적용할 수 있다.
-- controller는 Java로 구현되고, DB는 sql로 동작하기 때문에 java로 sql을 조작하기 위한 JPA라는 라이브러리가 필요하다.
-- `Entity` : java 객체를 DB가 이해할 수 있게 재구성한 데이터
-  - `@Entity` : 해당 class를 entity 로 선언
-  - `@Table(name="")` : 특정 table과 객체를 연동. 기본적으로는 calss 이름에 해당하는 DB의 table과 매핑 된다.
-  - `@Column` : 지정한 변수를 DB의 컬럼으로 선언
-- `Repository` : entity를 DB에 저장하는 역할을 수행하는 객체
-  - `save(ENTITY)` : 저장, DB의 insert / update 에 해당
-  - `delete(ENTITY)` : 특정 Entity 삭제, DB의 delete에 해당
-
-   - 상세 내용은 링크를 참조한다.
-     <details><summary>JPA Usage Links</summary>
-       
-     - [JPA Repository Query function](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#jpa.query-methods.query-creation)
-     - [JPA Repository Query annotation](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#repositories.query-streaming)
-     -  [JPA Repository get Top x result](https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/#repositories.limit-query-result)
-     -  [JPA update data from DTO](https://www.baeldung.com/spring-data-partial-update#1-mapping-strategy)
-     </details>
-     
-1. DTO 정의
-   - 서버의 Controller에서 이를 처리 가능하며, 사용자 입력을 Java Class로 대응시킨 형태를 DTO라 칭한다.
-   - DTO를 다음과 같이 정의하였다고 하자  
-
-    ```
-    class DtoSample {
-      private String name;
-      public DtoSample(String name) {
-          this.name = name;
-      }
+task buildReact(type: Exec) {
+    workingDir "$reactDir"
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        commandLine "npm.cmd", "run", "build"
+    } else {
+        commandLine "npm", "run", "build"
     }
-    ```
+}
 
-1. Entity 정의
-   - DTO에 해당하는 entity를 정의해야하며, 그 형태는 다음과 같다.   
-     - entity는 `@Entity` annotation을 붙여야 한다.
-     - Entity는 primary key를 가져야 하며, 이는 `@Id` annotation으로 지정한다.
-     - DB의 column에 해당하는 값들은 `@Column` annotation을 붙여준다.
-     - `@GeneratedValue`는 자동으로 생성된 값이 들어가도록 한다.
-     - '실제 DB table' ⊃ 'DTO에 정의된 column들' 이 성립해야 한다.
-     
-    ```
-    @Entity
-    public class sampleEntity {
-        @Id // 대표값
-        @GeneratedValue // 자동생성
-        private Long id;
-        @Column
-        private String name;
-  
-        public sampleEntity(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-  
+task copyReactBuildFiles(type: Copy) {
+    dependsOn "buildReact"
+    from "$reactDir/build"
+    into "$projectDir/src/main/resources/static"
+}
+
+processResources {
+    dependsOn "copyReactBuildFiles"
+}
+```
+
+---
+
+## 2. 애플리케이션 환경 설정 (`application.yml`)
+
+Spring Boot는 `application.properties` 또는 계층 구조 표현이 편리한 `application.yml`을 통해 포트, 데이터베이스, 로깅 수준을 통합 관리합니다.
+
+```yaml
+server:
+  port: 8080
+
+spring:
+  # H2 인메모리 데이터베이스 및 웹 콘솔 활성화
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  # JPA 및 하이버네이트 설정
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# 로깅 프레임워크 (SLF4J / Logback) 설정
+logging:
+  level:
+    root: INFO
+    com.example.demo: DEBUG
+  file:
+    name: logs/application.log
+    max-history: 7
+    max-size: 10MB
+```
+
+---
+
+## 3. 웹 MVC 컨트롤러와 RESTful API 개발
+
+Spring MVC에서 클라이언트의 HTTP 요청을 매핑하고 JSON 응답이나 뷰를 반환하는 컨트롤러 계층을 구성합니다.
+
+### 3.1. `@Controller`와 `@RestController`
+- **`@Controller`**: 주로 Thymeleaf나 Mustache 템플릿 파일의 이름을 문자열로 반환하여 HTML 화면을 서버 사이드 렌더링(SSR)할 때 사용합니다.
+- **`@RestController`**: `@Controller`에 `@ResponseBody`가 결합된 형태로, 자바 객체를 직렬화하여 순수 JSON/XML 페이로드를 반환하는 RESTful API 전용 컨트롤러입니다.
+
+### 3.2. 요청 데이터 바인딩 (`@RequestBody`, `@RequestParam`)
+```java
+@RestController
+@RequestMapping("/api/v1/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
-    ```
 
-1. Repository 구현
-   - Entity를 DB에 저장하기 위한 Repository도 생성한다.
-   - repository는 entity로 DB에 접근하는 방법을 정의하기 위한 객체이다.
-   - spring에서 기본으로 제공하는 형태를 상속받아 사용도 가능하다.   
-
-    ```
-    // CrudRepository<관리대상, 대표값의 type>
-    public interface searchNameRepository extends CrudRepository<sampleEntity, Long> {
-        // CrudRepository 의 기본값을 사용
+    // 쿼리 파라미터 수신: /api/v1/users?name=홍길동
+    @GetMapping
+    public ResponseEntity<UserResponseDto> getUserByName(@RequestParam String name) {
+        return ResponseEntity.ok(userService.findByName(name));
     }
-    ```
-   - 직접 구상한 쿼리를 사용하고 싶다면 camelcase로 구성된 함수 이름으로 쿼리를 추가할 수 있다.
-       <details> <summary> Tips </summary>
-         
-         [no property ~ found for type ~ 오류 해결법](https://stackoverflow.com/questions/19733464/order-by-date-asc-with-spring-data)
-       </details>
-     
-     
-     ```
-     public interface searchNameRepository extends CrudRepository<SampleEntity, Long> {
-         // select * from SampleEntity where name = ?1     
-         @Query("Select s From SampleEntity")
-         List<sampleEntity> findByName(String name);
 
-         // select * from SampleEntity where name = ?1 and id = 1
-         @Query("Select s From SampleEntity where s.id = 1")
-         List<sampleEntity> findByName(String name);
-      }
-
-     ```
-   
-1. 기타 추가작업
-   - 이전에 만들었던 controller 에 내용을 추가한다. DTO로 받은 내용을 Entity로 변환시켜 repository를 통해 처리한다.   
-
-    ```
-    @Autowired // String boot가 알아서 new 해서 사용하는 annotation
-    searchNameRepository snr;
-    
-    @PostMapping("/data/part1")
-    public String handleForm(DtoSample dto) {
-      sampleEntity name = dto.toEntity(); // toEntity 구현 필요
-      name = snr.save(name); // 'save'는 저장 및 저장된 데이터를 반환함
-      return "returnView";
+    // JSON 본문 페이로드 수신
+    @PostMapping
+    public ResponseEntity<Long> createUser(@RequestBody UserCreateRequestDto requestDto) {
+        Long createdId = userService.save(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
     }
-    ```
+}
+```
 
-   - contorller에서 받은 DTO 데이터를 entity로 변환시킬 때 사용한 `toEntity()` 함수를 구현해야 한다.
-   - DTO 파일을 추가로 수정한다.  
+---
 
-    ```  
-    class DtoSample {
-      private String name;
-      public DtoSample(String name) {
-          this.name = name;
-      }
-      public sampleEntity toEntity() {
-          return new sampleEntity(null, this.name); // id에 null을 넣는다. @GeneratedValue에 의해 자동으로 생성된다.
-      }
+## 4. Spring Data JPA를 활용한 데이터베이스 영속성 계층
+
+Spring Data JPA를 도입하면 SQL 쿼리를 직접 작성하지 않고 인터페이스 메서드 선언만으로 CRUD 및 페이징을 처리할 수 있습니다.
+
+### 4.1. `@Entity` 도메인 클래스 매핑
+```java
+@Entity
+@Table(name = "members")
+public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 50)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    protected Member() { } // JPA 기본 생성자 필수
+
+    public Member(String name, String email) {
+        this.name = name;
+        this.email = email;
     }
-    ```
 
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+}
+```
 
-### 데이터 교환
-- view에서 사용자 입력을 받아 처리하는 과정을 다룬다.
-- 앞서 JPA를 통해 구현한 DB 시스템에 데이터를 넣을 수 있다. 
+### 4.2. 리포지토리 인터페이스 정의 (`JpaRepository`)
+`JpaRepository<엔티티, ID타입>`을 상속받으면 기본적인 `save()`, `findById()`, `findAll()`, `delete()`가 자동 제공됩니다.
 
-1. view 구현
-    - view쪽에서는 `form` 태그를 사용하여 controller에 데이터를 전송할 수 있다.
-    - `form` 태그의 인자로 `action`, `method`를 적용 가능하다.
-      - `action` : 데이터를 보낼 url을 설정. ex) action="/data/part1"
-      - `method` : 전송 방법을 설정한다. post 혹은 get 적용 가능
-    - `form` 태그 안의 `input`태그를 두고, 인자로 `name`을 설정한다.
-      ```
-      <form action="/data/userRank" method="post">
-        <label>type your character name</label>
-        <input type="text" name="userName">
-        <br/>
-        <button>see table</button>
-        <br/>
-      </form>
-      ```
-1. controller 구현
-    - DTO로 사용할 class를 선언한다. (ex: DtoSample)
-    - controller 를 구현한 java 파일에서 `@PostMapping` annotation을 달고, 인자로 위에서 선언한 DTO를 받는다.   
-    - return 값으로 지정한 이름의 view로 redirect 한다. (ex: returnView)
-        ```
-        @PostMapping("/data/part1")
-        public String handleForm(DtoSample dto) {
-          return "returnView";
-        }
-      ```
-     - parameter를 꼭 DTO 형태로 받지 않을 수도 있다.
-       - `@RequestBody`, `@RequestParam` annotation을 이용하여 데이터를 받을 수 있다.
-           ```
-             public String handleUserNameForm(@RequestBody String userName, Model model) {}
-             // userName = "userName=TESTNAME" 과 같이 데이터가 받아진다.
-           ```
-           ```
-             public String handleUserNameForm(@RequestParam String userName, Model model) {}
-             // userName = "TESTNAME" 과 같이 데이터를 받을 수 있다.
-           ```
+```java
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.util.Optional;
 
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
-### Bean
-- Spring boot를 실행하면 container가 동작하는데, 이 container가 관리하는 객체를 bean이라고 한다.
-1. 선언
-   1. Component 사용
-      - `@Component` annotation을 class에 붙여주면, 해당 class가 bean으로 등록된다.
-      - 직접 구현한 객체를 bean으로 적용할 떄 사용할 수 있다.
-      - `@AutoWired` annotation을 이용해 의존성을 정의할 수 있다.
-        ```
-        @Component
-        class C {
-          // C가 bean으로 등록
-          public C() {
-            System.out.println("use C as bean");
-          }
-        
-          @AutoWired
-          private D d; // D 라는 class에 대한 dependency 정의
-        }
-        ```
-   1. Bean 사용
-      - `@Configuration` annotation을 class에 붙여주고, 해당 class에 선언된 함수에 `@Bean` annotation을 붙여준다.
-      - `@Bean` 이 붙은 함수에서 반환되는 값들은 모두 Bean으로 관리된다.
-      - 3rd party에서 구현된 객체를 bean으로 적용할 때 사용할 수 있다.
-      - bean으로 반환할 객체 생성자에 인자를 넣어 의존성을 정의할 수 있다. 
-        ```
-        class Foo {
-          public Foo() {
-            System.out.println("use Foo as bean");
-          }
-        }
-        class Bar {
-          public Bar() {
-            System.out.println("Bar as dependency");
-          }
-        }
+    // 쿼리 메서드: 메서드 이름 규칙에 따라 JPQL이 자동 생성됨
+    Optional<Member> findByEmail(String email);
 
-        @Configuration
-        class configure {
-          @Bean
-          public Bar bar() {
-            return new Bar(); // Bar을 bean으로 선언
-          }
-          @Bean
-          public Foo foo() {
-            return new Foo(new Bar()); // Foo가 Bar의 의존성을 가짐을 표현
-          }
-        }
-        ```
-   
-   - spring은 `@ComponentScan` annotation이 붙은 class에서 component(bean)을 찾아가기 시작한다.
-     - spring 프로젝트를 생성하면 main 함수가 있는 class가 있는데, 이 clalss에 붙은 `@SpringBootApplication` annotation이 `@ComponentScan` annotation을 포함하고 있다.
-     - `@Configuration` annotation 도 `@Component` annotation을 포함하고 있어 scan 대상이 된다.
-     - `@Controller` 로 선언된 class들도 bean으로 관리되는데, 이는 `@Controller`가 `@Component` annotation을 포함하고 있기 때문이다.
+    // 커스텀 JPQL 쿼리
+    @Query("SELECT m FROM Member m WHERE m.name LIKE %:keyword%")
+    List<Member> searchByName(@Param("keyword") String keyword);
+}
+```
 
+---
 
-## Annotation 및 기능
-### Value
-- `@Value` annotation을 변수에 선언하면 프로젝트 설정파일(application.yml) 에서 변수를 가져올 수 있다.
-    ```
-    @Value(${server.port})
-    private int port;
-    ```
-### Scheduled
-- spring boot로 특정 주기마다 반복 동작을 수행하는 기능을 구현할 수 있다.
-1. main 함수가 선언된 class에 `@EnableScheduling` 을 선언한다.
-2. schedule을 관리할 class(Scheduler)를 선언하고, `@Component` annotation을 붙인다. 
-3. 에서 생성한 Scheduler class에 함수를 선언하고, `@Scheduled` annotation을 붙인다.
-   - `@Scheduled(cron = "1 2 3 4 5 ?")` : 매 5월4일3시2분1초 에 동작
-     - 숫자대신 *을 하면 모든 값에 동작하도록 설정 가능
-     - 앞에서부터 초,분,시,일,월,요일이며 요일은 0이 일요일 6이 토요일, 7또한 일요일이다. 
-     - [상세 내용은 공식 document 참조](https://spring.io/blog/2020/11/10/new-in-spring-5-3-improved-cron-expressions)
-   - `fixedDelay=1000` : 매 1초마다 동작(함수 종료 시점부터 1초)
-   - `fixedRate=1000` : 매 1초마다 동작(함수 시작 시점부터 1초)
+## 5. 스프링 빈(Bean) 관리와 유용한 컴포넌트 기능
 
-### SLF4J
-- 로그를 쉽게 설정하기 위한 툴
+### 5.1. 빈 등록 방식 (@Component vs @Configuration + @Bean)
+- **`@Component` 계열 (`@Service`, `@Repository`, `@Controller`)**: 클래스 단위로 선언하며 `@ComponentScan`에 의해 자동 감지되어 싱글톤 빈으로 등록됩니다.
+- **`@Configuration` + `@Bean`**: 외부 라이브러리 객체나 환경 설정 객체를 수동으로 생성하고 커스터마이징하여 컨테이너에 등록할 때 사용합니다.
 
-## 참조한 사이트
-1. https://allonsyit.tistory.com/43
-1. https://galid1.tistory.com/494
-1. https://atoz-develop.tistory.com/entry/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B9%88Bean%EC%9D%98-%EA%B0%9C%EB%85%90%EA%B3%BC-%EC%83%9D%EC%84%B1-%EC%9B%90%EB%A6%AC
-1. https://goateedev.tistory.com/128
-1. https://itworldyo.tistory.com/40
-1. https://docs.spring.io/spring-data/jpa/docs/current/reference/html/
+### 5.2. `@Scheduled` 주기적 배치 스케줄러 구현
+애플리케이션 메인 클래스에 `@EnableScheduling`을 선언하고 스케줄러 컴포넌트를 정의합니다.
+
+```java
+@Component
+public class CacheWarmupScheduler {
+
+    // 6자리 Cron 표현식: 초 분 시 일 월 요일 (매일 자정에 실행)
+    @Scheduled(cron = "0 0 0 * * *")
+    public void runMidnightTask() {
+        System.out.println("자정 정기 캐시 갱신 작업을 수행합니다.");
+    }
+
+    // 이전 작업 종료 후 10초(10000ms) 지연 뒤 반복 실행
+    @Scheduled(fixedDelay = 10000)
+    public void runPeriodicTask() {
+        // 주기적 헬스체크 로직 수행
+    }
+}
+```
+Spring Boot는 복잡한 인프라 설정 없이 어노테이션 기반으로 엔터프라이즈 기능들을 간결하게 조립할 수 있는 강력한 생산성을 제공합니다.

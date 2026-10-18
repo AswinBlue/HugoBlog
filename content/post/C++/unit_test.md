@@ -1,8 +1,8 @@
 ---
 title: "C++ 단위 테스트 완벽 가이드: Google Test 및 Google Mock 활용법"
-date: 2024-08-19T04:00:00+09:00
-lastmod: 2024-08-19T04:00:00+09:00
-description: "C++ 소프트웨어 품질 향상을 위한 단위 테스트의 기본 원칙과 Google Test(gtest) 및 Google Mock(gmock) 프레임워크의 테스트 픽스처, 매크로, 테스트 대역 기법을 상세히 정리합니다."
+date: 2024-08-19 04:00:00+09:00
+lastmod: 2024-08-19 04:00:00+09:00
+description: "C++ 소프트웨어 품질 향상을 위한 단위 테스트(Unit Test)의 기본 원칙과 Google Test(gtest) 및 Google Mock(gmock) 프레임워크의 테스트 픽스처, 검증 매크로, 테스트 대역 기법을 상세히 정리합니다."
 slug: "cpp-unit-test-googletest-and-googlemock-guide"
 categories:
   - "C++"
@@ -17,6 +17,7 @@ ShowToc: true
 TocOpen: true
 draft: false
 ---
+
 ## 테스트의 속성
 - 좋은 단위 테스트를 작성하기 위해서는 아래 세 가지 기준을 만족해야 한다. 
   1. 가독성

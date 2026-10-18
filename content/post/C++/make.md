@@ -1,8 +1,8 @@
 ---
 title: "GNU Make 기본 사용법과 Makefile 문법 및 내장 매크로 정리"
-date: 2023-07-13T18:35:05+09:00
-lastmod: 2023-07-13T18:35:05+09:00
-description: "C/C++ 프로젝트의 분할 컴파일과 빌드 자동화를 지원하는 GNU Make의 기본 원리와 Makefile의 타깃·의존성 구조, 변수 치환, 내장 매크로($<, $@, $^) 및 실행 옵션을 정리합니다."
+date: 2023-07-13 18:35:05+09:00
+lastmod: 2023-07-13 18:35:05+09:00
+description: "C/C++ 대규모 프로젝트의 분할 컴파일과 빌드 자동화를 지원하는 GNU Make의 기본 동작 원리와 Makefile 타깃·의존성 구조, 변수 치환, 내장 자동 매크로($<, $@, $^) 및 실행 옵션을 상세히 정리합니다."
 slug: "gnu-make-makefile-syntax-and-macros"
 categories:
   - "C++"
@@ -77,7 +77,7 @@ OBJS = $(SRCS:.c=.o) # main.o func.o 로 치환됨
 - `$*`: 접미사(확장자)가 제외된 타깃의 이름
 - `$?`: 타깃보다 최신으로 갱신된 의존 파일 목록
 
-#### 패턴 규칙(Pattern Rule) 예시
+### 패턴 규칙(Pattern Rule) 예시
 `.c` 소스 파일들로부터 동명의 `.o` 오브젝트 파일을 생성하는 빌드 룰을 일반화할 수 있다.
 
 ```makefile

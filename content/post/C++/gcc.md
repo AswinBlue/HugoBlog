@@ -1,7 +1,7 @@
 ---
 title: "GCC 컴파일 과정과 핵심 옵션 및 정적·동적 라이브러리 가이드"
-date: 2023-07-10T22:13:06+09:00
-lastmod: 2023-07-10T22:13:06+09:00
+date: 2023-07-10 22:13:06+09:00
+lastmod: 2023-07-10 22:13:06+09:00
 description: "GCC 컴파일러의 4단계 빌드 과정(전처리, 컴파일, 어셈블, 링킹)과 핵심 옵션(-E, -S, -c, -g, -Wall), 정적 및 동적 라이브러리(ar, LD_LIBRARY_PATH, LD_PRELOAD) 생성과 활용법을 정리합니다."
 slug: "gcc-compilation-process-and-options"
 categories:

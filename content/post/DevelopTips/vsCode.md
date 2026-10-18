@@ -1,29 +1,32 @@
 ---
-title: "VS Code 생산성 극대화를 위한 단축키 및 필수 확장 플러그인 추천"
-description: "Visual Studio Code의 멀티 커서 편집, 터미널 분할 단축키, Git Lens, Prettier, ESLint 등 개발 효율을 2배 이상 높여주는 환경 설정 팁입니다."
-slug: "vscode-productivity-shortcuts-and-extensions"
+title: "VS Code에서 C/C++ 개발 환경 구축 및 디버깅 단축키 설정 가이드"
 date: 2022-04-16T09:07:48+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
+lastmod: 2022-04-16T09:07:48+09:00
+description: "Visual Studio Code에서 MinGW/GCC 컴파일러 연동, settings.json, launch.json, tasks.json 설정 및 빌드/실행 단축키 커스텀까지 C/C++ 개발 환경을 완벽 구축하는 방법입니다."
+slug: "vscode-cpp-environment-settings-debug-guide"
 categories: ["DevelopTips"]
-tags: ["vscode", "development-tools", "ide", "productivity"]
+tags: ["vscode", "c-plus-plus", "gcc", "mingw", "debugging", "development-tips"]
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
-# VS code
-- visual studio code 사용법
+# VS Code C/C++ 개발 환경 구축 가이드
 
-## 개발환경
-### C / C++
-1. 컴파일러
-  - gcc 혹은 mingw 설치가 필요하다. 인터넷에서 설치하도록 한다.
+Visual Studio Code를 활용하여 Windows 환경에서 C/C++ 프로젝트를 빌드하고 디버깅하기 위한 설정 가이드입니다.
 
-1. 설정파일
-  - 컴파일 및 실행을 위해서는 launch.json, setting.json, tasks.json 파일이 필요하다.
-  - vs code에서 알아서 작성해 주지만, 기본 설정으로 부족한 부분은 수정해야 한다.
-```
-# settings.json
+## 1. 컴파일러 및 도구 체계
+C/C++ 프로그램을 빌드하기 위해 GCC 컴파일러 및 GDB 디버거 설치가 필요합니다:
+- MinGW-w64 설치 후 시스템 환경 변수 `Path`에 `bin` 폴더 경로(예: `C:\mingw-w64\bin`)를 추가합니다.
+- 터미널에서 `gcc --version` 및 `g++ --version` 명령어로 설치 여부를 확인합니다.
+
+## 2. VS Code 핵심 설정 파일 구성
+
+프로젝트 루트의 `.vscode` 디렉터리 내에 컴파일, 런타임 디버깅, 태스크 실행을 위한 설정 파일 3종을 구성합니다.
+
+### 2.1. settings.json
+C/C++ Runner 및 인텔리센스 설정을 정의합니다:
+```json
 {
   "C_Cpp_Runner.cStandard": "",
   "C_Cpp_Runner.cppStandard": "",
@@ -59,8 +62,9 @@ TocOpen: true
 }
 ```
 
-```
-# launch.json
+### 2.2. launch.json
+GDB 디버깅 세션 구성을 지정합니다:
+```json
 {
   "version": "0.2.0",
   "configurations": [
@@ -70,9 +74,9 @@ TocOpen: true
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "cwd": "f:/Documents/GitHub/acmicpc/15997",
+      "cwd": "${fileDirname}",
       "environment": [],
-      "program": "동작시킬 프로그램 경로",
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
       "internalConsoleOptions": "openOnSessionStart",
       "MIMode": "gdb",
       "miDebuggerPath": "C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/gdb.exe",
@@ -89,60 +93,62 @@ TocOpen: true
 }
 ```
 
-```
-# tasks.json
+### 2.3. tasks.json
+빌드 컴파일 및 실행 태스크를 정의합니다:
+```json
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "shell",
-            "label": "execute",
-            "command": "${fileDirname}/${fileBasenameNoExtension}.exe",
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "problemMatcher": []
-        },
-        {
-            "type": "cppbuild",
-            "label": "C/C++: g++.exe 활성 파일 빌드",
-            "command": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\g++.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build",
-            "detail": "컴파일러: \"C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\g++.exe\""
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "execute",
+      "command": "${fileDirname}/${fileBasenameNoExtension}.exe",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "type": "cppbuild",
+      "label": "C/C++: g++.exe 활성 파일 빌드",
+      "command": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\g++.exe",
+      "args": [
+        "-fdiagnostics-color=always",
+        "-g",
+        "${file}",
+        "-o",
+        "${fileDirname}\\${fileBasenameNoExtension}.exe"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "build",
+      "detail": "컴파일러: g++.exe 활성 파일 빌드"
+    }
+  ]
 }
 ```
 
-1. 단축키
-  - `Ctrl + Shift + P` 단축키로 명령을 일일이 수행해도 되지만, 단축키를 설정해 바로 실행하는게 빠르다.
-  - 파일 -> 기본설정 -> 바로가기키 (`Ctrl + K & Ctrl + S`) 를 누르고, 우측 상단 '바로가기 키 열기' 를 클릭하여 단축키를 직접 입력한다.
-```
-// 키 바인딩을 이 파일에 넣어서 기본값 재정의
+## 3. 사용자 정의 빌드 및 실행 단축키 설정
+
+`Ctrl + Shift + P` 메뉴를 거치지 않고 원클릭으로 빌드 및 테스트를 수행할 수 있도록 바로 가기 키(`keybindings.json`)를 등록합니다:
+1. `파일 > 기본 설정 > 바로 가기 키` (`Ctrl + K, Ctrl + S`) 열기
+2. 우측 상단의 '바로 가기 키 열기(JSON)' 아이콘 클릭
+3. 아래 설정을 추가하여 빌드(`Ctrl + Alt + C`)와 실행(`Ctrl + Alt + E`)을 매핑:
+
+```json
 [
-    {
-        "key": "ctrl+alt+c",
-        "command": "workbench.action.tasks.build",
-    },
-    {
-        "key": "ctrl+alt+e",
-        "command": "workbench.action.tasks.test",
-    }
+  {
+    "key": "ctrl+alt+c",
+    "command": "workbench.action.tasks.build"
+  },
+  {
+    "key": "ctrl+alt+e",
+    "command": "workbench.action.tasks.test"
+  }
 ]
 ```

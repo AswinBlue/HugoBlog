@@ -1,930 +1,297 @@
 ---
-title: "TensorFlow 2.x 딥러닝 핵심 아키텍처 및 신경망 모델 학습 실전 가이드"
-description: "텐서플로우 Keras Sequential API를 활용한 다층 퍼셉트론(MLP) 및 합성곱 신경망(CNN) 구성, 손실 함수와 옵티마이저 최적화 기법을 다룹니다."
-slug: "tensorflow-deep-learning-architecture-and-model-training"
+title: "TensorFlow 2.x 핵심 개념부터 CNN·RNN 딥러닝 모델 구현까지 총정리"
 date: 2021-11-27T08:15:42+09:00
-lastmod: 2026-10-18T18:00:00+09:00
-draft: false
+lastmod: 2021-11-27T08:15:42+09:00
+description: "TensorFlow의 텐서 연산 기초부터 선형·로지스틱 회귀, 역전파 알고리즘, 경사 하강법 옵티마이저, 그리고 CNN과 RNN·LSTM 신경망 모델 설계까지 딥러닝 핵심 이론과 실습 코드를 완벽 정리합니다."
+slug: "tensorflow-deep-learning-core-guide"
 categories: ["MachineLearning"]
-tags: ["machine-learning", "deep-learning", "tensorflow", "python", "neural-network"]
+tags: ["tensorflow", "deep-learning", "machine-learning", "cnn", "rnn", "python"]
 ShowToc: true
 TocOpen: true
+draft: false
 ---
 
-#Tensorflow
-- TensorFlow는 구글에서 수치연산을 위해 만든 라이브러리이다.
+# TensorFlow 딥러닝 완벽 가이드
+
+TensorFlow는 구글에서 수치 연산과 머신러닝/딥러닝 연구 및 배포를 위해 개발한 오픈소스 라이브러리입니다.
 
 ## 기본 개념
-- node와 edge로 구성된 graph를 이용해 수치 연산을 수행한다.
-  - node들은 특정한 데이터가 들어오면 연산을 수행하거나, 형태를 변경하거나, 결과를 출력하는 역할을 한다.
-  - edge는 학습데이터가 저장되는 다차원 배열이다.
-  - edge는 node에서 계산된 데이터를 다음 node로 이동시킨다.
-  - edge는 방향성이 있으며(directed), tensor라 불린다.
+- Node와 Edge로 구성된 Graph를 이용해 대규모 수치 연산을 수행합니다.
+  - Node는 특정한 데이터가 입력되면 연산을 수행하거나, 형태를 변경하거나, 결과를 출력하는 연산 단위입니다.
+  - Edge는 학습 데이터가 저장되는 다차원 배열(Tensor)이며, 연산 결과 데이터를 다음 Node로 방향성(Directed) 있게 전달합니다.
+- [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml) 등에서 실습용 데이터셋을 내려받아 활용할 수 있습니다.
 
-  - [archive.ics.uci.edu/ml]() 에서 학습용 데이터를 받아 사용할 수 있다.
 ---
 
-## 설치
-1. python과 pip를 설치한다.
-2. `pip install tensorflow` 명령을 수행한다.
- - window에서 'client_load_reporting_filter.h' 파일을 찾지 못해 설치를 못했다면, path 경로가 너무 길어서 발생하는 오류이다.
- - 실행에서 `regedit`을 실행하고, 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem' 레지스트리를 찾아 값을 1로 세팅해준다.
+## 설치 및 개발 환경
+1. Python 및 pip 설치
+2. TensorFlow 설치:
+   ```bash
+   pip install tensorflow
+   ```
+   - Windows 환경에서 경로 길이 제한 문제로 파일 에러가 발생하는 경우, 레지스트리 편집기(`regedit`)에서 `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled` 값을 1로 설정합니다.
 
 ### 연관 모듈
-- 함께 쓰면 효율이 좋은 모듈들
-1. matplotlib
-1. numpy
- - `data = np.loadtxt(FILE_NAME, delimiter=',')` : ,를 기준으로 데이터를 나누는 csv 파일을 읽어들임. 숫자 데이터를 읽을 때 사용
-1. keras (tensorflow 설치시 자동성치된다)
-`y_encoded = to_categorical(y_data)` : y_data 를 one-hot-encoding 하는 함수  (tensorflow.keras.utils.to_categorical)
-1. pandas
- - `df = pd.read_csv(FILE_NAME)` : csv 파일을 읽어서 dataframe을 구성한다. 숫자 및 문자열 데이터를 읽을 때 사용 가능
-1. sklearn
-- 데이터 전처리
-```
-e = sklearn.preprocessing.LabelEncoder()
-e.fit(data)  # data 에 들어있는 값 중 unique한 값을 뽑아(중복 제거) 특정 string에 번호를 매기는(indexing) 함수
-data = e.transform(data)  # indexing 된 정보를 바탕으로 실제 data값을 index로 치환
-```
+- 함께 활용하면 생산성이 높아지는 핵심 라이브러리:
+  1. `matplotlib`: 데이터 및 손실 그래프 시각화
+  2. `numpy`: 수치 연산 및 배열 처리 (`np.loadtxt(FILE_NAME, delimiter=',')`)
+  3. `keras`: 고수준 딥러닝 API (TensorFlow 2.x 내장, 원-핫 인코딩 `to_categorical` 등 지원)
+  4. `pandas`: 데이터프레임 기반 입출력 (`pd.read_csv(FILE_NAME)`)
+  5. `sklearn`: 데이터 전처리 및 인코딩
+     ```python
+     e = sklearn.preprocessing.LabelEncoder()
+     e.fit(data)
+     data = e.transform(data)
+     ```
 
 ---
 
-## 기본 문법
-1. 상수 선언  
-  `val = tf.constant(value, dtype=None, shape=None, name='Conts', verify_shape=False)`
-  - value = 값
-  - dtype : 데이터 타입, ex) 'tf.float32', 'tf.float64', 'tf.int8'
-    - float(32, 64), int(8, 16, 64),uint(8, 16), string, bool, complex(64, 128 : 복소수)
-  - shape : 차원, value 형태에 따라 자동으로 설정 됨, ex) '[3,3]'
-  - name : 상수의 이름
-  - verify_shape : tensor의 shape를 바꿀수 있는지 여부
+## 기본 문법 및 텐서 연산
+1. 상수 선언:
+   ```python
+   val = tf.constant(value, dtype=None, shape=None, name='Const')
+   ```
+   - `dtype`: `tf.float32`, `tf.float64`, `tf.int32`, `tf.string`, `tf.bool` 등
 
-1. 배열 생성  
-  - `arr = tf.range(5)`
-  > output : `tf.Tensor : shape(5,), dtype=int32, numpy=([0, 1, 2, 3, 4], dtype=int32)`
-  - 'tf.zeros([2,3])'
-  > output : `[[0, 0, 0], [0, 0, 0]]`
-  - 'tf.ones([2,3])'
-  > output : `[[1, 1, 1], [1, 1, 1]]`
-  - 'tf.fill([2,3], 5)'
-  > output : `[[5, 5, 5], [5, 5, 5]]`
+2. 배열 생성:
+   - `tf.range(5)` -> `[0, 1, 2, 3, 4]`
+   - `tf.zeros([2, 3])` -> 2x3 영행렬
+   - `tf.ones([2, 3])` -> 2x3 일행렬
+   - `tf.fill([2, 3], 5)` -> 5로 채워진 2x3 행렬
 
-1. 연산자
-  `tf.add(x,y)` : x + y  
-  `tf.subtract(x,y)` : x - y  
-  `tf.multiply(x,y)` : x * y  
-  `tf.div(x,y)` : x / y  
-  `tf.floordiv(x,y)` : x // y  
-  `tf.mod(x,y)` : x % y  
-  `tf.pow(x,y)` : x ** y  
-  `tf.less(x,y)` : x < y  
-  `tf.less_equal(x,y)` : x <= y  
-  `tf.greater(x,y)` : x > y  
-  `tf.greater_equal(x,y)` : x >= y  
-  `tf.logical_and(x,y)` : x & y  
-  `tf.logical_or(x,y)` : x | y  
-  `tf.logical_xor(x,y)` : x ^ y  
-  `tf.maximum(x,y)` : max(x,y)  
-  `tf.reduce_sum(a)` : 배열 a에서 같은 index 위치의 값을 모두 더한 스칼라 값을 반환  
-  `tf.reduce_mean(a)` : 배열 a에서 같은 index 위치의 값을 평균낸 스칼라 값을 반환  
+3. 연산자:
+   - 사칙 연산: `tf.add(x, y)`, `tf.subtract(x, y)`, `tf.multiply(x, y)`, `tf.divide(x, y)`
+   - 비교 및 논리: `tf.equal(x, y)`, `tf.less(x, y)`, `tf.greater(x, y)`, `tf.logical_and(x, y)`
+   - 축약 연산: `tf.reduce_sum(a, axis=0)`, `tf.reduce_mean(a, axis=1)`
 
-  - x,y가 배열인 경우, 연산자는 같은 index에 위치한 값끼리 연산한다.  
-  ex) `tf.add(x,y) = [(x[0] + y[0]), (x[1] + y[1]), (x[2] + y[2]), ...]`  
-  - 'reduce' 가 들어간 연산은 axis 파라미터를 설정하여 어느 축을 기준으로 연산을 수행할지 설정 가능  
-  ex)
-  ```
-  a = [[1,2,3],[4,5,6]]
-  tf.reduce_sum(a, axis=0) = [5, 7, 9]
-  tf.reduce_sum(a, axis=1) = [6, 15]
+4. 변수 선언 및 업데이트:
+   - `var = tf.Variable(value, dtype=type)`
+   - `var.assign(value)`: 새 값 대입
+   - `var.assign_add(value)`: 덧셈 누적
+   - `var.assign_sub(value)`: 뺄셈 누적
+   - `tf.cast(var, dtype)`: 자료형 변환
+
+5. 값 확인 및 난수:
+   - `val.numpy()`: 텐서를 NumPy 배열로 변환
+   - `tf.random.set_seed(1234)`: 난수 시드 고정
+   - `tf.random.normal([2, 1], mean=0.0)`: 정규분포 난수 생성
+
+---
+
+## 심화 내용 및 핵심 수학
+
+### 텐서플로와 행렬 연산
+- `tf.matmul(a, b)`: 행렬의 곱(내적)
+- `tf.linalg.inv(a)`: 역행렬 연산
+- **브로드캐스팅 (Broadcasting)**: 형상(Shape)이 다른 행렬 간 연산 시, 차원이 맞지 않는 축을 자동으로 복제 확장하여 연산을 가능하게 하는 메커니즘입니다.
+
+### 텐서플로 함수 (@tf.function)
+- TensorFlow 2.x에서는 Eager Execution(즉시 실행)이 기본이지만, `@tf.function` 데코레이터를 적용하면 파이썬 함수를 AutoGraph를 통해 고속 C++ 연산 그래프로 변환하여 실행 속도를 극대화합니다.
+  ```python
+  @tf.function
+  def t_func(a, b):
+      return tf.matmul(a, b)
   ```
 
-1. 변수
-  - tensorflow에서 변수는 node를 만들고, 그 안의 값을 참조하는 방식이다.
+### 자동 미분 (tf.GradientTape)
+- 역전파 및 최적화에서 기울기(Gradient) 계산에 사용됩니다.
+  ```python
+  x1 = tf.Variable(tf.constant(1.0))
+  x2 = tf.Variable(tf.constant(2.0))
+  with tf.GradientTape() as tape:
+      y = tf.multiply(x1, x2)
+  gradients = tape.gradient(y, [x1, x2])
+  # x1에 대한 미분값: 2.0, x2에 대한 미분값: 1.0
+  ```
 
-    `var = tf.Variable(value, dtype=type)`
-    - value : 변수에 담을 값
-    - dtype : 변수 타입
-    - 2.x 버전에서는 위와같이 선언과 동시에 초기화가 가능하다.
-  - node를 생성하고 var은 그 node의 주소를 가리킨다.
+### 선형 회귀 (Linear Regression)
+- **선형 회귀 정의**: 종속변수 $y$와 독립변수 $x$ 간의 선형 상관관계를 모델링하는 회귀분석 기법입니다 ($y = Wx + b$, $W$: 가중치, $b$: 편향).
+- **오차방정식**: 실제값과 예측값의 차이를 측정합니다.
+  - MSE (Mean Squared Error, 평균 제곱 오차): $\frac{1}{n}\sum (y_{pred} - y_{true})^2$
+- **경사 하강법 (Gradient Descent)**: 비용 함수(Cost Function)의 미분 기울기를 계산하고, 학습률(Learning Rate, $\eta$)을 곱해 손실이 최소화되는 방향으로 가중치를 점진적으로 갱신합니다.
+  ```python
+  learning_rate = 0.1
+  with tf.GradientTape() as tape:
+      hypothesis = W * x_data + b
+      cost = tf.reduce_mean(tf.square(hypothesis - y_data))
+  W_grad, b_grad = tape.gradient(cost, [W, b])
+  W.assign_sub(learning_rate * W_grad)
+  b.assign_sub(learning_rate * b_grad)
+  ```
 
-    `var.assign(value)`
-  - var이 가리키는 node에 value 값을 적용
+### 로지스틱 회귀 (Logistic Regression)
+- 독립변수의 선형 결합을 통해 0과 1 사이의 사건 발생 확률을 예측하는 분류(Classification) 기법입니다.
+- **시그모이드 함수**: 출력값을 $(0, 1)$ 범위로 압축하는 비선형 활성화 함수입니다:
+  $$y = \frac{1}{1 + e^{-(Wx + b)}}$$
+- **로지스틱 오차함수 (Binary Cross Entropy)**:
+  $$\text{Loss} = -[y \log(h) + (1 - y) \log(1 - h)]$$
 
-    `var.assign_add(value)`
-  - var이 가리키는 node에 value 값을 더함
+```python
+x_train = np.array([[1., 1.], [1., 2.], [2., 1.], [3., 2.], [3., 3.], [2., 3.]], dtype=np.float32)
+y_train = np.array([[0.], [0.], [0.], [1.], [1.], [1.]], dtype=np.float32)
 
-    `var.assign_add(value)`
-  - var이 가리키는 node에 value 값을 뺌
+W = tf.Variable(tf.random.normal([2, 1]))
+b = tf.Variable(tf.random.normal([1]))
 
-    `tf.cast()`
-  - 변수를 특정 값, 특정 형태로 치환해주는 함수
-
-1. 출력  
-  `val.numpy()` : 'val' tensor를 numpy 배열 형태로 출력
-
-1. 비교
-  `tf.equal()` : tensorflow 변수를 비교하는 함수
-
-1. 랜덤
-  `tf.random.set_seed()` : 정수를 이용해 랜덤값 시드 설정
-  `tf.random.normal([2, 1], mean=0.0))` : 정규분포에 기반한 랜덤값, 인자로 행렬 shape와 평균이 들어간다.
-
----
-
-## 심화 내용
-
-### tensorflow와 행렬
-- TensorFlow에서 배열은 행렬로 표현되며, 행렬은 shape라 불린다.
-- 행렬 계산을 위한 함수를 제공한다.
-`tf.matmul(a, b)` : 행렬의 내적(곱)
-`tf.linalg.inv(a)` : 역행렬
-
-1. Broadcasting
-  - 행렬을 곱셈 혹은 덧셈을 하기 위해서는 shape에 대한 제약조건이 있고, tensorflow에서도 마찬가지다.
-  - tensorflow에서는 행렬 연산에서 차원(shape)이 맞지 않을 때 행렬을 자동으로 늘려서(Stretch) 차원을 맞춰주는 Broadcasting기능이 있다.
-    - 연산시 shape는 첫번째 피연산자를 기준으로 한다.
-    - stretch 시 새로 생성된 공간에는 기존 내용을 복사하여 채워넣는다.
-    - 단, 늘릴 수는 있지만, 줄일수는 없다.
-  ex)
-  a[4,3] + b[1,3] : 가능
-  a[4,3] + b[1,5] : 불가능 (3 < 5 이므로, 5를 3으로 바꾸려면 축소해야함)
-  a[4,1] + b[1,3] : 가능
-
-### tensorflow 함수
-- tensorflow 1.x 버전은 placeholder를 통해 입력을 받는 객체를 생성하고, 실행시 session을 통해 feed 값을 전달한다. 즉 명시적으로 입력 형태를 구성해야 했다.
-- tensorflow는 2.x 버전부터 python 프로그램처럼 라이브러리를 사용할 수 있도록 연산에 함수를 제공하고 있다. 함수를 사용하면 placeholder를 생략하고 사용할 수 있다.
-- tensorflow 함수는 파이썬 함수처럼 정의하여 사용 가능하며, 컴파일시 속도 향상을 원한다면 `@tf.function` 데코레이터를 적용하면 된다.  
-ex)
-
-```
-@tf.function
-def t_func(a,b):
-    return tf.matmul(a,b)
-
-x = [[4,5,6],[6,7,8]]  # tensorflow 변수가 아님
-w = tf.Variable([2,5],[6,5],[17,10])
-print(t_func(x,w))
-# tensorflow 2.x 이후부터는 변수 x같은 값들도
-# placeholder를 만들고 feed 값을 주는 복잡한 과정 없이
-# tensorflow 함수를 이용해 연산 가능해졌다.
-```
-
-### tensorflow 미분
-- gradient 계산에 미분이 많이 사용고, tensorflow는 미분 함수를 제공한다.
-- `tape.gradient(y,x)` : 텐서 x에 대한 y의 미분값
-- `tape.watch()` : 상수형 텐서를 변수형 텐서로 변환
-
-ex)
-
-```
-x1 = tf.Variable(tf.constant(1.0))  # 변수 선언
-x2 = tf.Variable(tf.constant(2.0))  # 변수 선언
-with tf.GradientTape() as tape:  # 미분을 위해 GradientTape 객체 생성
-    y = tf.multiply(x1, x2)  # 미분할 함수값을 GradientTape 객체 안에서 정의
-gradients = tape.gradient(y, [x1, x2])  # x1 미분값과 x2 미분값을 각각 반환
-# y = x1 * x2
-# x1 에 대한 미분값 : 2.0
-# x2 에 대한 미분값 : 1.0
-# gradients = [2.0, 1.0]
-
-a = tf.constant(2.0)
-gradients2 = tape.gradient(y,a)
-# 상수로 미분하면 None 값이 된다.
-# gradients2 = None
-
-# 상수를 변수로 변환시켜 미분시킬 수 있다.
-with tf.GradientTape() as tape:
-    tape.watch(a)
-    y = tf.multiply(x1, a)
-gradients3 = tape.gradient(y,a)
-# gradients3 = 1.0
-```
-
-### 선형 회귀
-- '딥러닝'은 데이터를 통해 관계를 학습하고, 학습된 모델을 통해 데이터가 주어지면 예측값을 도출해 내는 기술이다.
-- '딥러닝'의 가장 기본적인 계산 원리는 '션형 회귀'와 '로지스틱 회귀' 이다.
-
-1. 선형회귀 : 데이터 분포를 통해 데이터들과 가장 근접한 선을 도출해내는 계산법  
-1. 로지스틱 회귀 : 0과 1 둘 중 하나를 선택하는 계산법  
-  - 판단의 근거를 마련할 때 사용
-  - sigmoid 함수를 사용하여 확률값으로 사용
-
-### 선형 회귀 정의
-- 종속변수 y와 한개 이상의 독립변수 x와의 선형 상관관계를 모델링하는 회귀분석 기법
-  - 단순 선형회귀 : 하나의 변수에 기반하여 동작
-  - 다중 선형 회귀 : 둘 이상의 변수에 기반하여 동작
-- 선형 예측함수를 통해 회귀식을 모델링하고, 알려지지 않은 파라미터를 데이터로 추정
-- 회귀식을 선형 모델이라고 한다.
-
-- 값을 예측하기 위해 학습 데이터로 적합한 예측 모형을 개발한다.
-- 종속변수 y와 이에 연관된 독립변수들 x1, x2... 에 대해 x와 y간의 관계를 정량화 할 수 있다.
-- 일반적으로 최소제곱을 사용해 선형 회귀 모델을 구할 수 있다. (y = ax + b 형태)
-  - 독립변수(x)가 증가하면 최소 제곱법으로 처리가 불가능하다.
-
-- 딥러닝에서는 y = wx + b 형태로 표현하는데, w 는 weight, b는 bias 를 뜻한다.
-  - weight : 가중치, 입력값 x의 영향도를 표현하는 상수
-  - bias : 기준점, 판단의 근거가 되는 식의 기준점을 표현하는 상수
-
-### 오차방정식
-- 선형 회귀에서 입력값이 여러개일 경우, 첫번째 입력으로 임의의 선을 그린다.
-- 정답과 임의의 선이 맞는지 확인하고 평가한다 (오차 확인)
-- 확인된 오차 값을 이용해 임의의 선을 수정한다.
-- 즉,  y = ax + b 에서 (x,y)를 입력으로 받고 a,b를 추론한다. 이러한 계산 식을 오차방정식이라 한다.
-
-- 오차의 합 = ∑ (예측값 - 정답)²
-- MSE : Mean Squared Error, 평균제곱오차 = (오차의 합) / n
-- RMSE : Root Mean Squared Error, 평균 제곱근 오차 = root(편균제곱오차)
-
-### 경사 하강법
-- 대표적인 '최적화 알고리즘'으로, 비용 함수를 최소화하기 위해 반복해서 파라미터를 조정해나가는 방식이다.
-- `y = a*x` 방정식에서 x = [1,2,3] y = [1,2,3] 이라고 한다면 a값은 1이다.
-이때 MSE 오차식과 x에 대해 그래프를 그리면 2차원 그래프가 나오게 된다. 이때 기울기가 0인 부분, 즉 꼭짓점의 x 값이 정답이 된다.
-- 이러한 특성을 이용하여 다음과 같이 정답을 찾는 recursive한 전략을 취할 수 있다.  
-  1) 임의의 값 x1에서 미분을 구한다.  
-  2) 구해진 기울기의 반대 방향으로 이동하여 그래프와 겹쳐지는 부분의 x좌표를 x2라 한다.  
-  3) 1~2 과정을 반복하면 점차 기울기가 줄어들고, 이를 충분히 수행하면 정답값에 수렴한다.  
-
-- 하지만 오차 그래프의 폭이 좁은 경우, 위 방식을 수행하면 특정 값으로 수렴하지 않고 결과값이 발산한다.
-- 이를 막기 위해 기울기를 100% 취하지 않고, '학습률' 이라는 상수를 곱해 일정 양만큼만 전략에 반영될 수 있게 한다.
-- 학습률은 정해진 값이 아니고, 데이터에 따라 적합한 값이 달라지는 상수이다.
-- 위 전략을 수정하여 다시 적용하면
- 1) 임의의 값 x1에서 미분을 구하고, 학습률을 적용하여 값을 조정한다.   
- 2) 구해진 값을 기울기로하여 이동할 때 그래프와 겹쳐지는 부분의 x좌표를 x2라 한다.  
- 3) 1~2 과정을 반복하면 점차 기울기가 줄어들고, 이를 충분히 수행하면 정답값에 수렴한다.  
-
-```
-learning_rate = 0.1
-with tf.GradleTape() as tape:
-  hypothesis = W * x_data
-  cost = tf.reduce_mean(tf.square)
-```
----
-
-### 로지스틱 회귀
-- 선형회귀와 함께 대표적인 딥러닝 알고리즘이다.
-- 독립변수의 선형 결합을 이용하여 사건 발생의 가능성을 예측하는데 사용되는 '통계 기법' 이다. (확률 계산)
-- 로지스틱 회귀는 종속변수와 독립변수 간의 관계를 함수로 나타내어 향후 예측모델에서 사용하므로, 독립변수의 선형 결합으 종속변수를 설명한다는 관점에서 선형 회귀분석과 유사하다.
-- 하지만, 로지스틱 회귀는 데이터의 결과가 특정 분류로 나뉘어 지기 때문에 classification 기법으로 볼 수 있다.
-
-- 이진 분류 문제, 즉 0과 1 중 하나를 판별하는 문제는 로지스틱 회귀를 이용하여 풀 수 있다.
-- step function 혹은 sigmoid를 사용하는데, 보통 0과 1 사이의 확률값을 표현할 수 있는 sigmoid를 사용한다.
-
-### 시그모이드
-- 시그모이드 방정식은 아래와 같다.  
-`y = 1 / (1 + e <sup>-x</sup>)`
-- e는 자연상수이며, 자연상수를 사용하였기 때문에 확률값으로 사용 가능하다.
-- sigmoid 함수에 선형 회귀 함수를 대입하면 아래와 같이 된다.  
-`y = 1 / (1 + e <sup>(-wx+b)</sup>)`
-- 이 함수에 경사하강법을 이용하여 w와 b를 찾아낼 수 있다.
-
-- w값이 증가하면 sigmoid 함수는 step function에 유사하게 경사가 가팔라 진다.
-- b값이 증가하면 그래프가 우측 방향으로 이동한다.
-
-
-### 오차함수
-- 로지스틱 회귀는 target이 0 또는 1 두가지라는 점에서 선형 회귀와 다르다.
-- 때문에 로지스틱 회귀는 오차함수도 두가지가 있다.
-  - 정답이 0일 경우 -log(l-h) 그래프 형태이다.
-  - 정답이 1일 경우 -log(h) 그래프 형태이다.
-- 정답값 0 혹은 1을 대입하면 원하는 오차함수가 나오는 식을 binary cross entropy 라 하고, 그 식은 다음과 같다.   
- `Y = -(Y * LOG(H) + (1-Y)*LOG(1-H))`
-
-- 로지스틱 회귀법을 tensorflow 함수로 구현하면 아래와 같다.
-
-```
-# 6 by 2 형태의 x 데이터 학습값
-x_train = np.array([[1., 1.],
-                   [1., 2.],
-                   [2., 1.],
-                   [3., 2.],
-                   [3., 3.],
-                   [2., 3.]],
-                   dtype=np.float32)
-# 6 by 1 형태의 y 데이터 학습값
-y_train = np.array([[0.],
-                   [0.],
-                   [0.],
-                   [1.],
-                   [1.],
-                   [1.]],
-                   dtype=np.float32)
-
-# 이 학습값을 이용해 W와 b를 찾아본다.
-
-
-# 랜덤값을 위한 설정
-tf.random.set_seed(12345)
-# W와 b의 초기값을 랜덤하게 설정, x값이 [6, 2] 이므로 W 형태를 [2, 1] 로 해야 y 값인 [6, 1] 에 맞게 matmul이 가능하다.
-W = tf.Variable(tf.random.normal([2, 1], mean=0.0))
-b = tf.Variable(tf.random.normal([1], mean=0.0))
-
-print('weights: \n', W.numpy(), '\n\nbias: \n', b.numpy())
-
-# x값을 sigmoid 함수에 대입하여 y값을 반환하는 함수
-# x값의 shape가 [,2] 형태이므로 z = -(w1*x1 + w2*x2 + b) 가 된다.
 def predict(X):
     z = tf.matmul(X, W) + b
-    hypothesis = 1 / (1 + tf.exp(-z))
-    return hypothesis
+    return 1 / (1 + tf.exp(-z))
 
-# 반복 학습
+learning_rate = 0.05
 for i in range(2001):
     with tf.GradientTape() as tape:
-        hypothesis = predict(x_train)
-        # cost : binary cross entropy 식으로 loss 값을 계산
-        cost = tf.reduce_mean(-tf.reduce_sum(y_train*tf.math.log(hypothesis) + (1-y_train)*tf.math.log(1-hypothesis)))
-
-        # w와 b로 편미분하여 오차값 계산
-        W_grad, b_grad = tape.gradient(cost, [W, b])
-
-        # 오차값에 learning rate를 적용한 결과값으로 w와 b를 재설정
-        W.assign_sub(learning_rate * W_grad)
-        b.assign_sub(learning_rate * b_grad)
-
-# 계산된 w,b를 사용하여 x, y에 대해 정상적으로 예측값이 나오는지 확인
-def acc(hypo, label):
-    # 0.5 이상이면 0, 이하이면 1의 확률이 더 높으므로, 0.5를 기준으로 0 또는 1로 치환해 준다.
-    predicted = tf.cast(hypo > 0.5, dtype=tf.float32)
-    # 정확도 = 계산값과 정답을 비교하여 맞으면 1점, 틀리면 0점으로 판단한 후 전체 점수를 평균 낸 값
-    accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted, label), dtype=tf.float32))
-    return accuracy
-
-# 결과 계산
-accuracy = acc(predict(x_train), y_train).numpy()
+        h = predict(x_train)
+        cost = tf.reduce_mean(-tf.reduce_sum(y_train * tf.math.log(h) + (1 - y_train) * tf.math.log(1 - h)))
+    W_grad, b_grad = tape.gradient(cost, [W, b])
+    W.assign_sub(learning_rate * W_grad)
+    b.assign_sub(learning_rate * b_grad)
 ```
 
----
+### 퍼셉트론과 신경망
+- 인간의 신경세포(Neuron) 동작을 모방하여 가중합과 활성화 함수를 결합한 최소 연산 단위입니다.
+- **다층 퍼셉트론 (MLP)**: 단일 퍼셉트론으로 해결할 수 없는 비선형 문제(예: XOR 문제)를 해결하기 위해 입력층과 출력층 사이에 하나 이상의 은닉층(Hidden Layer)을 둔 신경망 구조입니다.
 
-### 퍼셉트론
-- 퍼셉트론은 뉴럴 네트워크의 기본이 되는 개념으로, 인간의 신경망을 본따 프랑크 로젠블라트가 1957년에 고안한 알고리즘이다.
-- 인간의 신경망은 외부 자극을 입력으로 받아 뉴런을 타고 신호가 전달된다. 뉴런과 뉴런 사이의 시냅스에서 신호를 전달하려면 역치값을 넘겨야 신호가 전달된다.
-- 퍼셉트론은 입력을 받아 가중합(w1*x1 + w2+x2 + ... + wi*xi+ b)을 취하고, 활성화 함수(sigmoid)를 거쳐 출력값을 생성한다.
+### 오차 역전파 (Backpropagation)
+- 연쇄 법칙(Chain Rule)을 활용하여 출력층에서 계산된 오차를 입력층 방향으로 거꾸로 전파하며 각 은닉층의 가중치와 편향에 대한 미분값을 효율적으로 계산하는 알고리즘입니다.
+- **출력층 오차 계산**: $\delta_{out} = (y_{out} - y_{target}) \cdot y_{out}(1 - y_{out})$
+- **은닉층 오차 계산**: $\delta_{h} = (\sum \delta_{next} \cdot W_{next}) \cdot y_h(1 - y_h)$
+- 가중치 갱신 공식: $W_{new} = W_{old} - \eta \cdot \delta \cdot x$
 
-### 다층 퍼셉트론
-- 한 개의 퍼셉트론은 여러 문제를 해결할수 있다.
-  - 좌표 평면에서 선 하나로 그룹을 구분지을 수 있는 경우에 해당한다.
-  - 대표적인 모델로는 AND모델, OR 모델이 있다.
-- 하지만 단일 퍼셉트론으로 풀지 못하는 문제도 존재한다.
-  - XOR 모델이 대표적이다. 선 하나를 그어서 그룹을 분류할 수 없다.
+### 그래디언트 소실과 가중치 초기화
+- Sigmoid 활성화 함수는 도함수의 최댓값이 0.25에 불과하여, 층이 깊어질수록 기울기가 0으로 수렴하는 기울기 소실(Vanishing Gradient) 문제가 발생합니다.
+- 이를 해결하기 위해 ReLU, LeakyReLU 등의 활성화 함수를 사용합니다.
+- **Xavier 및 He 초기화**:
+  - Xavier(Glorot): 대칭형 함수(Sigmoid, Tanh)에 적합, 분산 $\frac{2}{n_{in} + n_{out}}$
+  - He 초기화: 비대칭형 함수(ReLU)에 최적화, 분산 $\frac{2}{n_{in}}$
 
-- XOR 모델은 OR 퍼셉트론과 NAND 퍼셉트론을 1차적으로 수행하고, 두 수행에 대한 결과를 AND 연산하면 구할 수 있다. 이를 그래프로 표현하면 아래와 같다.
+### 고속 옵티마이저 (Optimizer)
+- 기본 경사 하강법의 느린 수렴 속도와 지역 최솟값(Local Minima) 정체 문제를 극복하기 위한 다양한 최적화 기법:
+  - **모멘텀 (Momentum)**: 물리적 관성을 적용하여 과거 기울기 방향을 일정 비율 누적 ($V_t = \gamma V_{t-1} - \eta \nabla W$)
+  - **네스테로프 모멘텀 (Nesterov Accelerated Gradient)**: 현재 위치가 아닌 관성으로 이동할 예상 위치에서의 기울기를 측정하여 불필요한 진동 억제
+  - **Adagrad**: 매개변수별로 자주 갱신된 가중치는 작은 학습률을, 드물게 갱신된 가중치는 큰 학습률을 적용
+  - **RMSprop**: Adagrad의 학습률 급감 문제를 지수 이동 평균(EMA)으로 보완
+  - **Adam (Adaptive Moment Estimation)**: 모멘텀의 방향성과 RMSprop의 적응형 학습률 크기를 결합한 가장 대중적인 최적화 알고리즘
 
-```
-0층     1층     2층
-x1   →   s1  ↘  
-   ↘ ↗         y
-   ↗ ↘         
-x2   →   s2  ↗  
-```
-- 다중 퍼셉트론은 여러 layer를 두고 연산을 한다는 의미이며, layer가 증가하면 더 많이 분석된다는 뜻.
-- 0층(가장 처음)은 input layer, 2층(가장 마지막)은 output layer, 그 사이의 layer는 hidden layer라 칭한다.
-- hidden layer를 많이 만들면 대체로 데이터를 많이 분석하여 더 좋은 결과를 낼 수 있다고 할 수 있다.
+### 다중 분류와 활성화 함수
+- 3개 이상의 클래스를 분류할 때 활용하는 구조:
+  - **SoftMax**: 출력 노드의 로짓(Logit) 점수 벡터를 총합이 1이 되는 확률 분포로 정규화:
+    $$y_k = \frac{e^{a_k}}{\sum_{i=1}^n e^{a_i}}$$
+  - **Cross Entropy**: 실제 정답 원-핫 벡터와 예측 확률 분포 간의 차이를 측정하는 손실 함수:
+    $$E = -\sum_{k} t_k \log(y_k)$$
 
-### 오차 역전파
-- 은닉층에 있는 각각의 w와 b를 구하는 방법이다.
-- 다층 퍼셉트론을 구성하면 각 layer마다 w와 b값이 구성되는데, 이때 오차를 구하기 위해 미분값을 구하는 것이 쉽지 않다.
-  - 미분 안에 연결된 식이 많기 때문
-  - layer의 개수는 변동될 수 있기 때문에 계산이 복잡하다
+### 과대적합 방지 및 규제 (Overfitting)
+- 모델이 훈련 데이터에만 지나치게 맞춰져 새로운 테스트 데이터에서 일반화 성능이 떨어지는 현상입니다.
+- **과대적합 방지 데이터 처리 기법**:
+  - Train / Validation / Test 데이터셋 분리 (예: 7:1.5:1.5 또는 8:1:1)
+  - 검증 손실(Validation Loss)이 반등하는 시점에 학습을 멈추는 조기 종료 (Early Stopping)
+  - 드롭아웃(Dropout): 학습 단계마다 뉴런 중 일부를 무작위로 비활성화하여 특정 뉴런에 대한 의존도 분산
+  - 데이터 증식(Data Augmentation): 회전, 반전, 크기 조절 등을 통한 데이터 다양성 확보
+- **K-겹 교차 검증 (K-Fold Cross Validation)**: 전체 데이터를 K개 폴드로 균등 분할하고 K번 반복 검증하여 모델의 일반화 신뢰도를 극대화합니다.
 
-- 이 문제를 해결하기 위해 1980년도 오차 역전파 알고리즘이 발명된다. 이전에도 w와 b를 구할수는 있었지만, 구하는 방법에 대해 규칙성을 찾지는 못했다.
-
-### 오차 역전파 개요
-- 최적화의 계산 방향이 output layer 에서 input layer 방향으로 진행된다. 이 떄문에 이 알고리즘을 back propagation 이라 부른다.
-- 퍼셉트론에서 w와 b값을 찾기 위해 오차가 작아지는 방향으로(기울기가 0이 되는 방향으로) 업데이트 해 나갔는데, 다층 퍼셉트론에서는 다음 식으로 가중치를 변화시켜 나간다.
-  - `W(t+1) = W * t - (∂오차) / (∂w)`: 새 가중치는 현 가중치에서 가중치에 대한 기울기를 뺀 값
-
-### 출력층 오차
-- 다층 퍼셉트론의 각 노드는 (1)입력값을 이용해 가중합을 만들고, (2) 가중합을 활성화 함수를 적용해 출력하는 두 단계를 수행한다.
-- 3개 layer를 가지는 형태를 표현하면 아래와 같다.
-  - yh1, yh2 : hidden layer의 출력값
-  - y_out1, y_out2 : output layer의 출력값, 예측값
-```
-0층               1층                                       2층
-x1 (w11)→ [가중합1 -> 활성화함수1]  →    yh1 (w31)→ [가중합3 -> 활성화함수3]  → y_out1
- (w21)↘  ↗                              (w41)↘  ↗
- (w12)↗  ↘                              (w32)↗  ↘
-x2 (w22)→ [가중합2 -> 활성화함수2]  →    yh2 (w42) → [가중합4 -> 활성화함수4]  → y_out2
-```
-
-- 오차 역전파는 y_out 값에서 반대로 진행하여 가중치 w를 업데이트 한다.
-- `w31(t+1) = w31 * t - (∂오차 y_out)/(∂w31)` : 현재 weight에 미분값을 빼주면 다음 weight가 된다.
-- 오차 y_out 안에는 여러개의 출력값이 존재할 수 있다. (output layer의 node 개수만큼)
-- y_out 안의 각각의 예측값에 대한 오차는 MSE를 이용해 구한다.
-  - output layer의 node가 n개라고 하면, k번째 오차는 다음과 같다. `오차_y_out_k = (y_target_k - y_out_k)² / n`
-
-- 오차 역전파로, y_out1 값의 오차로 w31을 업데이트 해 보자.
-1) 오차의 값은 `∂오차y_out / ∂w31` 이다.  
-2) chain rule에 의해 `∂오차y_out / ∂w31 = (∂오차y_out / ∂y_out1) * (∂y_out1 / ∂가중합3) * (∂가중합3 / ∂w31)` 가 성립한다. 이 식의 우항을 각각 나누어 계산하여 보자.
-2-1) `(∂오차y_out / ∂y_out1)`을 y_out1에 의해 편미분을 하면 y_out1과 관계없는 y_out2는 상수가 되어 사라진다. `y_out = y_out1 + y_out2 = (y_target1 - y_out1)² / 2 + (y_target2 - y_out2)² / 2` 이기때문에 최종 식은 `(∂오차y_out / ∂y_out1) = 1/2 * ∂(y_target1 - y_out1)² / ∂y_out1 = y_out1 - y_target1` 가 된다.
-2-2) `(∂y_out1 / ∂가중합3)` 은 '활성화함수3'을 미분 해 주는것과 같다.  
-  우리는 활성함수로 시그모이드를 사용했고, 시그모이드의 미분은 `∂σ(x) / ∂x = σ(x) * (1 - σ(x))` 이다.  
-  따라서 `∂y_out1 / ∂가중합3 = y_out1 * (1 - y_out1)` 이 된다.
-2-3) `가중합3 = w31 * yh1 + w41 * yh2 + 1(bias)` 형태인데, `(∂가중합3 / ∂w31)` 식에 첫 식을 대입하면 `(∂가중합3 / ∂w31 = yh1` 이 된다.  
-
-3) (2)에서 구한 세 식을 합하면 `(y_out1 - y_target1) * (y_out1 * (1 - y_out1)) * (yh1)` 형태이다. 이때,  
-  `y_out1 - y_target1` 은 출력값, `y_out1 * (1 - y_out1)` 은 활성화함수의 미분 값이다. 이를 활용하여 델타 식으로 표현하면  
-  `w31(t + 1) = w31 * t - δ * y * yh1` 이 된다. (`δ * y = (y_out1 - y_target1) * (y_out1 * (1 - y_out1))`)
-
-  #### 은닉층 오차
-  - 위에서 w31을 구했고, 이제 w11을 구해보자
-  - w31은 y_out1에만 영향을 주고, y_out2에는 영향을 주지 않았다. 하지만 w11은 y_out1과 y_out2에 모두 영향을 주어서 식의 복잡도가 높다.
-  - 점화식을 표현하면 `w11(t+1) = w11 * t - (∂오차 y_out) / ∂w11` 가 된다.
-    1) `(∂오차 y_out) / ∂w11 = (∂오차 y_out) / ∂yh1 * (∂yh1/∂가중합1) * (∂가중합1/∂w11)` 형태로 chain rule을 사용할 수 있다.  
-    2) `(∂yh1/∂가중합1)` 은 activation 함수의 미분값이므로, `(∂yh1/∂가중합1) = yh1(1 - yh1)` 이 된다.
-    3) 가중합을 w에 의해 미분하면 입력값이 된다. 따라서 `(∂가중합1/∂w11) = x1`  
-    4) `(∂오차 y_out) / ∂yh1 = ∂(오차y_out1 + 오차y_out2)/∂yh1 = ∂오차y_out1/∂yh1 + ∂오차y_out2/∂yh1`  
-    5-1) 4 식을 나눠서 계산해보자. 먼저  `∂오차y_out1/∂yh1 = ∂오차y_out1 / ∂가중합3 * ∂가중합3 / ∂yh1'  
-    5-1-1) 이때 `∂가중합3 / ∂yh1 = ∂(w31 * yh1 + w32 * yh2)/∂yh1 = w31`  
-    5-1-2) `∂오차y_out1 / ∂가중합 = (∂오차y_out1 / ∂y_out1) * (∂y_out1 / ∂가중합3) = ( y_out1 - y_target1) * w31  * (1-y_out1) * y_out1` (`∂오차y_out1 / ∂y_out1` 는 오차를 의미하고, `∂y_out1 / ∂가중합3` 는 활성함수의 미분값을 의미하기 때문)  
-    5-1-3) 최종적으로 `∂오차y_out1 / ∂yh1 = (y_out1 - y_target1) * w31 * (1 - y_out1) * y_out1 = δy_out1 * w31` 형태로 델타식을 만들 수 있다.  
-    5-2)  다음 `∂오차y_out2/∂yh1`도 5-1 에서 사용한 방식으로 계산하면 `∂오차y_out2/∂yh1 = δy_out2 * w41` 형태가 된다.  
-    5-3) 위 값들로 4 에서 봤던 식을 구성하면  `(∂오차 y_out) / ∂yh1 = δy_out1 * w31 + δy_out2 * w41` 이 된다.  
-    6) 2, 3, 5-3 에서 나온 값으로 1식을 재구성해보면 `(∂오차 y_out) / ∂w11 = (δy_out1 * w31 + δy_out2 * w41) * yh1(1 - yh1) * x1` 이다.
-
-  - 출력층의 오차 업데이트 : `(y_out1 - y_target1) * y_out1 * (1 - y_out1) * yh1`
-    - `(y_out1 - y_target1)` : 오차
-  - 은닉층의 오차 업데이트 : `(y_out1 * w31 + y_out2 * w41) * yh1 * (1-yh1) * x1`
-    - `(y_out1 * w31 + y_out2 * w41)` : hidden layer를 통해 출력값을 미분한 값
-  - '출력층의 오차 업데이트'와 '은닉층의 오차 업데이트'는 공통적으로 `y_out(1 - y_out) * x` 의 형태(sigmoid function 미분 * 입력값)를 지니고 있다.
-
-  - 은닉층의 가중치 업데이트를 델타식으로 표현하면  `w11(t+1) = w11 * t - δh * x1` 이다.
-  - 델타식으로 표현하면 generic 한 형태로 식을 가져갈 수 있어 꼭 필요하다.
-
----
-
-### 그래디언트 소실(gradient vanishing)
-- 다층 퍼셉트론을 사용할 때, 층이 많을 수록 데이터 분석 능력이 높아지지만, 실제로는 분석 증가량이 미미하다. 이는 활성화 함수 때문이다.  
-  - 가중치를 수정할 때, 오차 값을 미분한 값을 사용하였다.
-  - 각 층의 activation function 으로 sigmoid를 사용했는데, sigmoid 함수는 미분시 최대치가 0.3 밖에 되지 않는다.
-  - 층을 지날수록 activation function을 여러번 거치는데, sigmoid의 미분값을 여러번 거치게 되면 미분값이 중간에 0이 되어버리는 현상(vanishing gradient) 문제가 발생한다.
-  - 층을 거쳐 갈수록 기울기가 사라져 가중치를 수정할 값이 소실되어 뒤쪽 layer는 더이상 학습이 되어지지 않는다.
-- 그래디언트 소실 문제를 해결하기 위해 sigmoid를 대체할 다른 활성화함수들이 만들어 졌다.
-  - 하이퍼볼릭 탄젠트 : 미분 최대값 1, 소실문제를 약화시킬 순 있지만 해결되진 않는다.
-  - 렐루 : 0미만은 미분값 0, 0이상은 미분값 1. 많은 층을 사용할 때는 relu를 많이 사용한다.
-  - 소프트플러스
-
-### xavier와  he 초기화
-- 초기 w와 b 할당시 표준편차가 1이고, 평균이 0인 정규분포를 사용하였다.
-- 이렇게 되면 node를 통과한 결과값이 0과 1에 치중되어 있는 형태를 볼 수 있다.
-- 표준편차를 0.01을 주면 결과값이 0.5로 치중되게 된다. 이렇게 되면 layer를 몇개를 쓰던 layer가 하나인 경우와 동일한 효과가 나온다. 이를 표현력의 제한이라 한다.
-- 이러한 문제점을 xavier 방법을 사용하면 해결할수 있다.
-  - 가중치 초기화를 설정하는 방법으로, 결과값의 분포를 더 광범위하게 설정할 수 있게 하는 방법이다.
-  - `√(2/n_in + n_out)` 형태로 최초 사용하는 분포를 만들게 되면 더 광범위한 형태로 만들 수 있다. (n_in : layer의 입력node 개수, n_out : layer의 출력node 개수)
-  - 우리는 입력,출력 값이 같은 hidden layer를 사용하므로 `√(1/n)` 형태를 가진다.
-- 단, xavier 방식은 좌우 대칭인 activation function 에서는 효과적이지만, relu와 같은 좌우 비대칭 형태의 activation function에서는 한쪽으로 치우친 결과값이 얻어진다.
-- 이때는 '카밍 히'의 이름을 따서 he 초기값을 사용한다.
-  - `√2/n` 의 정규분포 값을 사용한다. (분포 범위를 더 넓게 잡는다)
-
----
-
-### 고속 옵티마이저
-- 옵티마이저란 경사하강법을 뜻한다. 고속 옵티마이저란 경사 하강법을 더 효율적으로 하는 방법이다.
-- 경사 하강법은 대체로 학습 속도와 정확도 문제를 갖고 있다. (learning rate 혹은 data에 의해 발생)
-  - 경사 하강법은 업데이트 시마다 전체 데이터에 대해 미분을 계산하여야 하여 속도가 매우 느리다.
-  - 학습률이 너무 크면 더이상 최적값으로 수렴하지 못하는 경우가 있다.
-- 경사 하강법은 구현하기 쉽고 단순하다는 장점이 이 있지만, 비등방성 함수에서는 탐색 경로가 비효율적이다. (ex: `f(x,y) = 1/20x^2 + y^2` 와 같은 타원형 형태)
-  - y축은 가파르지만, x축 변동은 거의 없다. 최적값은 (0,0) 이지만 미분으로 기울기 값을 구하면 (0,0) 이 아닌 다른 방향을 가리킬 확률이 매우 높다.
-  - 정상적으로 도달하더라도 지그재그 형태로 비효율적인 방식으로 이동하게 된다.
-- 경사 하강법은 무작정 기울어진 방향으로 진행하기 때문에 간단하지만 위와같은 문제점을 야기한다.
-- 경사 하강법의 문제점을 개선해 주는 모델들로는 '모멘텀', 'adagrad', 'adam' 등이 있다.
-
-### 모멘텀
-- 모멘텀 알고리즘은 물리 현상의 운동량에 착안하여 만들어 졌다.
-- 이전 회차의 미분값 중 일정 비율을 반영하여 현재 weight 값 설정에 영향을 주도록 하여 더 빠르게 최적점을 찾을 수 있도록 하는 방식이다.
-  - 기존에는 현재 미분값 * 학습률을 현재 w에 빼주었지만, 모멘텀에서는 (일정 비율) * (이전 미분값) - (학습률) * (현재 미분값) 을 현재 w에 더해준다.
-  - 이 값은 `V(t) = γ*v(t-1) - η*∂오차/∂w(t)` 로 표현한다.
-  - 즉, `W(t+1) = W(t) + V(t)` 와 같은 식이 된다.
-  - 이전의 미분값을 일부 적용함으로써 현재 미분값을 상충하는 효과를 얻을 수 있다. 이를 통해 학습 속도를 높일 수 있다.
-
-### 네스테로프 모멘텀
-- 네스테로프 모멘텀에서는 w를 업데이트 할 때 `γ*v(t-1) - η*∂오차/∂w(t)` 값 대신 `γ*v(t-1) - η*∂오차/∂(w(t) + γ*v(t-1))` 를 사용한다.
-- 모멘텀 방법으로 이동될 방향을 미리 예측하여 해당 방향으로 한단계 미리 이동한 그래디언트 값을 사용함으로써 불필요한 이동을 줄일 수 있다. 속도는 그대로이지만 단계를 절약할 수 있다.
-
-### 아다그리드
-- 학습률을 조절하여 효율을 높인 모멘텀이다.
-- 아다그라드는 weight값이 업데이트 될 때 마다 점점 최적점을 찾아간다고 가정하고, 학습을 시킬때 마다 일정량의 learning rate를 떨어뜨린다.
-- 학습률을 변화시키기 위해 G(t)값을 `G(t) = G(t-1) + [∂오차/∂w(t)]^2` 형태로 가져가며, 최종적으로 `W(t+1) = W(t) + η * (1/√G(t) + ε) * ∂오차/∂w(t)` 형태가 된다. (ε 는 0이 되는것을 방지하기 위해 더해주는 아주 작은 상수값)
-
-### RMSprop
-- 아다그라드에서 G(t)는 무한히 커지게 되는 문제점이 있다.
-- 이를 해결하기 위해 `G(t) = γ * G(t-1) + (1-γ) * [∂오차/∂w(t)]^2` 형태를 취한다.
-- 'γ' 값을 이용해 G(t) 값을 조절할 수 있도록 하였다.
-
-### Adam
-- RMSprop의 정확도, 모멘텀 방식의 속도 장점을 모두 취하는 방식이다.
-- RMSprop의 G(t) 값과 모멘텀의 V(t) 값을 유사하게 구하여 사용한다.
-  - `V(t) = γ_1 * G(t) + (1 - γ_1) * ∂오차/∂w(t)`
-  - `G(t) = γ_2 * G(t) + (1 - γ_2) * [∂오차/∂w(t)]^2`
-- V(t)와 G(t) 값을 조절하여 V'(t), G'(t) 를 만들어 W(t+1) 을 구한다.
-  - `V'(t) = V(t) / (1-r_1^t)`
-  - `G'(t) = G(t) / (1-r_2^t)`
-  - `W(t+1) = W(t) - η * (G'(t) / √(V'(t) + ε))`
-
-- 이때까지 내용을 모두 분석해 보면 전반적으로 adam 옵티마이저가 좋은 성능을 내기는 한다.
-- 하지만 항상 adam이 최적의 효율을 내지는 않는다. 이는 데이터 형태가 다르기 때문이다.
-- 데이터 형태에 따라 취해지는 패턴과 오차 그래프의 모양이 다르기 때문이다.
-- gradient descent, momentum, adagrid, adam, RMSprop 중 어느것이 효과가 좋은지 확인이 필요하다.
-
----
-
-### 다중 분류
-- 입력값을 기준으로 단순 0 또는 1을 판단하는게 아니라, 여러 class 중 하나로 분류하는 모델을 알아보자  
-- 출력 node 개수를 분류되는 항목 개수로 설정한다.
-- 활성화 함수를 적용하려면 Y값이 0과 1로 이루어져 있어야 한다. (100% 혹은 0%)
-  - 출력 node가 하나라면 Y값은 0 또는 1이면 되지만, 2개 이상이라면 배열이 되어야 한다.
-  - 1 => [1,0,0], 2 => [0,1,0], 3 => [0,0,1] 형태로 변형해서 사용해야 한다.  
-  - 이렇게 Y값을 0 또는 1로만 이루어진 형태로 바꾸어주는 기법을 one-hot-encoding 이라 한다.
-  - 텐서플로에서 `one_hot()` 함수를 지원한다.
-
-### softMax
-- classification 문제를 풀 때 점수 벡터를 클래스 별 확률로 변환하기 위해 사용하는 함수이다.
-- 각 점수 벡터에 지수를 취한 후 정규화 상수로 나누어 총합이 1이 되도록 계산한다.  
-  - exponential을 취하는 이유는 값이 클 수록 훨씬 더 높은 점수를 갖게 하기 위함이다.
-  - `y_k = exp(a_k) / ∑<i=1,n> exp(a_i)`
-- softMax는 exponential을 사용하기 때문에 큰 값의 나눗셈을 수행해야 하여 overflow가 발생하기 쉽다.
-- 수식을 개선하여 다음과 같이 사용한다. (keras에서도 개선된 수식을 사용함)  
-```
-y_k = exp(a_k) / ∑<i=1,n> exp(a_i)
-    = C * exp(a_k) / C * ∑<i=1,n> exp(a_i)
-    = exp(a_k + log C) / ∑<i=1,n> exp(a_i + log C)
-    = exp(a_k + C') / ∑<i=1,n> exp(a_i + C')
-```
-
-### Cross Entropy
-- softmax 에서 사용하는 오차방정식
-- cross entrpoy는 서로 다른 두 값의 확률 차이를 나타낼 수 있다.
-- `E = - ∑<k> t_k * log y_k` 형태를 가진다.
-  - ex) 정답이 [0, 1] 이고, 결과가 [1, 0] 인 경우, `E = 0 * log1 + 1 * log0 = ∞`
-  - ex) 정답이 [0, 1] 이고, 결과가 [0, 1] 인 경우, `E = 1 * log1 + 0 * log0 = 0`
-
----
-
-### 오버피팅
-- 훈련 데이터에 지나치게 적응하여 훈련 그 외의 데이터에 대해서는 제대로 평가를 하지 못하는 경우를 일컫는다.
-- 학습 데이터를 통해 경향성만 추출해 내는 것이 가장 바람직한 학습 목표이다.
-- 오버피팅은 모든 데이터를 모으지 못하면 발생할 수 있다. (훈련 데이터가 적을 때)  
-  - 한쪽으로 편향된 데이터를 학습에 사용하거나, 노이즈를 일으키는 데이터를 사용한 경우에 발생할 수 있다.
-- 은닉층이 너무 많거나 각 층의 노드 수가 많아 변수가 복잡해지면 발생할 수 있다.
-- 테스트 셋과 학습 셋이 중복될 때 생기기도 한다.
-
-
-### 데이터 처리 방법
-- 오버피팅을 줄이기 위해서 데이터를 조작하는 방법을 사용할 수 있다.
-
-1. 학습 데이터셋과 테스트 데이터셋을 구분해서 사용한다.
-  - 학습 : 테스트 를 7:3 또는 8:2 정도로 사용하는 것이 일반적이다.
-
-1. 학습 데이터를 '학습' 데이터와 '검증' 데이터로 나눈다.
-  - 학습 데이터를 이용하여 모델을 학습시킨다.
-  - 학습을 시키면서 중간중간 검증 데이터를 이용하여 학습된 모델을 검증한다.
-  - 데이터를 학습시킬수록 '학습' 데이터에 대한 오차는 점점 줄어들지만, '검증' 데이터에 대한 오차는 일정 구간이 되면 증가하게 된다.
-  - '검증' 데이터 오차가 증가하는 시점이 over-fitting이 시작되는 구간이므로 학습을 중단한다.
-  - '검증' 데이터는 학습에 사용되지 않고, 검증에만 사용됨에 주의한다.
-
-1. Dropout 규제 방법
-  - 제프리 힌튼이 2012년에 제안한 방법
-  - 매 훈련 step에서 일정 node를 훈련에서 무시하는 방법이다.
-  ex) node = {n1, n2, n3, n4} 가 있다면, step 1에서는 n1, n2만 있는 것 처럼 동작하고, step 2에서는 n3, n4만 있는 것 처럼 동작하고 ...
-
-1. 데이터를 증식한다.
-  - 관련 데이터를 모두 수집하는것이 최선이지만, 현실적으로 불가능하다.
-  - 대신 데이터를 증식하는 방법을 사용한다. 데이터 증식이란, 실제와 같은 훈련 데이터를 생성한다.
-    - 데이터 증식은 인공적으로 만든 샘플과 실제 데이터를 구분할 수 없어야 한다.
-    - 백색소음(white noise)를 추가하는 것은 도움이 되지 않는다. 의미있는 학습 데이터가 필요하다.
-  - 데이터 증식은 이미지 데이터를 처리할 때 매우 유용하다. 이미지는 확대, 축소, 이동, 회전, 반전 등을 통해 하나의 이미지로 여러 데이터를 만들 수 있다.
-
-
-### K겹 교차 검증의 이해
-- 데이터 셋을 학습용과 테스트용으로 나누었을 경우, 테스트에 사용되는 데이터는 극히 일부밖에 되지 않는다
-- 데이터 셋을 k등분 하여, 테스트 셋과 학습 셋을 돌려가며 사용하는 방법을 k겹 교차검증이라 한다.
-  - 전체 데이터를 5개로 나누었다 가정하고, 나눈 데이터의 덩어리를 각각 d1, d2, d3, d4, d5라 하자
-  - 이때 d1을 테스트 데이터로 사용, 나머지를 훈련 데이터로 사용한 경우 결과를 R1이라 하자
-  - d2를 테스트 데이터로 사용, 나머지를 훈련 데이터를 사용한 경우 결과를 R2라 하자
-  - d3, d4, d5도 마찬가지로 하여 R3, R4, R5를 도출해 낸다.
-  - R1~R5를 모두 합치면 최종 결과가 나온다.
-  - 데이터를 5등분 했으므로, 위 방법은 5겹 교차검증이 된다.  
-
-```
+```python
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import StratifiedKFold
-
-import numpy
+import numpy as np
 import pandas as pd
-import tensorflow as tf
-
-numpy.random.seed(777)
-tf.random.set_seed(777)
 
 df = pd.read_csv('sonar.csv', header=None)
-
 dataset = df.values
-x_data = dataset[:,0:60].astype(float)
-y_data = dataset[:,60]
+X = dataset[:, 0:60].astype(float)
+Y = dataset[:, 60]
 
-# y_data를 one-hot 으로 처리해 준다.
+skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+accuracy_list = []
 
-e = LabelEncoder()
-e.fit(y_data)
-y_data = e.transform(y_data)
+for train_idx, test_idx in skf.split(X, Y):
+    model = Sequential([
+        Dense(30, input_dim=60, activation='relu'),
+        Dense(10, activation='relu'),
+        Dense(1, activation='sigmoid')
+    ])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.fit(X[train_idx], Y[train_idx], epochs=100, batch_size=10, verbose=0)
+    score = model.evaluate(X[test_idx], Y[test_idx], verbose=0)[1]
+    accuracy_list.append(score)
 
-# k-fold 알고리즘을 사용할 객체를 형성한다.
-# n_splits : 10등분하여 사용할 것이다.
-# shuffle : 섞어서 사용할 수 있도록 허용
-# random_state : shuffle 사용시 사용할 랜덤한 seed 값
-
-n_fold = 10
-skf = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=48)
-
-accuracy = []
-
-# skf.split() 함수를 통해 x_data와 y_data를 k-fold 알고리즘에 맞게 분해하여 반환한다.
-# for문을 통해 데이터를 반복하여 학습을 수행한다.
-for train, test in skf.split(x_data, y_data):
-    # 모델을 구성한다.
-    # 활성함수로 sigmoid, 오차함수로 binary-crossentropy를 사용할 것이다.
-    model = Sequential()
-    model.add(Dense(30, input_dim=60, activation='relu'))
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy',
-                  optimizer='adam',
-                  metrics=['accuracy'])
-    model.fit(x_data[train], y_data[train], epochs=100, batch_size=5)
-    k_accuracy = "%.3f" % (model.evaluate(x_data[test], y_data[test])[1])
-    accuracy.append(k_accuracy)
-
-print("\n %.f fold accuracy:" % n_fold, accuracy)
-# 결과값은 데이터에 따라 달라질 수 있다. 학습에 사용된 데이터가 편향되어 있는 경우 평가 결과가 떨어지는 모습을 볼 수 있다.
-# k-fold 알고리즘을 사용하면 이러한 경우를 예방할 수 있다.
+print(f"평균 정확도: {np.mean(accuracy_list):.4f}")
 ```
 
----
+### 이미지 데이터 모델링과 CNN
+- 완전 연결 신경망(FCNN)은 2차원/3차원 이미지 데이터를 1차원으로 평탄화하여 공간적 기하 정보를 손실합니다.
+- **CNN과 FCNN 비교**:
+  - CNN은 커널(필터)을 이용한 국소 영역 합성곱을 통해 인접 픽셀 간의 공간 상관관계를 유지합니다.
+  - 가중치 공유(Weight Sharing) 덕분에 학습해야 할 파라미터 수가 대폭 감소합니다.
+- **CNN 핵심 이론**:
+  - **합성곱 (Convolution)**: 필터를 입력 데이터 위에서 일정 보폭(Stride)으로 슬라이딩하며 요소별 곱합을 계산하여 Feature Map 생성
+  - **패딩 (Padding)**: 출력 크기를 보존하고 외곽 정보 유실을 방지하기 위해 가장자리에 0을 채우는 기법 (Same vs Valid)
+  - **풀링 (Pooling)**: Max-Pooling 등을 통해 공간 크기를 다운샘플링하여 연산량을 줄이고 위치 변화에 대한 불변성(Invariance) 확보
 
-### 이미지 데이터 모델링
-- MNIST 는 대표적인 이미지 모델링 데이터로, 70,000개의 글자 이미지에 각각 0부터 9까지 정답이 포함되어있는 데이터 셋이다.
-  - train data 6만개, test data 1만개로 나누어져 있다.
-  - 이미지 크기는 28 by 28 크기로 구성되어 있고, 각 픽셀은 0~255 사이의 밝기 값을 가진다.
-
-- 이미지 데이터를 학습할 때는 전처리가 필요하다. MNIST를 예로 들어 알아보자.  
-1) 이미지 데이터는 2차원 데이터이다. 이를 1차원 데이터로 직렬화 하여야 학습이 가능하다.  
-  - `reshape()` 함수를 이용하여 784개의 속성을 가진 1차원 배열로 바꿔준다.
-2) 0~255 값은 데이터 폭이 큰 편이다. 데이터 폭이 크면 분산이 커지므로 이를 줄여주는것이 좋다.  
-  - normalization 을 하거나, scaling을 해 준다.
-  - max 값이 정해져 있으면 단순히 값을 max로 나눠주면 0~1 구간으로 scaling이 된다.
-  - max 값이 미정인 경우는 min-max scaler를 사용할 수 있다.
-    - `(요소값 - 최소값) / (최대값 - 최소값)`
-3) 결과 값이 0~9의 class로 나뉘기 때문에 one-hot encoding을 통해 y 값을 전처리 해준다.  
-
-### CNN
-- 연속하는 layer 상의 모든 node들이 서로 연결되어있는 형태를 'fully connected layer'(FC layer) 라고 한다.
-- 한 장의 컬러 사진은 3차원 데이터이다. 이를 FC 신경망을 이용하여 학습할 시 제약이 많다.
-- 이러한 다차원 데이터 학습을 손실 없이 사용할 수 있도록 만든 모델이 Neural Network이다.
-- 그 중 Convolution Neural Network를 사용하면 이미지의 공간 정보를 유지한 채로 학습이 가능하다.
-
-### CNN 과 FCNN 비교
-- Fully Connected Neural Network는 2차원 그림을 1차원으로 재구성하여 학습시켰다.
-- CNN은 2차원 배열을 특정 그룹(Kernal, filter)으로 나누어 특징을 추출하는 형태로 학습시키기 때문에 입출력 데이터에 대한 형상 유지가 가능하다.
-- 이미지 공간 정보를 유지하기 때문에 인접 이미지에 대한 특징을 효과적으로 인식할 수 있다.
-- 여러개의 filter(kernal)을 사용함으로써 다양한 특징을 추출하여 학습할 수 있다.
-- filter를 공유 파라미터로 사용하기 때문에 FCNN 보다 학습 파라미터가 적다.
-
-### CNN 이론
-- CNN 은 이미지의 특징을 추춣해 내는 부분과, 클래스를 분류하는 부분으로 구성된다.
-  - CNN을 통해 특성별로 분류를 하면, fully connected neural network로 값을 전달하여 원하는 class 를 판단하도록 한다.
-- 필터, 커널, 윈도우 라고 부르는 m by n lalyer를 정의한다.
-  - 필터는 원본 데이터보다 크기가 작아야 한다.
-  - 필터도 각 픽셀마다 값을 갖고 있다.
-- 전체 이미지 위에 필터를 겹쳐놓았을 때, 필터와 원본 이미지가 맞닿는 부분을 서로 곱한 다음, 모든 결과물을 합한다.
-- 필터를 한 픽셀씩 움직여 가며, 위 계산을 반복하고, 그 결과물을 m by n 형태로 정렬하면, convolved layer 결과물을 얻을 수 있다.
-
-1. 채널
-  - 한 이미지에 대해 여러 겹으로 쌓여져 있는 형태를 채널이라 한다.
-  - 컬러를 표현하기 위해서는 R,G,B 세 색깔의 채널을 합하면 된다.
-  - 색상이 많을수록 채널은 많아진다.
-
-1. 필터
-  - 일반적으로 (3,3), (4,4) 와 같은 정사각형 행렬로 정의된다.
-  - CNN에서 학습의 대상은 필터 파라미터이다. (필터 안의 픽셀 값)
-  - 필터를 사용해 원본 데이터를 순회하며 채널별로 합성곱을 구하고, 모든 채널의 합성곱을 다시 합해 Feature Map으로 만든다.
-  - 입력 데이터가 여러 채널을 가지는 경우, 필터도 채널의 갯수에 맞게 가져야 한다.
-  - 각 채널별로 필터를 적용하여 feature map을 구하고, 최종적으로 모든 채널의 feature map을 합산하여 최종 feature map을 도출한다.
-
-1. 스트라이드 (stride)
-  - 필터를 순회하는 간격을 stride라 한다.
-  - stride는 (1,1) 과 같은 형태로 표현한다. (가로로 1칸씩 이동, 세로로 1칸씩 이동)
-  - stride와 필터의 크기로 feature map 크기가 결정된다.
-
-1. padding
-  - 원본 데이터의 테두리에 0으로 채운 dummy pixel을 넣어줌으로써 feature map의 크기와 원본의 크기가 같아지도록 하는 것
-
-1. pooling
-  - 필터를 사용해 얻어낸 convolution layer의 모든 값을 더하는게 아닌, 특정 데이터만 뽑아서 feature map을 구성하는 방법이다.
-  - 출력 데이터의 크기를 줄이거나 데이터를 강조하는 용도로 사용한다.
-  - 방법에 따라 max pooling, average pooling, min pooling 등이 있다.
-
-
-```
+```python
 from tensorflow.keras.datasets import mnist
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
-import matplotlib.pyplot as plt
-import numpy as np
-import tensorflow as tf
-
-np.random.seed(3)
-tf.random.set_seed(3)
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train = x_train.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+x_test = x_test.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
 
-# 4차원형태 데이터 구성
-# [batch, x size, y size, channel]
-x_train = x_train.reshape(x_train.shape[0], 28, 28, 1).astype('float32')/255
-x_test = x_test.reshape(x_test.shape[0], 28, 28, 1).astype('float32')/255
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+model = Sequential([
+    Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D(pool_size=(2, 2)),
+    Dropout(0.25),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(10, activation='softmax')
+])
 
-model = Sequential()
-
-# CNN 모델 구성
-
-# 커널을 32개, 크기는 3 by 3
-# 입력층, 28 by 28 크기에 1채널 사용, relu 사용
-# stride 는 설정 하지 않으면 (1,1) 이 기본
-# padding은 설정하지 않으면 없음.
-# padding이 없고 stride가 (1,1) 이기 때문에 결과값은 (26,26) 크기가 될 것
-model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-
-# 커널 62개, 3 by 3
-# relu 사용
-model.add(Conv2D(64, (3,3), activation='relu'))
-# pooling 사용
-# max pooling 방법, pool_size = 2 이므로, stride는 자동으로 (2,2) 가 된다. (pooling은 중복되게 필터를 설정하지 않음)
-# 결과값은 절반의 크기(12,12) 가 될 것
-model.add(MaxPooling2D(pool_size=2))
-# dropout layer
-model.add(Dropout(0.25))
-
-# FCNN 모델 구성, 결과값으로 classification
-
-# 입력값이 (12,12,64) 이다. 이를 직렬화(1차원 배열화) 시켜 준다.
-model.add(Flatten())
-# 128 node를 가진 hidden layer
-model.add(Dense(128, activation='relu'))
-# FC에서 over-fitting이 두드러지기 때문에 더 높은 값으로 dropout을 설정하였다.
-model.add(Dropout(0.5))
-# MNIST는 10개중 하나를 선택하므로, 출력 layer의 node는 10개로 설정, softmax 사용
-model.add(Dense(10, activation='softmax'))
-
-# 모델 구조 확인
-model.summary()
-
-
-# 모델 학습 및 평가
-model.compile(loss='categorical_crossentropy',
-              optimizer='adam',
-              metrics=['accuracy'])
-
-result = model.fit(x_train, y_train,
-                   validation_data=(x_test, y_test),  # split 대신 직접 평가용 데이터를 지정하는 방법
-                   epochs=30,
-                   batch_size=200)
-
-print('loss & accuracy:',model.evaluate(x_test, y_test))
-y_vloss = result.history['val_loss']
-y_loss = result.history['loss']
-x_len = np.arange((len(y_loss)))
-plt.plot(x_len, y_vloss, '.', c='red', label='validation loss')
-plt.plot(x_len, y_loss, '.', c='blue', label='train loss')
-plt.legend(loc='best')
-plt.show()
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=10, batch_size=128)
 ```
 
-- FC layer를 사용하여 이미지 학습을 한 것 보다 CNN을 활용하여 학습을 한 것이 over-fitting 및 오차가 더 적음을 확인할 수 있다.
-- CNN으로 이미지를 학습시키는게 더 효율적이다.
+### 시계열 데이터 모델링과 RNN·LSTM
+- **순환 신경망 (RNN, Recurrent Neural Network)**: 이전 시점의 은닉 상태(Hidden State, $h_{t-1}$)를 다음 시점의 연산에 전달하여 순차적(Sequential) 시계열 데이터를 학습합니다.
+- **LSTM (Long Short-Term Memory)**: RNN의 장기 의존성(Long-Term Dependency) 결함과 기울기 소실 문제를 극복하기 위해 설계된 신경망입니다.
+- **LSTM Gate 메커니즘**:
+  - **Forget Gate ($f_t$)**: 이전 Cell State에서 버릴 정보를 결정 ($f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$)
+  - **Input Gate ($i_t$)**: 새 입력 정보 중 Cell State에 저장할 정보를 결정 ($i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$)
+  - **Cell State 갱신**: $C_t = f_t \cdot C_{t-1} + i_t \cdot \tanh(W_c \cdot [h_{t-1}, x_t] + b_c)$
+  - **Output Gate ($o_t$)**: 최종 은닉 상태($h_t$)로 출력할 정보를 결정 ($h_t = o_t \cdot \tanh(C_t)$)
 
 ---
 
-### RNN
-- Recurrent Neural Network 로, 시계열 데이터를 처리하기 위한 모델이다.
-  - 이전 데이터가 아후 데이터에 영향을 주는 데이터를 시계열 데이터라 한다.
-- 데이터가 순서대로 입력되었을 때, 앞서 받은 데이터 처리 결과값을 잠시 기억해 놓는 방법을 사용한다.
-  - 하나의 layer의 node간 연결되는 edge가 생긴다. 한 layer안 node들을 cell이라 칭한다.
-  - cell간 연결된 edge에는 'hidden_state' 데이터가 전달된다.
+## Keras 모델 구축 및 최적화
+
+### 모델 정의 방법
+1. `Sequential API`: 단일 입력-단일 출력의 순차적 레이어 스택 구성 시 적합
+2. `Functional API`: 다중 입력/출력, 잔차 연결(Residual Connection) 등 복잡한 비순환 유향 그래프(DAG) 설계 시 활용
+3. `Subclassing API`: `tf.keras.Model`을 상속받아 `call()` 메서드를 오버라이드하여 동적 루프 및 사용자 정의 레이어 구현
+
+### Keras Sequential API 활용
+- 모델 구축부터 평가까지의 표준 워크플로우:
+  ```python
+  from tensorflow.keras.models import Sequential
+  from tensorflow.keras.layers import Dense
+
+  # 1. 모델 정의
+  model = Sequential([
+      Dense(64, activation='relu', input_shape=(32,)),
+      Dense(32, activation='relu'),
+      Dense(1, activation='sigmoid')
+  ])
+
+  # 2. 컴파일 (손실 함수, 최적화 알고리즘, 평가 지표 설정)
+  model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+  # 3. 훈련 (Epochs, Batch Size, Validation Split 지정)
+  history = model.fit(x_train, y_train, epochs=50, batch_size=32, validation_split=0.2)
+
+  # 4. 평가 및 예측
+  test_loss, test_acc = model.evaluate(x_test, y_test)
+  predictions = model.predict(x_test)
   ```
-  x1   →   [A1]  →  h1
-          Whh ↓ h1
-  x2 -Wxh→ [A2]  →  h2
-             ↓ h2
-  x3   →   [A3]  →  h3
-  ```
-
-- RNN 에서 한 layer 내부의 node간 edge에 있는 weight는 hyperbolic tangent를 이용한다.
-`h_t = f(h_t-1, x_t) = tanh(x) = tanh(W_hh * h_t-1 + W_xh * x_t)`
-
-### RNN 모델링
-- RNN 모델은 '3 tensor'를 사용한다. 3 tensor의 각 요소는 아래와 같다.
-  - batch : 데이터 set의 개수
-  - time step : 데이터 한 set에서 데이터의 개수
-  - input dimension : 입력 데이터를 one-hot encoding 했을 때 크기
-- `output, hidden_state = SimpleRnn(3, return_state=True, return_sequences=True)(input)` :
-  - 결과값으로 크기 3인 데이터를 반환
-  - input으로는 3차원 배열이 필요, batch, time step, input dimension 을 고려한 형태
-  - return_sate가 true이면 output을 반환, 아니면 hidden_state(마지막시점 state)만 반환
-  - return_sequences가 true면 output으로 3차원 값 (각 batch별 학습결과)를 전달, false면 2차원(최종 결과)를 반환
-  - hidden_state 에는
-
-### LSTM
-- RNN은 gradient에 의한 vanishing 문제가 크다. 이를 개선하기 위한 모델이 LSTM 이다.
-- Long Short Term Memory, 중요한 데이터는 길게 기억하고 중요하지 않은 데이터는 짧게 기억한다.
-  - 데이터를 다음 cell에 넘길지 말지 판단하는 절차를 거친다.  
-1) LSTM에서는 'hidden_state'에 더해 'cell_state' 값을 추가로 전달한다.  
-  - cell_state 는 과거로부터 전달되는 값들을 유지할 수 있도록 한다.  
-2) LSTM 에서는 Gate 가 추가된다.  
-  - 데이터를 얼마나 통과할지 필터링 해주는 역할이다.
-  - 총 3개(forget, input, output)의 gate가 있다.
-  - 각각 데이터를 얼마나 잊을지, 입출력으로 들어온 데이터 양 조절을 관장한다.
-
-### Gate
-1. Input Gate
-  - 최종 cell_state에 현재 cell의 cell_state 값을 얼마나 적용할지 설정
-  - `i_t = σ(W_i * [h_t-1, x_t] + b_i)` : hidden_state와 입력값에 input gate의 weight, bias를 적용한 후 sigmoid를 취함.
-1. Forget Gate
-  - sigmoid 함수로 cell_state 값을 얼마나 통과시킬지 설정
-  - forget gate도 weight와 bias가 존재한다. (W_f, b_f)
-  - `f_t = σ(W_f * [h_t-1, x_t] + b_f)` : hidden_state와 입력값에 forget gate의 weight, bias를 적용한 후 sigmoid를 취함.
-1. Output Gate
-  - 최종 cell_state 값으로 최종 hidden_state 값이 얼마나 출력될지 결정
-  - `o_t = σ(W_o * [h_t-1, x_t] + b_o)` : hidden_state와 입력값에 output gate의 weight, bias를 적용한 후 sigmoid를 취함.
-
-- `C_t = f_t * C_t-1 + i_t * C'_t` : 최종 cell_state는 (forget gate를 통과한 이전 cell_state) + (hidden_state와 입력값으로 hidden_state를 계산하고, input gate를 통과시킨 값)이다.
-  - `C'_t = tanh(W_c * [h_t-1, x_t] + b_c)` : C'_t 값은 입력값과 hidden_state로 현재 cell의 cell_state를 구하는 식이다.
-  - 이를 input gate에 통과시키면 `i_t * C'_t` 값이 된다.
-  - C_t-1 은 이전 cell에서 받은 cell_state 이다.
-  - 이를 forget gate에 통과시키면 `f_t * c_t-1` 값이 된다.
-
-- `h_t = o_t * tanh(C_t)` : 최종 cell_state 를 hyperbolic tangent 취한 값에 output gate를 적용하면 최종 hidden_state 값이 결정된다.
-
-
-- LSTM은 기본 RNN보다 복잡하지만 훨씬 더 좋은 성능을 낼 수 있다.
-
-
-
-
-
-
----
-
-## 모델
-- 딥 러닝을 위한 신경망 구조를 모델이라 한다
-
-### 모델 정의 방법과 최적화
-- x 데이터는 attribute, y 데이터는 class라 칭한다.
-
-1. 입력층, 은닉층, 출력층 구성
-  - 아래 내용들은 일반적인 경우에 해당하는 경우이므로, 실제 모델 정의시에는 직접 확인해볼 필요가 있다.
-  1) 데이터에 맞게 입력층의 node 개수를 결정한다.  
-  2) 얕은 신경망보다 심층 신경망이 효율적인 파라미터를 구성한다. (하나씩 layer를 늘려가 본다.)  
-  3) 은닉층의 노드 개수를 입력 노드 개수보다 많이 편성한다. (무조건은 아니므로 확인 필요)  
-  4) 결정할 수 있는 데이터를 조금씩 줄여 깔때기 모양으로 은닉층을 설정하는게 좋다. (갈수록 node 개수를 줄여감)  
-  5) 첫 은닉층의 노드 개수는 과대적합(over fitting)이 시작되기 전까지 뉴런 수를 점진적으로 늘리는 것이 좋다.  
-  6) 은닉층이 많아질수록 ReLU 함수를 사용하는것이 좋다.(vanishing 현상 방지)  
-  7) 출력층의 활성화 함수를 결정하고, 출력층의 활성화 함수에 따라 오차함수도 결정한다.   
-  - 둘중 하나를 선택한다면 sigmoid 함수와 binary_crossentropy 를 사용한다.  
-
-1. 다중분류 모델링
-  1) 데이터의 속성에 맞게 입력 node의 수 구성  
-  2) 문자열로 된 class 값을 indexing 하고, one-hot-encoding으로 값을 변형해준다.  
-  3) class의 개수에 맞게 출력층 node 개수를 설정한다.  
-  4) 활성화 함수 및 오차방정식으로 softMax와 categorical cross-entropy를 적용한다.  
-
-### 생성 방법
-1. tensorflow.keras.Sequential : Sequential 함수를 이용하는 방법
-2. functional approach : 직접 함수를 구성하는 방법
-3. tensorflow.keras.Model : Model 클래스를 상속하고 재정의하여 사용하는 방법
-
-### Keras.Sequential
-- keras를 이용해서 sequential 모델을 생성하는 방법
-- `model = Sequential()` : sequential 한 layer 형태를 가진 모델을 생성
-- `model.add(Dense(units =2, activation='sigmoid', input_dim = 2))` : layer 추가
-  - node 수가 2개
-  - activation function이 sigmoid
-  - 입력값이 2차원 형태
-  - input_dim 인자는 첫번 째 layer에만 사용해 주면 된다.
-- `model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])` : model 객체를 어떤 형태로 학습시킬지 정의
-  - binary_crossentropy 를 loss function으로 설정
-  - optimizer로 sgd 설정
-  - 실행될 때 마다 loss 값과 accuracy 값을 출력으로 보여줌
-- `result = model.fit(x_train, y_train, epochs=50000, batch_size = 10, validation_split=0.3)` : model에 training 실행
-  - x_train, y_train : 학습용 x, y 데이터  
-  - epochs : 학습 데이터를 통해 반복 학습시킬 횟수  
-  - batch_size : 입력 데이터를 몇 묶음 단위로 전달할지 설정, 하나씩 학습하는 것 보다 학습률 출렁임이 더 안정적이다.  
-  - validation_split : 데이터중 0.3%는 검증용으로 사용, 'validation_data' 로 직접 데이터를 전달할 수도 있음
-  - result : result.history 에서 'loss', 'val_loss', 'accuracy', 'val_accuracy' 키워드로 loss, accuracy 값 확인 가능
-- `model.layers[0].get_weights()[0]` :
-  - model.layers 는 입력 layer을 0번째 index로 하여 특정 layer를 반환  
-  - get_weights() 는 해당 layer의 [weight, bias] 를 담고 있는 배열을 반환
-- `model.predict(x_predict)` : 학습된 모델에 x_predict 값을 넣을 시 특정 y 값을 추정하여 반환하는 함수
-- `model.evaluate(x_data, y_data)` : 학습된 모델에 입력값(x_data)과 정답(y_data) 를 전달받아 [loss, accuracy] 를 반환하는 함수
